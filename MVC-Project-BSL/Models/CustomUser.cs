@@ -4,7 +4,7 @@ namespace MVC_Project_BSL.Models
 {
     public class CustomUser : IdentityUser
     {
-        public int Id { get; set; }
+        public string Id { get; set; } // Dit moet een string zijn als je Identity gebruikt
         public string Naam { get; set; }
         public string Voornaam { get; set; }
         public string Straat { get; set; }

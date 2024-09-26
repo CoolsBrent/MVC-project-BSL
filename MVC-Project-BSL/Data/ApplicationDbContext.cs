@@ -42,6 +42,24 @@ namespace MVC_Project_BSL.Data
                 .HasOne(f => f.Bestemming)
                 .WithMany(b => b.Fotos)
                 .HasForeignKey(f => f.BestemmingId);
+
+            // Relaties tussen Kind en CustomUser
+            modelBuilder.Entity<Kind>()
+                .HasOne(k => k.Persoon)
+                .WithMany(u => u.Kinderen)
+                .HasForeignKey(k => k.PersoonId);
+
+            // Relaties tussen Monitor en CustomUser
+            modelBuilder.Entity<Models.Monitor>()
+                .HasOne(m => m.Persoon)
+                .WithMany(u => u.Monitoren)
+                .HasForeignKey(m => m.PersoonId);
+
+            // Relaties tussen OpleidingPersoon en CustomUser
+            modelBuilder.Entity<OpleidingPersoon>()
+                .HasOne(o => o.Persoon)
+                .WithMany(u => u.Opleidingen)
+                .HasForeignKey(o => o.PersoonId);
         }
     }
 }

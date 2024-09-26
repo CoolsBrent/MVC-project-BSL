@@ -2,12 +2,12 @@
 {
     public class OpleidingPersoon
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public int OpleidingId { get; set; }
         public Opleiding Opleiding { get; set; }
 
-        public int PersoonId { get; set; }
+        public string PersoonId { get; set; }
         public CustomUser Persoon { get; set; }
     }
 

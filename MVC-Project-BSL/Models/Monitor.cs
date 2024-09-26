@@ -2,10 +2,10 @@
 {
     public class Monitor
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public bool IsHoofdMonitor { get; set; }
 
-        public int PersoonId { get; set; }
+        public string PersoonId { get; set; }
         public CustomUser Persoon { get; set; }
 
         public ICollection<Groepsreis> Groepsreizen { get; set; }

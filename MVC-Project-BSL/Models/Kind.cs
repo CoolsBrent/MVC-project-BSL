@@ -9,7 +9,7 @@
         public string Allergieen { get; set; }
         public string Medicatie { get; set; }
 
-        public int PersoonId { get; set; }
+        public string PersoonId { get; set; }
         public CustomUser Persoon { get; set; }
 
         public ICollection<Groepsreis> Groepsreizen { get; set; }
