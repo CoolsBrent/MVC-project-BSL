@@ -1,0 +1,53 @@
+﻿@model RegisterViewModel
+
+<h2>Register</h2>
+
+<form asp-action="Register" method="post">
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Naam"></label>
+        <input asp-for="Naam" class="form-control" />
+        <span asp-validation-for="Naam" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Voornaam"></label>
+        <input asp-for="Voornaam" class="form-control" />
+        <span asp-validation-for="Voornaam" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+    <!-- Voeg andere velden zoals geboortedatum, adres, enz. toe -->
+    <div class="form-group">
+        <label asp-for="Geboortedatum"></label>
+        <input asp-for="Geboortedatum" class="form-control" />
+        <span asp-validation-for="Geboortedatum" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="TelefoonNummer"></label>
+            <input asp-for="TelefoonNummer" class="form-control" />
+            <span asp-validation-for="TelefoonNummer" class="text-danger"></span>
+         </div>
+            <div class="form-group">
+                <label asp-for="RekeningNummer"></label>
+                <input asp-for="RekeningNummer" class="form-control" />
+                <span asp-validation-for="RekeningNummer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HuisDokter"></label>
+                <input asp-for="HuisDokter" class="form-control" />
+                <span asp-validation-for="HuisDokter" class="text-danger"></span>
+             </div>
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>

@@ -1,6 +1,8 @@
-﻿namespace MVC_Project_BSL.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace MVC_Project_BSL.Models
 {
-    public class CustomUser
+    public class CustomUser : IdentityUser
     {
         public int Id { get; set; }
         public string Naam { get; set; }
