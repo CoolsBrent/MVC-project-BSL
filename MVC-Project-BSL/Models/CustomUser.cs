@@ -1,8 +1,9 @@
-﻿namespace MVC_Project_BSL.Models
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace MVC_Project_BSL.Models
 {
-    public class CustomUser
+    public class CustomUser : IdentityUser
     {
-        public int Id { get; set; }
         public string Naam { get; set; }
         public string Voornaam { get; set; }
         public string Straat { get; set; }
@@ -12,7 +13,6 @@
         public DateTime Geboortedatum { get; set; }
         public string Huisdokter { get; set; }
         public string ContractNummer { get; set; }
-        public string Email { get; set; }
         public string TelefoonNummer { get; set; }
         public string RekeningNummer { get; set; }
         public bool IsActief { get; set; }
