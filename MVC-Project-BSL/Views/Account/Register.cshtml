@@ -19,6 +19,26 @@
         <span asp-validation-for="Voornaam" class="text-danger"></span>
     </div>
     <div class="form-group">
+        <label asp-for="Straat"></label>
+        <input asp-for="Straat" class="form-control" />
+        <span asp-validation-for="Straat" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Huisnummer"></label>
+        <input asp-for="Huisnummer" class="form-control" />
+        <span asp-validation-for="Huisnummer" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Gemeente"></label>
+        <input asp-for="Gemeente" class="form-control" />
+        <span asp-validation-for="Gemeente" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Postcode"></label>
+        <input asp-for="Postcode" class="form-control" />
+        <span asp-validation-for="Postcode" class="text-danger"></span>
+    </div>
+    <div class="form-group">
         <label asp-for="Password">Wachtwoord</label>
         <input asp-for="Password" type="password" class="form-control" />
         <span asp-validation-for="Password" class="text-danger"></span>
@@ -28,26 +48,25 @@
         <input asp-for="ConfirmPassword" type="password" class="form-control" />
         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
     </div>
-    <!-- Voeg andere velden zoals geboortedatum, adres, enz. toe -->
     <div class="form-group">
         <label asp-for="Geboortedatum"></label>
         <input asp-for="Geboortedatum" class="form-control" />
         <span asp-validation-for="Geboortedatum" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            <label asp-for="TelefoonNummer">Telefoonnummer</label>
-            <input asp-for="TelefoonNummer" class="form-control" />
-            <span asp-validation-for="TelefoonNummer" class="text-danger"></span>
-         </div>
-            <div class="form-group">
-                <label asp-for="RekeningNummer">Rekeningnummer</label>
-                <input asp-for="RekeningNummer" class="form-control" />
-                <span asp-validation-for="RekeningNummer" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Huisdokter"></label>
-                <input asp-for="Huisdokter" class="form-control" />
-                <span asp-validation-for="Huisdokter" class="text-danger"></span>
-             </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="TelefoonNummer">Telefoonnummer</label>
+        <input asp-for="TelefoonNummer" class="form-control" />
+        <span asp-validation-for="TelefoonNummer" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RekeningNummer">Rekeningnummer</label>
+        <input asp-for="RekeningNummer" class="form-control" />
+        <span asp-validation-for="RekeningNummer" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Huisdokter"></label>
+        <input asp-for="Huisdokter" class="form-control" />
+        <span asp-validation-for="Huisdokter" class="text-danger"></span>
+    </div>
     <button type="submit" class="btn btn-primary">Registreren</button>
 </form>

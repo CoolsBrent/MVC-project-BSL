@@ -18,7 +18,6 @@ namespace MVC_Project_BSL.Data
         public DbSet<Onkosten> Onkosten { get; set; }
         public DbSet<Kind> Kinderen { get; set; }
         public DbSet<Models.Monitor> Monitoren { get; set; }
-        public DbSet<CustomUser> Gebruikers { get; set; }
         public DbSet<Opleiding> Opleidingen { get; set; }
         public DbSet<OpleidingPersoon> OpleidingPersonen { get; set; }
 

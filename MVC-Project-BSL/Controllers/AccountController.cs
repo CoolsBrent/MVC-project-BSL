@@ -45,6 +45,10 @@ namespace MVC_Project_BSL.Controllers
                     IsActief = true
                 };
 
+                // Log het user-object voor debugging
+                Console.WriteLine($"User: {user.Naam}, {user.Voornaam}, {user.Email}"); // Voeg dit toe voor debugging
+
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
