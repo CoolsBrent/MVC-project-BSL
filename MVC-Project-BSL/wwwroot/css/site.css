@@ -20,3 +20,6 @@ html {
 body {
   margin-bottom: 60px;
 }
+.bg-navbar {
+    background-color: #3C3C3C !important; /* Achtergrondkleur instellen met hogere prioriteit */
+}
