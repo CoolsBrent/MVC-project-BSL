@@ -12,7 +12,7 @@ namespace MVC_Project_BSL.Models
         public string Postcode { get; set; }
         public DateTime Geboortedatum { get; set; }
         public string Huisdokter { get; set; }
-        public string ContractNummer { get; set; }
+        public string? ContractNummer { get; set; }
         public string TelefoonNummer { get; set; }
         public string RekeningNummer { get; set; }
         public bool IsActief { get; set; }
