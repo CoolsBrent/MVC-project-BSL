@@ -12,9 +12,11 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         {
             _context = context;
             GroepsreisRepository = new GenericRepository<Groepsreis>(_context);
+            BestemmingRepository = new GenericRepository<Bestemming>(_context);
         }
 
         public IGenericRepository<Groepsreis> GroepsreisRepository { get; }
+        public IGenericRepository<Bestemming> BestemmingRepository { get; private set; }
 
         public void SaveChanges()
         {

@@ -1,0 +1,56 @@
+﻿@model MVC_Project_BSL.Models.Groepsreis
+
+@{
+    ViewBag.Title = "Aanmaken van een groepsreis";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <strong>Er zijn fouten opgetreden:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<h2>Create Groepsreis</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Begindatum" class="control-label"></label>
+        <input asp-for="Begindatum" class="form-control" />
+        <span asp-validation-for="Begindatum" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Einddatum" class="control-label"></label>
+        <input asp-for="Einddatum" class="form-control" />
+        <span asp-validation-for="Einddatum" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Prijs" class="control-label"></label>
+        <input asp-for="Prijs" class="form-control" />
+        <span asp-validation-for="Prijs" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BestemmingId" class="control-label">Bestemming</label>
+        <select asp-for="BestemmingId" asp-items="ViewBag.Bestemmingen" class="form-control"></select>
+        <span asp-validation-for="BestemmingId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
