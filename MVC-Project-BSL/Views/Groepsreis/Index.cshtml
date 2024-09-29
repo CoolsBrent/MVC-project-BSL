@@ -30,6 +30,7 @@ else
                     <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
                     <td>@groepsreis.Prijs.ToString("C")</td>
                     <td>
+                        <a asp-action="Detail" asp-route-id="@groepsreis.Id">Bekijken</a> |
                         <a asp-action="Edit" asp-route-id="@groepsreis.Id">Bewerken</a> |
                         <a asp-action="Delete" asp-route-id="@groepsreis.Id">Verwijderen</a>
                     </td>

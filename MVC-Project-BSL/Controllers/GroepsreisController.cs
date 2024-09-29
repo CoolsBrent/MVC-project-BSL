@@ -138,13 +138,14 @@ namespace MVC_Project_BSL.Controllers
 
         public GroepsreisController(IUnitOfWork unitOfWork)
         {
+           
             _unitOfWork = unitOfWork;
         }
 
         // GET: Groepsreis
         public async Task<IActionResult> Index()
         {
-            var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync();
+            var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query => query.Include(g => g.Bestemming));
             return View(groepsreizen);
         }
 
@@ -178,6 +179,7 @@ namespace MVC_Project_BSL.Controllers
                 groepsreis.Monitoren = groepsreis.Monitoren ?? new List<Models.Monitor>();
                 groepsreis.Onkosten = groepsreis.Onkosten ?? new List<Onkosten>();
                 groepsreis.Activiteiten = groepsreis.Activiteiten ?? new List<Activiteit>();
+                
 
                 // Sla de nieuwe groepsreis op als het formulier geldig is
                 await _unitOfWork.GroepsreisRepository.AddAsync(groepsreis);
@@ -270,5 +272,26 @@ namespace MVC_Project_BSL.Controllers
             var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
             return groepsreis != null;
         }
+        // GET: Groepsreis/Detail/5
+        public async Task<IActionResult> Detail(int id)
+        {
+            // Haal alle groepsreizen op met de bijbehorende monitoren en hun personen
+            var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+                query => query.Include(g => g.Monitoren)
+                               .ThenInclude(m => m.Persoon) // Persoon van Monitoren ophalen
+                               .Include(g => g.Bestemming)
+                               .Include(g => g.Kinderen)); // Bestemming van de Groepsreis ophalen
+
+            // Zoek de specifieke groepsreis met het gegeven id
+            var groepsreis = groepsreizen.FirstOrDefault(g => g.Id == id);
+
+            if (groepsreis == null)
+            {
+                return NotFound();
+            }
+
+            return View(groepsreis);
+        }
+
     }
 }

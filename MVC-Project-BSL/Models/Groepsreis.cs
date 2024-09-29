@@ -18,7 +18,7 @@ namespace MVC_Project_BSL.Models
 
         [Required(ErrorMessage = "Bestemming is verplicht.")]
         public int BestemmingId { get; set; }
-        public Bestemming Bestemming { get; set; }
+        public Bestemming? Bestemming { get; set; }
 
 
         // Zorg ervoor dat deze collecties worden geïnitialiseerd om lege lijsten te vermijden
