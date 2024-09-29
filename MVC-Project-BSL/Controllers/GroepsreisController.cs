@@ -204,7 +204,7 @@ namespace MVC_Project_BSL.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.GroepsreisRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
             return View(groepsreis);
         }
 
@@ -238,7 +238,7 @@ namespace MVC_Project_BSL.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.GroepsreisRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
             return View(groepsreis);
         }
 
