@@ -1,4 +1,5 @@
-﻿@model IEnumerable<MVC_Project_BSL.Models.Groepsreis>
+﻿@using System.Globalization
+@model IEnumerable<MVC_Project_BSL.Models.Groepsreis>
 
 <h1>Groepsreizen</h1>
 
@@ -28,7 +29,7 @@ else
                     <td>@groepsreis.Begindatum.ToShortDateString()</td>
                     <td>@groepsreis.Einddatum.ToShortDateString()</td>
                     <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
-                    <td>@groepsreis.Prijs.ToString("C")</td>
+                    <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
                     <td>
                         <a asp-action="Detail" asp-route-id="@groepsreis.Id">Bekijken</a> |
                         <a asp-action="Edit" asp-route-id="@groepsreis.Id">Bewerken</a> |
