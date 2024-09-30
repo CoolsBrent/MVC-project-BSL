@@ -31,8 +31,15 @@ else
                     <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
                     <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
                     <td>
-                        <a asp-action="Detail" asp-route-id="@groepsreis.Id">Bekijken</a> |
-                        <a asp-action="Edit" asp-route-id="@groepsreis.Id">Bewerken</a> |
+                        <!-- Bekijken knop -->
+                        <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-info">
+                            Bekijken
+                        </a>
+
+                        <!-- Bewerken knop -->
+                        <a asp-action="Edit" asp-route-id="@groepsreis.Id" class="btn btn-warning">
+                            Bewerken
+                        </a>
 
                         <!-- Verwijderknop die de modal activeert -->
                         <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@groepsreis.Id">
