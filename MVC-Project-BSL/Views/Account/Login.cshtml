@@ -1,21 +1,27 @@
 ﻿@model MVC_Project_BSL.ViewModels.LoginViewModel
 
-<h2>Inloggen</h2>
+<h2 class="mx-auto" style="max-width: 70%; text-align: left;">Inloggen</h2>
 
-<form asp-action="Login" method="post">
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Password">Wachtwoord</label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="form-group mb-2">
-        <input asp-for="RememberMe" />
-        <label asp-for="RememberMe">Herinner mij?</label>
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+<div class="d-flex justify-content-center">
+    <form asp-action="Login" method="post" class="col-md-6">
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="Password">Wachtwoord</label>
+            <input asp-for="Password" type="password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-2">
+            <div class="form-check">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label">Herinner mij?</label>
+            </div>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+</div>
