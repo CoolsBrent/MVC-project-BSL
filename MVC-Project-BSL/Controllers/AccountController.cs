@@ -54,7 +54,7 @@ namespace MVC_Project_BSL.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Dashboard");
                 }
 
                 foreach (var error in result.Errors)
@@ -89,7 +89,7 @@ namespace MVC_Project_BSL.Controllers
                     Debug.WriteLine(result);
                     if (result.Succeeded)
                     {
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Dashboard");
                     }
 
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");

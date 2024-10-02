@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+@using MVC_Project_BSL.ViewModels
+@model DashboardViewModel
+
+<h2>Welkom op je dashboard, @User.Identity.Name!</h2>
+<!-- Knoppen voor beheer -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "GebruikersBeheer")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
+    </div>
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "Groepsreizen")" class="btn btn-success btn-block">Groepsreizen Beheren</a>
+    </div>
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "Activiteiten")" class="btn btn-info btn-block">Activiteiten Beheren</a>
+    </div>
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "Opleidingen")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
+    </div>
+</div>
+
+            <!-- Overzicht van aankomende groepsreizen -->
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Aankomende Groepsreizen</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group">
+                                @* Voorbeelddata: je kunt deze vervangen door echte gegevens *@
+                                <li class="list-group-item">Groepsreis naar Parijs - Datum: 15-10-2024 - Aantal deelnemers: 10 - Aantal Monitoren: 2 - Hoofd Monitor: Sybe</li>
+                                <li class="list-group-item">Groepsreis naar Berlijn - Datum: 22-10-2024 - Aantal deelnemers: 20 - Aantal Monitoren: 4 - Hoofd Monitor: Laurens</li>
+                                <li class="list-group-item">Groepsreis naar Rome - Datum: 05-11-2024 - Aantal deelnemers: 10 - Aantal Monitoren: 2 - Hoofd Monitor: Brent</li>
+                                <li class="list-group-item">Groepsreis naar Amsterdam - Datum: 12-11-2024 - Aantal deelnemers: 15 - Aantal Monitoren: 3 - Hoofd Monitor: Brent</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @*foreach (var groepsreis in Model.Groepsreizen)
+        {
+
+                <div class="col-md-4">
+                    <div class="card mb-3">
+                        <img src="@groepsreis.Bestemming.Fotos" class="card-img-top" alt="@groepsreis.Bestemming.BestemmingsNaam" style="height: 200px; object-fit: cover;" />
+                        <div class="card-body">
+                            <h5 class="card-title">@groepsreis.Bestemming.BestemmingsNaam</h5>
+                            <p class="card-text">Begindatum: @groepsreis.Begindatum.ToString("dd-MM-yyyy")</p>
+                            <p class="card-text">Einddatum: @groepsreis.Einddatum.ToString("dd-MM-yyyy")</p>
+                            <p class="card-text">Aantal Deelnemers: @groepsreis.Kinderen.Count</p>
+                            <p class="card-text">Aantal Monitoren: @groepsreis.Monitoren.Count</p>
+                            <p class="card-text">Hoofdmonitor @groepsreis.Monitoren.FirstOrDefault(m => m.IsHoofdMonitor)?.Persoon.Voornaam ?? "Geen hoofdmonitor" </p>
+                            
+                        </div>
+                    </div>
+                </div>
+            
+        }*@
+    
+

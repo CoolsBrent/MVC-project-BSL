@@ -2,26 +2,28 @@
 @inject SignInManager<CustomUser> SignInManager
 @inject UserManager<CustomUser> UserManager
 
-<ul class="navbar-nav">
+<ul class="navbar-nav bg-navbar">
     @if (SignInManager.IsSignedIn(User))
     {
-        
+
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+            <a class="nav-link text-light" asp-controller="Dashboard" asp-action="Index" title="Manage">
+                Hello @User.Identity?.Name! <i class="bi bi-person"></i>
+            </a>
         </li>
         <li class="nav-item">
             <form class="form-inline" asp-controller="Account" asp-action="Logout" asp-route-returnUrl="@Url.Action("Index", "Home")">
-                <button type="submit" class="nav-link btn btn-link text-dark">Afmelden</button>
+                <button type="submit" class="nav-link btn btn-link text-light">Afmelden</button>
             </form>
         </li>
     }
     else
     {
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Register">Registreren</a>
+            <a class="nav-link text-light" asp-controller="Account" asp-action="Register">Registreren</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Login">Inloggen</a>
+            <a class="nav-link text-light" asp-controller="Account" asp-action="Login">Inloggen</a>
         </li>
     }
 </ul>
