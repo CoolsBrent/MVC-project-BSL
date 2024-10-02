@@ -46,9 +46,6 @@ namespace MVC_Project_BSL.Controllers
                     IsActief = true
                 };
 
-                // Log het user-object voor debugging
-                Console.WriteLine($"User: {user.Naam}, {user.Voornaam}, {user.Email}"); // Voeg dit toe voor debugging
-
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -86,21 +83,33 @@ namespace MVC_Project_BSL.Controllers
                     // Gebruik de juiste overload van PasswordSignInAsync die een user-object accepteert
                     var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
 
-                    Debug.WriteLine(result);
+                    // Log het resultaat voor debugging
+                    Debug.WriteLine($"SignIn result: {result.Succeeded}, User: {user.Email}");
+
                     if (result.Succeeded)
                     {
                         return RedirectToAction("Index", "Dashboard");
                     }
-
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    else if (result.IsLockedOut)
+                    {
+                        ModelState.AddModelError(string.Empty, "Account is vergrendeld. Probeer het later opnieuw.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Ongeldig wachtwoord. Controleer uw wachtwoord en probeer het opnieuw.");
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "User not found.");
+                    // Optioneel: Geef een generieke foutmelding om te voorkomen dat je aangeeft dat de gebruiker niet bestaat
+                    ModelState.AddModelError(string.Empty, "Ongeldige inlogpoging.");
                 }
             }
+
+            // Als we hier komen, is er een probleem met de invoer
             return View(model);
         }
+
 
         // Afhandeling van de logout
         [HttpPost]
