@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data;
+using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models; // Vergeet niet je CustomUser namespace toe te voegen
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
@@ -15,7 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Gebruik CustomUser in plaats van IdentityUser
-builder.Services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // Voeg controllers met views toe

@@ -21,6 +21,12 @@ namespace MVC_Project_BSL.Data
         public DbSet<Opleiding> Opleidingen { get; set; }
         public DbSet<OpleidingPersoon> OpleidingPersonen { get; set; }
 
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.LogTo(Console.WriteLine); // Log alle database-acties naar de console
+        }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
+using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -30,7 +31,7 @@ namespace MVC_Project_BSL.Controllers
             {
                 var user = new CustomUser
                 {
-                    UserName = model.Email,
+                    UserName = model.Voornaam,
                     Email = model.Email,
                     Naam = model.Naam,
                     Voornaam = model.Voornaam,
@@ -77,13 +78,26 @@ namespace MVC_Project_BSL.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                // Probeer de gebruiker op te halen op basis van het e-mailadres
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user != null) // Zorg ervoor dat de gebruiker bestaat
                 {
-                    return RedirectToAction("Index", "Dashboard");
+                    // Gebruik de juiste overload van PasswordSignInAsync die een user-object accepteert
+                    var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+                    Debug.WriteLine(result);
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("Index", "Dashboard");
+                    }
+
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 }
-                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                return View(model);
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "User not found.");
+                }
             }
             return View(model);
         }
