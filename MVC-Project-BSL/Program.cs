@@ -4,111 +4,112 @@ using MVC_Project_BSL.Data;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-// Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-
-// Voeg ApplicationDbContext en SQL Server toe
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
-
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
-// Voeg Razor Pages toe
-builder.Services.AddRazorPages();
-
-// Gebruik CustomUser in plaats van IdentityUser
-builder.Services.AddIdentity<CustomUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-// Voeg controllers met views toe
-builder.Services.AddControllersWithViews();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+public partial class Program
 {
-    app.UseMigrationsEndPoint();
-}
-else
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-// Zorg dat authenticatie en autorisatie wordt gebruikt
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-app.MapRazorPages();
-
-//Aanmaken van rollen bij opstart
-await SeedRoles(app.Services);
-
-app.Run();
-
-// Methode om rollen aan te maken
-static async Task SeedRoles(IServiceProvider serviceProvider)
-{
-    // Maak een scope aan om de scoped services te kunnen gebruiken
-    using (var scope = serviceProvider.CreateScope())
+    public static async Task Main(string[] args)
     {
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<CustomUser>>();
+        var builder = WebApplication.CreateBuilder(args);
 
-        string[] roleNames = ["Deelnemer", "Monitor", "Hoofdmonitor", "Verantwoordelijke", "Beheerder"];
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        foreach (var roleName in roleNames)
+        // Add services to the container.
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
+        // Voeg ApplicationDbContext en SQL Server toe
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(connectionString));
+
+        builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+        // Voeg Razor Pages toe
+        builder.Services.AddRazorPages();
+
+        // Gebruik CustomUser in plaats van IdentityUser
+        builder.Services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = false)
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+        // Voeg controllers met views toe
+        builder.Services.AddControllersWithViews();
+
+        var app = builder.Build();
+
+        // Configure the HTTP request pipeline.
+        if (app.Environment.IsDevelopment())
         {
-            var roleExist = await roleManager.RoleExistsAsync(roleName);
-            if (!roleExist)
+            app.UseMigrationsEndPoint();
+        }
+        else
+        {
+            app.UseExceptionHandler("/Home/Error");
+            app.UseHsts();
+        }
+
+        app.UseHttpsRedirection();
+        app.UseStaticFiles();
+
+        app.UseRouting();
+
+        // Zorg dat authenticatie en autorisatie wordt gebruikt
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+        app.MapRazorPages();
+
+        //Aanmaken van rollen bij opstart
+        using (var scope = app.Services.CreateScope())
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            var roles = new[] { "Deelnemer", "Monitor", "Hoofdmonitor", "Verantwoordelijke", "Beheerder" };
+
+            foreach (var role in roles)
             {
-                await roleManager.CreateAsync(new ApplicationRole(roleName));
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
             }
         }
 
-        // Optioneel: Als je een standaard gebruiker wilt aanmaken en deze de rol 'Beheerder' wilt geven
-        var adminEmail = "admin@mvc";
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-        if (adminUser == null)
+        //Aanmaken van Admin bij opstart
+        using (var scope = app.Services.CreateScope())
         {
-            var newAdmin = new CustomUser
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                Gemeente = "Geel",
-                Naam = "Admin",
-                Voornaam = "Administrator",
-                Straat = "AdminStraat",
-                Huisnummer = "1",
-                Postcode = "2440",
-                Geboortedatum = new DateTime(1990, 1, 1),
-                Huisdokter = "Dr. Admin",
-                TelefoonNummer = "014/123456",
-                RekeningNummer = "BE123456789",
-                IsActief = true,
-            };
-            var adminResult = await userManager.CreateAsync(newAdmin, "AdminPassword123!");
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<CustomUser>>();
 
-            if (adminResult.Succeeded)
+            string email = "admin@mvc";
+            string password = "AdminPassword123!";
+
+            if (await userManager.FindByEmailAsync("admin@mvc") == null)
             {
-                await userManager.AddToRoleAsync(newAdmin, "Beheerder");
+                var admin = new CustomUser
+                {
+                    UserName = email,
+                    Email = email,
+                    Gemeente = "Geel",
+                    Naam = "Admin",
+                    Voornaam = "Administrator",
+                    Straat = "AdminStraat",
+                    Huisnummer = "1",
+                    Postcode = "2440",
+                    Geboortedatum = new DateTime(1990, 1, 1),
+                    Huisdokter = "Dr. Admin",
+                    TelefoonNummer = "014/123456",
+                    RekeningNummer = "BE123456789",
+                    IsActief = true
+                };
+
+                await userManager.CreateAsync(admin, password);
+                await userManager.AddToRoleAsync(admin, "Beheerder");
             }
         }
+
+        app.Run();
+
     }
 }

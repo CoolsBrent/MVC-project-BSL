@@ -8,10 +8,10 @@ namespace MVC_Project_BSL.Controllers
     // [Authorize(Roles = "Beheerder")]
     public class RoleManagementController : Controller
     {
-        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<CustomUser> _userManager;
 
-        public RoleManagementController(RoleManager<ApplicationRole> roleManager, UserManager<CustomUser> userManager)
+        public RoleManagementController(RoleManager<IdentityRole> roleManager, UserManager<CustomUser> userManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
