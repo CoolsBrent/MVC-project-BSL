@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<CustomUser>
+    public class ApplicationDbContext : IdentityDbContext<CustomUser, IdentityRole, string>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

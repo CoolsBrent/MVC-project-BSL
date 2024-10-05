@@ -50,6 +50,9 @@ namespace MVC_Project_BSL.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    // Voeg gebruiker toe aan de rol 'Deelnemer'
+                    await _userManager.AddToRoleAsync(user, "Deelnemer");
+
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Dashboard");
                 }
