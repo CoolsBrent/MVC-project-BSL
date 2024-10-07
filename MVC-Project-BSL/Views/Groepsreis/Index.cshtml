@@ -18,6 +18,8 @@ else
                     <th>Begindatum</th>
                     <th>Einddatum</th>
                     <th>Bestemming</th>
+                <th>Beschrijving</th>
+                    <th>Leeftijdscategorie</th>
                     <th>Prijs</th>
                     <th>Acties</th>
                 </tr>
@@ -29,6 +31,8 @@ else
                             <td>@groepsreis.Begindatum.ToShortDateString()</td>
                             <td>@groepsreis.Einddatum.ToShortDateString()</td>
                             <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
+                            <td>@groepsreis.Bestemming?.Beschrijving</td>
+                            <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
                             <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
                             <td>
                                 <!-- Bekijken knop -->

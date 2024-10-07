@@ -8,7 +8,7 @@
         public string PersoonId { get; set; }
         public CustomUser Persoon { get; set; }
 
-        public ICollection<Groepsreis> Groepsreizen { get; set; }
+        public ICollection<Groepsreis> Groepsreizen { get; set; } = new List<Groepsreis>();
     }
 
 }

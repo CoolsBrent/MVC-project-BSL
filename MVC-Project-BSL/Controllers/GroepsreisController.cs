@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using MVC_Project_BSL.Data;
 using Microsoft.AspNetCore.Authorization;
 using MVC_Project_BSL.Data.UnitOfWork;
+using MVC_Project_BSL.ViewModels;
+using MVC_Project_BSL.ViewModels.MVC_Project_BSL.ViewModels;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -138,7 +140,7 @@ namespace MVC_Project_BSL.Controllers
 
         public GroepsreisController(IUnitOfWork unitOfWork)
         {
-           
+
             _unitOfWork = unitOfWork;
         }
 
@@ -154,6 +156,8 @@ namespace MVC_Project_BSL.Controllers
         {
             // Zorg ervoor dat je de bestemmingen ophaalt vanuit de Bestemming repository of DbSet
             ViewBag.Bestemmingen = new SelectList(_unitOfWork.BestemmingRepository.GetAllAsync().Result, "Id", "BestemmingsNaam");
+            ViewBag.Activiteiten = new SelectList(_unitOfWork.ActiviteitRepository.GetAllAsync().Result, "Id", "Naam");
+
             return View();
         }
 
@@ -179,7 +183,7 @@ namespace MVC_Project_BSL.Controllers
                 groepsreis.Monitoren = groepsreis.Monitoren ?? new List<Models.Monitor>();
                 groepsreis.Onkosten = groepsreis.Onkosten ?? new List<Onkosten>();
                 groepsreis.Activiteiten = groepsreis.Activiteiten ?? new List<Activiteit>();
-                
+
 
                 // Sla de nieuwe groepsreis op als het formulier geldig is
                 await _unitOfWork.GroepsreisRepository.AddAsync(groepsreis);
@@ -191,6 +195,7 @@ namespace MVC_Project_BSL.Controllers
 
             // Als het formulier niet geldig is, moet je de bestemmingen opnieuw in de ViewBag laden
             ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+            ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam");
 
             // Geef het formulier opnieuw weer met de ingevulde gegevens
             return View(groepsreis);
@@ -205,6 +210,8 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound();
             }
             ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+
+            ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Activiteiten);
             return View(groepsreis);
         }
 
@@ -239,6 +246,8 @@ namespace MVC_Project_BSL.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+
+            ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Activiteiten);
             return View(groepsreis);
         }
 
@@ -275,23 +284,38 @@ namespace MVC_Project_BSL.Controllers
         // GET: Groepsreis/Detail/5
         public async Task<IActionResult> Detail(int id)
         {
+
+            var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+                query => query.Include(m => m.Persoon));
+
+
             // Haal alle groepsreizen op met de bijbehorende monitoren en hun personen
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
                 query => query.Include(g => g.Monitoren)
                                .ThenInclude(m => m.Persoon) // Persoon van Monitoren ophalen
                                .Include(g => g.Bestemming)
-                               .Include(g => g.Kinderen)); // Bestemming van de Groepsreis ophalen
+                               .Include(g => g.Kinderen));
 
             // Zoek de specifieke groepsreis met het gegeven id
             var groepsreis = groepsreizen.FirstOrDefault(g => g.Id == id);
+
+            var ingeschrevenMonitoren = groepsreis?.Monitoren.Select(m => m.PersoonId).ToList();
+            var uniekeMonitoren = monitoren
+                    .Where(m => !ingeschrevenMonitoren.Contains(m.PersoonId))
+                    .GroupBy(m => m.PersoonId)
+                    .Select(g => g.First())
+                    .ToList();
+            groepsreis.BeschikbareMonitoren = uniekeMonitoren.ToList();
 
             if (groepsreis == null)
             {
                 return NotFound();
             }
 
+
             return View(groepsreis);
         }
+        
 
     }
 }

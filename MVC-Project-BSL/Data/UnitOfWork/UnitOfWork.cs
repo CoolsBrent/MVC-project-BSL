@@ -13,10 +13,16 @@ namespace MVC_Project_BSL.Data.UnitOfWork
             _context = context;
             GroepsreisRepository = new GenericRepository<Groepsreis>(_context);
             BestemmingRepository = new GenericRepository<Bestemming>(_context);
+            ActiviteitRepository = new GenericRepository<Activiteit>(_context);
+            MonitorRepository = new GenericRepository<Models.Monitor>(_context);
+            KindRepository = new GenericRepository<Kind>(_context);
         }
 
         public IGenericRepository<Groepsreis> GroepsreisRepository { get; }
         public IGenericRepository<Bestemming> BestemmingRepository { get; private set; }
+        public IGenericRepository<Activiteit> ActiviteitRepository { get; private set; }
+        public IGenericRepository<Models.Monitor> MonitorRepository { get; private set; }
+        public IGenericRepository<Kind> KindRepository { get; private set; }
 
         public void SaveChanges()
         {
