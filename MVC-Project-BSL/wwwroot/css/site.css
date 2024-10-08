@@ -23,3 +23,72 @@ body {
 .bg-navbar {
     background-color: #3C3C3C !important; /* Achtergrondkleur instellen met hogere prioriteit */
 }
+
+/* Algemene body stijl */
+body {
+    background-color: white; /* Witte achtergrond */
+}
+
+/* Navbar styling */
+.bg-navbar {
+    background-color: #3C3C3C; /* Accentkleur voor de navbar */
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #d4592b; /* Accentkleur voor primaire knoppen */
+    border-color: #d4592b; /* Accentkleur voor de rand van knoppen */
+}
+
+    .btn-primary:hover {
+        background-color: #3C3C3C; /* Donkere accentkleur bij hover */
+        border-color: #3C3C3C; /* Donkere accentkleur bij hover */
+    }
+
+/* Card styling voor groepsreizen */
+.card {
+    border: 1px solid #d4592b; /* Accentkleur rand voor kaarten */
+    transition: transform 0.2s; /* Voeg een lichte overgang toe */
+}
+
+    .card:hover {
+        transform: scale(1.05); /* Vergroot de kaart bij hover */
+    }
+
+
+
+/* Formulier styling */
+.form-row {
+    margin-bottom: 1rem; /* Ruimte tussen formulier rijen */
+}
+
+.form-group label {
+    font-weight: bold; /* Vetgedrukte labels voor formulieren */
+}
+
+/* CSS voor de hero section */
+.hero-section {
+    background-image: url('/images/hero-bg.jpg'); /* Zorg dat je een mooie achtergrondafbeelding hebt */
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+}
+
+    .hero-section h1 {
+        font-size: 3rem;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .hero-section p {
+        font-size: 1.5rem;
+        font-family: 'Playfair Display', serif;
+    }
+
+.card {
+    transition: transform 0.3s;
+}
+
+    .card:hover {
+        transform: scale(1.05);
+    }
+
