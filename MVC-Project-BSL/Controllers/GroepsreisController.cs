@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.ViewModels;
 using MVC_Project_BSL.ViewModels.MVC_Project_BSL.ViewModels;
+using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -325,7 +326,74 @@ namespace MVC_Project_BSL.Controllers
 
             return View(groepsreis);
         }
-        
+        [HttpPost]
+        public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
+        {
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
+            var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+
+            if (groepsreis == null || kind == null)
+            {
+                return NotFound();
+            }
+
+            // Voeg het kind toe aan de groepsreis
+            groepsreis.Kinderen.Add(kind);
+
+            // Sla de wijzigingen op
+            _unitOfWork.SaveChanges();
+
+            return RedirectToAction("Detail", new { id = groepsreisId });
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteDeelnemer(int groepsreisId, int kindId)
+        {
+            Debug.WriteLine($"Verzoek ontvangen om kind met ID {kindId} te verwijderen uit groepsreis met ID {groepsreisId}.");
+
+            // Groepsreis ophalen inclusief de kinderen
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(
+            groepsreisId, g => g.Kinderen);
+            var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+
+            if (groepsreis == null)
+            {
+                Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
+                return NotFound();
+            }
+
+            if (kind == null)
+            {
+                Debug.WriteLine($"Kind met ID {kindId} niet gevonden.");
+                return NotFound();
+            }
+
+            // Kinderen loggen die in de groepsreis zitten
+            Debug.WriteLine("Huidige kinderen in groepsreis:");
+            foreach (var k in groepsreis.Kinderen)
+            {
+                Debug.WriteLine($"Kind ID: {k.Id}, Naam: {k.Naam}");  // Bijvoorbeeld: log ook de naam van het kind
+            }
+
+            // Verwijder het kind uit de groepsreis
+            if (groepsreis.Kinderen.Contains(kind))
+            {
+                Debug.WriteLine($"Kind met ID {kindId} gevonden in groepsreis. Verwijderen...");
+                groepsreis.Kinderen.Remove(kind);
+
+                // Wijzigingen opslaan
+                Debug.WriteLine("Wijzigingen opslaan...");
+                _unitOfWork.SaveChanges();
+                Debug.WriteLine($"Kind met ID {kindId} succesvol verwijderd uit groepsreis met ID {groepsreisId}.");
+            }
+            else
+            {
+                Debug.WriteLine($"Kind met ID {kindId} is geen deelnemer aan groepsreis met ID {groepsreisId}.");
+            }
+
+            return RedirectToAction("Detail", new { id = groepsreisId });
+        }
+       
+
 
     }
 }

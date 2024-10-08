@@ -57,8 +57,8 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.Property<int>("GroepsreizenId")
                         .HasColumnType("int");
 
-                    b.Property<string>("MonitorenId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("MonitorenId")
+                        .HasColumnType("int");
 
                     b.HasKey("GroepsreizenId", "MonitorenId");
 
@@ -318,8 +318,11 @@ namespace MVC_Project_BSL.Data.Migrations
 
             modelBuilder.Entity("MVC_Project_BSL.Models.Monitor", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsHoofdMonitor")
                         .HasColumnType("bit");

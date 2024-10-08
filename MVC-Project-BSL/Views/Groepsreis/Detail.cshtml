@@ -38,7 +38,8 @@
                 <thead>
                     <tr>
                         <th>Naam</th>
-                        <th>Hoofdmonitor</th> <!-- Kolom voor hoofdmonitor -->
+                        <th>Hoofdmonitor</th>
+                        <th>Actie</th><!-- Kolom voor hoofdmonitor -->
                     </tr>
                 </thead>
                 <tbody>
@@ -47,6 +48,13 @@
                         <tr>
                             <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
                             <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
+                            <td>
+                                <form asp-action="DeleteMonitor" method="post" style="display:inline;">
+                                    <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                                    <input type="hidden" name="monitorId" value="@monitor.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
+                                </form>
+                            </td>
                         </tr>
                     }
                 </tbody>
@@ -67,7 +75,8 @@
             <thead>
                 <tr>
                     <th>Naam</th>
-                    <th>Hoofdmonitor</th> <!-- Kolom voor hoofdmonitor -->
+                    <th>Hoofdmonitor</th>
+                    <th>Actie</th><!-- Kolom voor hoofdmonitor -->
                 </tr>
             </thead>
             <tbody>
@@ -76,6 +85,13 @@
                     <tr>
                         <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
                         <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
+                        <td>
+                            <form asp-action="AddMonitor" method="post" style="display:inline;">
+                                <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                                <input type="hidden" name="monitorId" value="@monitor.Id" />
+                                <button type="submit" class="btn btn-primary btn-sm">Voeg Toe</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -93,6 +109,7 @@
                     <tr>
                         <th>Naam</th>
                         <th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
+                        <th>Actie</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -105,7 +122,16 @@
                         <tr>
                             <td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
                             <td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+                            <td>
+                                <form asp-action="DeleteDeelnemer" method="post">
+                                    <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                                    <input type="hidden" name="kindId" value="@kind.Id" />
+                                    <button type="submit" class="btn btn-danger">Verwijderen</button>
+                                </form>
+                            </td>
                         </tr>
+                       
+                       
                     }
                 </tbody>
             </table>
@@ -126,6 +152,7 @@
                 <tr>
                     <th>Naam</th>
                     <th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
+                    <th>Actie</th>
                 </tr>
             </thead>
             <tbody>
@@ -138,7 +165,15 @@
                     <tr>
                         <td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
                         <td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+                        <td>
+                            <form asp-action="VoegDeelnemerToe" method="post">
+                                <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                                <input type="hidden" name="kindId" value="@kind.Id" />
+                                <button type="submit" class="btn btn-primary">Toevoegen</button>
+                            </form>
+                        </td>
                     </tr>
+                   
                 }
             </tbody>
         </table>
