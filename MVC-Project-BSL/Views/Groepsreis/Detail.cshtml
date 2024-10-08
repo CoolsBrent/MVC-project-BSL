@@ -29,24 +29,24 @@
     </dl>
 </div>
 <div class="row">
+    <!-- Ingeschreven Monitoren -->
     <div class="col-md-6">
-<h2>Ingeschreven Monitoren</h2>
-
+        <h2>Ingeschreven Monitoren</h2>
         @if (Model.Monitoren.Any())
         {
             <table class="table">
                 <thead>
                     <tr>
                         <th>Naam</th>
-                        <th>Hoofdmonitor</th> <!-- Voeg een kolom toe voor hoofdmonitor -->
+                        <th>Hoofdmonitor</th> <!-- Kolom voor hoofdmonitor -->
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var monitor in Model.Monitoren)
                     {
                         <tr>
-                            <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Zorg ervoor dat Persoon correct is ingesteld -->
-                            <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Toon of het een hoofdmonitor is -->
+                            <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
+                            <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
                         </tr>
                     }
                 </tbody>
@@ -60,61 +60,89 @@
         }
     </div>
 
+    <!-- Beschikbare Monitoren -->
     <div class="col-md-6">
         <h2>Beschikbare Monitoren</h2>
         <table class="table">
             <thead>
                 <tr>
                     <th>Naam</th>
-                    <th>Hoofdmonitor</th> <!-- Voeg een kolom toe voor hoofdmonitor -->
+                    <th>Hoofdmonitor</th> <!-- Kolom voor hoofdmonitor -->
                 </tr>
             </thead>
             <tbody>
                 @foreach (var monitor in Model.BeschikbareMonitoren)
                 {
                     <tr>
-                        <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Zorg ervoor dat Persoon correct is ingesteld -->
-                        <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Toon of het een hoofdmonitor is -->
+                        <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
+                        <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
                     </tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
-<h2>Deelnemers</h2>
-@if (Model.Kinderen.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Naam</th>
-                <th>Leeftijd</th>
-                <th>Acties</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var kind in Model.Kinderen)
-            {
-                // Bereken de leeftijd
-                var geboortedatum = kind.Geboortedatum;
-                var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-                if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+<div class="row">
+    <!-- Ingeschreven Deelnemers -->
+    <div class="col-md-6">
+        <h2>Ingeschreven Deelnemers</h2>
+        @if (Model.Kinderen.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Naam</th>
+                        <th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var kind in Model.Kinderen)
+                    {
+                        var geboortedatum = kind.Geboortedatum;
+                        var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+                        if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
-                <tr>
-                    <td>@kind.Voornaam @kind.Naam</td>
-                    <td>@leeftijd jaar</td> <!-- Toon de berekende leeftijd -->
-                   
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-warning">
-        Geen deelnemers geregistreerd voor deze groepsreis.
+                        <tr>
+                            <td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
+                            <td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                Geen deelnemers geregistreerd voor deze groepsreis.
+            </div>
+        }
     </div>
-}
+
+    <!-- Beschikbare Deelnemers -->
+    <div class="col-md-6">
+        <h2>Beschikbare Deelnemers</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Naam</th>
+                    <th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var kind in Model.BeschikbareDeelnemers) 
+                {
+                    var geboortedatum = kind.Geboortedatum;
+                    var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+                    if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+                    <tr>
+                        <td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
+                        <td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
 <p>
     <a asp-action="Index" class="btn btn-primary">Terug naar Lijst</a>

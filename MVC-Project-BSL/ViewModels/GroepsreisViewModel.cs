@@ -14,25 +14,21 @@ namespace MVC_Project_BSL.ViewModels
         public DateTime Einddatum { get; set; }
 
         [Required]
-        public string? BestemmingNaam { get; set; }
-        [Required]
         public string? Bestemming { get; set; }
-        [Required]
-        public int MinLeeftijd { get; set; }
-        [Required]
-        public int MaxLeeftijd { get; set; }
 
-
-        public string FotoUrl { get; set; }
+        [Required]
+        public List<string> FotoUrls { get; set; } = new List<string>(); // Voor eenvoudige tekstinvoer
 
         [Required]
         public string? Beschrijving { get; set; }
 
         [Required]
-        public float Prijs { get; set; }
+        public string? Leeftijdscategorie { get; set; }
+
+        [Required]
+        public decimal Prijs { get; set; }
 
         public List<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
-        public List<Kind> Kinderen { get; set; } = new List<Kind>();
 
         public List<Models.Monitor> Monitoren { get; set; } = new List<Models.Monitor>(); 
     }

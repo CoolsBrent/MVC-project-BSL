@@ -288,6 +288,9 @@ namespace MVC_Project_BSL.Controllers
             var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
                 query => query.Include(m => m.Persoon));
 
+            var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
+                query => query.Include(m => m.Persoon));
+
 
             // Haal alle groepsreizen op met de bijbehorende monitoren en hun personen
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
@@ -305,7 +308,14 @@ namespace MVC_Project_BSL.Controllers
                     .GroupBy(m => m.PersoonId)
                     .Select(g => g.First())
                     .ToList();
+
+            var ingeschrevenDeelnemers = groepsreis?.Kinderen.Select(m => m.Id).ToList();
+            var uniekeDeelnemers = deelnemers
+                    .Where(m => !ingeschrevenDeelnemers.Contains(m.Id))  // Selecteer de eerste unieke deelnemer per groep (PersoonId)
+                    .ToList();
+
             groepsreis.BeschikbareMonitoren = uniekeMonitoren.ToList();
+            groepsreis.BeschikbareDeelnemers = uniekeDeelnemers.ToList();
 
             if (groepsreis == null)
             {
