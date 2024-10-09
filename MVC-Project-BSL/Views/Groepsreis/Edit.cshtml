@@ -26,23 +26,7 @@
         <input asp-for="Prijs" class="form-control" />
         <span asp-validation-for="Prijs" class="text-danger"></span>
     </div>
-    <!-- Leeftijdscategorieen Dropdown -->
-    <div class="form-group">
-        <label asp-for="Bestemming.MinLeeftijd" class="control-label"></label>
-        <input asp-for="Bestemming.MinLeeftijd" class="form-control" />
-        <span asp-validation-for="Bestemming.MinLeeftijd" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Bestemming.MaxLeeftijd" class="control-label"></label>
-        <input asp-for="Bestemming.MaxLeeftijd" class="form-control" />
-        <span asp-validation-for="Bestemming.MaxLeeftijd" class="text-danger"></span>
-    </div>
-
-    <!-- Activiteiten Dropdown -->
-    <div class="form-group">
-        <label for="Activiteiten">Activiteiten</label>
-        <select asp-items="ViewBag.Activiteiten" class="form-control"></select>
-    </div>
+    
     <div class="form-group">
         <label asp-for="BestemmingId" class="control-label">Bestemming</label>
         <select asp-for="BestemmingId" asp-items="ViewBag.Bestemmingen" class="form-control"></select>
