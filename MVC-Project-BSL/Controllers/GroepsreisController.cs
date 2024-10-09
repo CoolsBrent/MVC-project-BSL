@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MVC_Project_BSL.Models;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MVC_Project_BSL.Data;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.ViewModels;
 using MVC_Project_BSL.ViewModels.MVC_Project_BSL.ViewModels;
 using System.Diagnostics;
+using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.Controllers
 {

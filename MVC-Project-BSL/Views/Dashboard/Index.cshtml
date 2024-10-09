@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+﻿@using System.Globalization
+@model IEnumerable<MVC_Project_BSL.Models.Groepsreis>
+
+<h2>Welkom op je dashboard, @User.Identity.Name!</h2>
+<!-- Knoppen voor beheer -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
+    </div>
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "Groepsreis")" class="btn btn-success btn-block">Groepsreizen Beheren</a>
+    </div>
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "Activiteiten")" class="btn btn-info btn-block">Activiteiten Beheren</a>
+    </div>
+    <div class="col-md-3">
+        <a href="@Url.Action("Index", "Opleidingen")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        Er zijn momenteel geen groepsreizen beschikbaar. <br />
+        <a asp-action="Create" class="btn btn-primary">Voeg een nieuwe groepsreis toe</a>
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Begindatum</th>
+                <th>Einddatum</th>
+                <th>Bestemming</th>
+                <th>Prijs</th>
+                <th>Aantal deelnemers</th>
+                <th>Aantal monitoren</th>
+                <th>Hoofdmonitor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var groepsreis in Model)
+            {
+                var hoofdmonitor = groepsreis.Monitoren.FirstOrDefault(m => m.IsHoofdMonitor)?.Persoon?.Voornaam ?? "Geen hoofdmonitor";
+                <tr>
+                    <td>@groepsreis.Begindatum.ToShortDateString()</td>
+                    <td>@groepsreis.Einddatum.ToShortDateString()</td>
+                    <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
+                    <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
+                    <td>@groepsreis.Kinderen.Count</td>
+                    <td>@groepsreis.Monitoren.Count</td>
+                    <td>@hoofdmonitor</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+

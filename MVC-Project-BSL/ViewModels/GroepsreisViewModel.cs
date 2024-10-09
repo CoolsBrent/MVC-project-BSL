@@ -8,9 +8,11 @@ namespace MVC_Project_BSL.ViewModels
         public int Id { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
         public DateTime Begindatum { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
         public DateTime Einddatum { get; set; }
 
         [Required]
@@ -23,14 +25,26 @@ namespace MVC_Project_BSL.ViewModels
         public string? Beschrijving { get; set; }
 
         [Required]
-        public string? Leeftijdscategorie { get; set; }
+        public decimal Prijs { get; set; }
+
+        // Verander Leeftijdscategorie naar MinLeeftijd en MaxLeeftijd voor filtering
+        [Required]
+        public int MinLeeftijd { get; set; }
 
         [Required]
-        public decimal Prijs { get; set; }
+        public int MaxLeeftijd { get; set; }
+
+
 
         public List<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
 
+
         public List<Models.Monitor> Monitoren { get; set; } = new List<Models.Monitor>(); 
+        // Filteropties die vanuit de view worden gebruikt
+        public int? MinLeeftijdFilter { get; set; }
+        public int? MaxLeeftijdFilter { get; set; }
+        public DateTime? BegindatumFilter { get; set; }
+
     }
 }
 

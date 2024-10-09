@@ -3,14 +3,14 @@
 <h1>Details van de Groepsreis</h1>
 
 <div>
-	<h4>Groepsreis</h4>
-	<hr />
-	<dl class="row">
-		<dt class="col-sm-2">Begindatum</dt>
-		<dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy HH:mm")</dd>
+    <h4>Groepsreis</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Begindatum</dt>
+        <dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
 
-		<dt class="col-sm-2">Einddatum</dt>
-		<dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy HH:mm")</dd>
+        <dt class="col-sm-2">Einddatum</dt>
+        <dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
 
 		<dt class="col-sm-2">Prijs</dt>
 		<dd class="col-sm-10">@Model.Prijs.ToString("C")</dd>
@@ -214,6 +214,36 @@
 		}
 	</div>
 
-	<p>
-		<a asp-action="Index" class="btn btn-primary">Terug naar Lijst</a>
-	</p>
+
+<h2>Geregistreerde Monitoren</h2>
+@if (Model.Monitoren.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Naam</th>
+                <th>Hoofdmonitor</th> <!-- Voeg een kolom toe voor hoofdmonitor -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var monitor in Model.Monitoren)
+            {
+                <tr>
+                    <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Zorg ervoor dat Persoon correct is ingesteld -->
+                    <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Toon of het een hoofdmonitor is -->
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-warning">
+        Geen monitoren geregistreerd voor deze groepsreis.
+    </div>
+}
+
+<p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Terug naar Home</a>
+</p>
+

@@ -8,9 +8,11 @@ namespace MVC_Project_BSL.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Begindatum is verplicht.")]
+        [DataType(DataType.Date)]
         public DateTime Begindatum { get; set; }
 
         [Required(ErrorMessage = "Einddatum is verplicht.")]
+        [DataType(DataType.Date)]
         public DateTime Einddatum { get; set; }
 
         [Required(ErrorMessage = "Prijs is verplicht.")]

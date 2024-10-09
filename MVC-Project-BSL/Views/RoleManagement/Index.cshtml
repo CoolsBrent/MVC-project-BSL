@@ -1,0 +1,92 @@
+﻿@model MVC_Project_BSL.ViewModels.RoleManagementViewModel
+
+<h2>Rollen Beheren</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Gebruikers</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Gebruikersnaam</th>
+                    <th>Email</th>
+                    <th>Huidige Rollen</th>
+                    <th>Actie</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var userRoles in Model.Users)
+                {
+                    <tr>
+                        <td>@userRoles.User.UserName</td>
+                        <td>@userRoles.User.Email</td>
+                        <td>
+                            @foreach (var role in userRoles.Roles)
+                            {
+                                <span>@role</span>
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#assignRoleModal"
+                                    data-userid="@userRoles.User.Id" data-username="@userRoles.User.UserName">
+                                Rol Toewijzen
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <h3>Rollen</h3>
+        <ul class="list-group">
+            @foreach (var role in Model.Roles)
+            {
+                <li class="list-group-item">@role.Name</li>
+            }
+        </ul>
+    </div>
+</div>
+
+<!-- Modal voor het toewijzen van rollen -->
+<div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignRoleModalLabel">Rol Toewijzen</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form asp-action="AssignRole" method="post">
+                    <input type="hidden" id="selectedUserId" name="SelectedUserId" />
+
+                    <div class="form-group">
+                        <label for="SelectedRole">Kies een rol:</label>
+                        <select class="form-control" id="SelectedRole" name="SelectedRole">
+                            @foreach (var role in Model.Roles)
+                            {
+                                <option value="@role.Name">@role.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Rol Toewijzen</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#assignRoleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var userId = button.data('userid');
+            var modal = $(this);
+            modal.find('#selectedUserId').val(userId);
+        });
+    </script>
+}
