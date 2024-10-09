@@ -1,7 +1,69 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
+﻿@using System.Globalization
+@model IEnumerable<MVC_Project_BSL.ViewModels.GroepsreisViewModel>
+
+@{
+    ViewData["Title"] = "Groepsreizen - Welkom";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welkom op jouw persoonlijk dashboard <br />@User.Identity?.Name</h1>
+<!-- Hero Section -->
+<div class="hero-section bg-dark text-white text-center py-5">
+    <div class="container">
+        <h1 class="display-4">Welkom bij Groepsreizen BSL</h1>
+        <p class="lead">Ontdek onze spannende groepsreizen voor jongeren van 6 tot 21 jaar!</p>
+        <a href="#groepsreizen" class="btn btn-primary btn-lg">Bekijk Groepsreizen</a>
+    </div>
+</div>
+
+<!-- Beschikbare Groepsreizen -->
+<div class="container mt-5" id="groepsreizen">
+    <h2>Beschikbare Groepsreizen</h2>
+
+    <form method="get" asp-action="Index" class="mb-4">
+        <div class="form-row d-flex">
+            <div class="form-group col-md-3">
+                <label for="minLeeftijd">Min Leeftijd</label>
+                <input type="number" class="form-control" name="minLeeftijd" />
+            </div>
+            <div class="form-group col-md-3 mx-3">
+                <label for="maxLeeftijd">Max Leeftijd</label>
+                <input type="number" class="form-control" name="maxLeeftijd" />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="begindatum">Begindatum</label>
+                <input type="date" class="form-control" name="begindatum" />
+            </div>
+            <div class="form-group col-md-3 mt-4 ms-2">
+                <button type="submit" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+    </form>
+
+
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning">
+            Er zijn momenteel geen groepsreizen beschikbaar.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var groepsreis in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="@Url.Content("~/images/" + groepsreis.FotoUrls.FirstOrDefault())" class="card-img-top" alt="@groepsreis.Bestemming" />
+                        <div class="card-body">
+                            <h5 class="card-title">@groepsreis.Bestemming</h5>
+                            <p class="card-text">@groepsreis.Beschrijving</p>
+                            <p class="card-text">Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
+                            <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                            <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary">Meer Informatie</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

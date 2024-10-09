@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MVC_Project_BSL.Models;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MVC_Project_BSL.Data;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
+using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -138,7 +134,7 @@ namespace MVC_Project_BSL.Controllers
 
         public GroepsreisController(IUnitOfWork unitOfWork)
         {
-           
+
             _unitOfWork = unitOfWork;
         }
 
@@ -179,7 +175,7 @@ namespace MVC_Project_BSL.Controllers
                 groepsreis.Monitoren = groepsreis.Monitoren ?? new List<Models.Monitor>();
                 groepsreis.Onkosten = groepsreis.Onkosten ?? new List<Onkosten>();
                 groepsreis.Activiteiten = groepsreis.Activiteiten ?? new List<Activiteit>();
-                
+
 
                 // Sla de nieuwe groepsreis op als het formulier geldig is
                 await _unitOfWork.GroepsreisRepository.AddAsync(groepsreis);
