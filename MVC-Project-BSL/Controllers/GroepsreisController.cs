@@ -392,8 +392,146 @@ namespace MVC_Project_BSL.Controllers
 
             return RedirectToAction("Detail", new { id = groepsreisId });
         }
-       
 
 
-    }
+		[HttpPost]
+		public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, string monitorId)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+
+			if (groepsreis == null)
+			{
+				return NotFound("Groepsreis niet gevonden");
+			}
+
+			foreach (var monitor in groepsreis.Monitoren)
+			{
+				monitor.IsHoofdMonitor = false;
+			}
+
+			var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
+			if (geselecteerdeMonitor == null)
+			{
+				return NotFound("Monitor niet gevonden");
+			}
+
+			geselecteerdeMonitor.IsHoofdMonitor = true;
+
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction("Detail", new { id = groepsreisId });
+		}
+		[HttpPost]
+		public async Task<IActionResult> MaakGewoneMonitor(int groepsreisId, string monitorId)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+
+			if (groepsreis == null)
+			{
+				return NotFound("Groepsreis niet gevonden");
+			}
+
+			var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
+			if (geselecteerdeMonitor == null)
+			{
+				return NotFound("Monitor niet gevonden");
+			}
+
+			// Zet de hoofdmonitor-status terug naar "niet hoofdmonitor"
+			geselecteerdeMonitor.IsHoofdMonitor = false;
+
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction("Detail", new { id = groepsreisId });
+		}
+		[HttpPost]
+		public async Task<IActionResult> DeleteMonitor(int groepsreisId, string monitorId)
+		{
+			Debug.WriteLine($"Verzoek ontvangen om monitor met ID {monitorId} te verwijderen uit groepsreis met ID {groepsreisId}.");
+
+			// Groepsreis ophalen inclusief de ingeschreven monitoren
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+			var monitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
+
+			if (groepsreis == null)
+			{
+				Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
+				return NotFound();
+			}
+
+			if (monitor == null)
+			{
+				Debug.WriteLine($"Monitor met ID {monitorId} niet gevonden.");
+				return NotFound();
+			}
+
+			// Monitoren loggen die ingeschreven zijn in de groepsreis
+			Debug.WriteLine("Huidige ingeschreven monitoren in groepsreis:");
+			foreach (var m in groepsreis.Monitoren)
+			{
+				Debug.WriteLine($"Monitor ID: {m.Id}, Naam: {m.Persoon?.Voornaam} {m.Persoon?.Naam}");
+			}
+
+			// Verwijder de monitor uit de groepsreis
+			if (groepsreis.Monitoren.Contains(monitor))
+			{
+				Debug.WriteLine($"Monitor met ID {monitorId} gevonden in groepsreis. Verwijderen...");
+				groepsreis.Monitoren.Remove(monitor);
+
+				
+
+				// Wijzigingen opslaan
+				Debug.WriteLine("Wijzigingen opslaan...");
+				_unitOfWork.SaveChanges();
+				Debug.WriteLine($"Monitor met ID {monitorId} succesvol verwijderd uit groepsreis met ID {groepsreisId}.");
+			}
+			else
+			{
+				Debug.WriteLine($"Monitor met ID {monitorId} is geen ingeschreven monitor in groepsreis met ID {groepsreisId}.");
+			}
+
+			return RedirectToAction("Detail", new { id = groepsreisId });
+		}
+		[HttpPost]
+		public async Task<IActionResult> AddMonitor(int groepsreisId, string monitorId)
+		{
+			Debug.WriteLine($"Verzoek ontvangen om monitor met ID {monitorId} toe te voegen aan groepsreis met ID {groepsreisId}.");
+
+			// Groepsreis ophalen inclusief de ingeschreven monitoren
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+			var monitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
+
+			if (groepsreis == null)
+			{
+				Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
+				return NotFound();
+			}
+
+			if (monitor == null)
+			{
+				Debug.WriteLine($"Monitor met ID {monitorId} niet gevonden.");
+				return NotFound();
+			}
+
+			// Voeg de monitor toe aan de groepsreis
+			if (!groepsreis.Monitoren.Contains(monitor))
+			{
+				Debug.WriteLine($"Monitor met ID {monitorId} is nog niet ingeschreven in de groepsreis. Toevoegen...");
+				groepsreis.Monitoren.Add(monitor);
+
+				
+				// Wijzigingen opslaan
+				_unitOfWork.SaveChanges();
+				Debug.WriteLine($"Monitor met ID {monitorId} succesvol toegevoegd aan groepsreis met ID {groepsreisId}.");
+			}
+			else
+			{
+				Debug.WriteLine($"Monitor met ID {monitorId} is al ingeschreven in groepsreis met ID {groepsreisId}.");
+			}
+
+			return RedirectToAction("Detail", new { id = groepsreisId });
+		}
+
+	}
 }
+

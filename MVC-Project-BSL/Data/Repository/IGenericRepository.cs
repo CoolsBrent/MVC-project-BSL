@@ -14,9 +14,10 @@ namespace MVC_Project_BSL.Data.Repository
 
         // Nieuwe methode om een entiteit op te halen met inclusies
         Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes);
-
-        Task<TEntity?> GetByIdAsync(int id);
-        Task AddAsync(TEntity entity);
+		
+		Task<TEntity?> GetByIdAsync(int id);
+		Task<TEntity?> GetByStringIdAsync(string id);
+		Task AddAsync(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);
         void Save();
