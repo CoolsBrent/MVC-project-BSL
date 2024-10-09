@@ -1,4 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace MVC_Project_BSL.Data.Repository
 {
@@ -32,8 +37,27 @@ namespace MVC_Project_BSL.Data.Repository
         {
             return await _dbSet.FindAsync(id);
         }
+		public async Task<TEntity?> GetByStringIdAsync(string id)
+		{
+			return await _dbSet.FindAsync(id);
+		}
 
-        public async Task AddAsync(TEntity entity)
+		// Nieuwe methode om een entiteit op te halen met inclusies
+		public async Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            // Pas de includes toe op de query
+            foreach (var include in includes)
+            {
+                query = query.Include(include);
+            }
+
+            return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        }
+	
+
+		public async Task AddAsync(TEntity entity)
         {
             try
             {

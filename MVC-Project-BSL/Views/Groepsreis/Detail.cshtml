@@ -12,16 +12,208 @@
         <dt class="col-sm-2">Einddatum</dt>
         <dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
 
-        <dt class="col-sm-2">Prijs</dt>
-        <dd class="col-sm-10">@Model.Prijs.ToString("C")</dd>
+		<dt class="col-sm-2">Prijs</dt>
+		<dd class="col-sm-10">@Model.Prijs.ToString("C")</dd>
 
-        <dt class="col-sm-2">Bestemming</dt>
-        <dd class="col-sm-10">@Model.Bestemming?.BestemmingsNaam</dd>
+		<dt class="col-sm-2">Leeftijdscategorie</dt>
+		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
-        <dt class="col-sm-2">Aantal Deelnemers</dt>
-        <dd class="col-sm-10">@Model.Kinderen.Count()</dd>
-    </dl>
+		<dt class="col-sm-2">Bestemming</dt>
+		<dd class="col-sm-10">@Model.Bestemming?.BestemmingsNaam</dd>
+
+		<dt class="col-sm-2">Beschrijving</dt>
+		<dd class="col-sm-10">@Model.Bestemming?.Beschrijving</dd>
+
+		<dt class="col-sm-2">Aantal Deelnemers</dt>
+		<dd class="col-sm-10">@Model.Kinderen.Count()</dd>
+	</dl>
 </div>
+<div class="row">
+	<!-- Ingeschreven Monitoren -->
+	<div class="col-md-6">
+		<h2>Ingeschreven Monitoren</h2>
+		@if (Model.Monitoren.Any())
+		{
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Naam</th>
+						<th>Hoofdmonitor</th>
+						<th class ="text-center">Acties</th><!-- Kolom voor hoofdmonitor -->
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var monitor in Model.Monitoren)
+					{
+						<tr>
+							<td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
+							<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
+							<td class="text-center align-middle">
+								@if (!monitor.IsHoofdMonitor)
+								{
+									<!-- Knop om hoofdmonitor te maken -->
+									<form asp-action="MaakHoofdmonitor" method="post" style="display:inline;">
+										<input type="hidden" name="groepsreisId" value="@Model.Id" />
+										<input type="hidden" name="monitorId" value="@monitor.Id" />
+										<button type="submit" class="btn btn-success btn-sm me-1">Maak Hoofdmonitor</button>
+									</form>
+								}
+								else
+								{
+									<form asp-action="MaakGewoneMonitor" method="post" style="display:inline;">
+										<input type="hidden" name="groepsreisId" value="@Model.Id" />
+										<input type="hidden" name="monitorId" value="@monitor.Id" />
+										<button type="submit" class="btn btn-success btn-sm me-1">Maak monitor</button>
+									</form>
+								}
+								<form asp-action="DeleteMonitor" method="post" style="display:inline;">
+									<input type="hidden" name="groepsreisId" value="@Model.Id" />
+									<input type="hidden" name="monitorId" value="@monitor.Id" />
+									<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
+								</form>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		else
+		{
+			<div class="alert alert-warning">
+				Geen monitoren geregistreerd voor deze groepsreis.
+			</div>
+		}
+	</div>
+
+	<!-- Beschikbare Monitoren -->
+	<div class="col-md-6">
+		<h2>Beschikbare Monitoren</h2>
+		@if (Model.BeschikbareMonitoren.Any())
+		{
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Naam</th>
+					<th>Hoofdmonitor</th>
+					<th>Actie</th><!-- Kolom voor hoofdmonitor -->
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var monitor in Model.BeschikbareMonitoren)
+				{
+					<tr>
+						<td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
+						<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
+						<td>
+							<form asp-action="AddMonitor" method="post" style="display:inline;">
+								<input type="hidden" name="groepsreisId" value="@Model.Id" />
+								<input type="hidden" name="monitorId" value="@monitor.Id" />
+								<button type="submit" class="btn btn-primary btn-sm">Voeg Toe</button>
+							</form>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+		}
+		else
+		{
+			<div class="alert alert-warning">
+				Geen monitoren beschikbaar.
+			</div>
+		}
+	</div>
+</div>
+<div class="row">
+	<!-- Ingeschreven Deelnemers -->
+	<div class="col-md-6">
+		<h2>Ingeschreven Deelnemers</h2>
+		@if (Model.Kinderen.Any())
+		{
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Naam</th>
+						<th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
+						<th>Actie</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var kind in Model.Kinderen)
+					{
+						var geboortedatum = kind.Geboortedatum;
+						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+						<tr>
+							<td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
+							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+							<td>
+								<form asp-action="DeleteDeelnemer" method="post">
+									<input type="hidden" name="groepsreisId" value="@Model.Id" />
+									<input type="hidden" name="kindId" value="@kind.Id" />
+									<button type="submit" class="btn btn-danger">Verwijderen</button>
+								</form>
+							</td>
+						</tr>
+
+
+					}
+				</tbody>
+			</table>
+		}
+		else
+		{
+			<div class="alert alert-warning">
+				Geen deelnemers geregistreerd voor deze groepsreis.
+			</div>
+		}
+	</div>
+
+	<!-- Beschikbare Deelnemers -->
+	<div class="col-md-6">
+		<h2>Beschikbare Deelnemers</h2>
+		@if (Model.BeschikbareDeelnemers.Any())
+		{
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Naam</th>
+					<th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
+					<th>Actie</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var kind in Model.BeschikbareDeelnemers)
+				{
+					var geboortedatum = kind.Geboortedatum;
+					var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+					if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+					<tr>
+						<td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
+						<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+						<td>
+							<form asp-action="VoegDeelnemerToe" method="post">
+								<input type="hidden" name="groepsreisId" value="@Model.Id" />
+								<input type="hidden" name="kindId" value="@kind.Id" />
+								<button type="submit" class="btn btn-primary">Toevoegen</button>
+							</form>
+						</td>
+					</tr>
+
+				}
+			</tbody>
+		</table>
+		}
+		else
+		{
+			<div class="alert alert-warning">
+				Geen deelnemers beschikbaar.
+			</div>
+		}
+	</div>
+
 
 <h2>Geregistreerde Monitoren</h2>
 @if (Model.Monitoren.Any())
@@ -54,3 +246,4 @@ else
 <p>
     <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Terug naar Home</a>
 </p>
+

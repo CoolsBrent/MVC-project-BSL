@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MVC_Project_BSL.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace MVC_Project_BSL.Data.Repository
 {
@@ -9,8 +12,12 @@ namespace MVC_Project_BSL.Data.Repository
         Task<IEnumerable<TEntity>> GetAllAsync(
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);
 
-        Task<TEntity?> GetByIdAsync(int id);
-        Task AddAsync(TEntity entity);
+        // Nieuwe methode om een entiteit op te halen met inclusies
+        Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes);
+		
+		Task<TEntity?> GetByIdAsync(int id);
+		Task<TEntity?> GetByStringIdAsync(string id);
+		Task AddAsync(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);
         void Save();

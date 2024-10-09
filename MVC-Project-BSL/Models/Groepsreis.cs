@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MVC_Project_BSL.Models
 {
@@ -28,6 +29,10 @@ namespace MVC_Project_BSL.Models
         public ICollection<Monitor> Monitoren { get; set; } = new List<Monitor>();
         public ICollection<Onkosten> Onkosten { get; set; } = new List<Onkosten>();
         public ICollection<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
+        [NotMapped]
+        public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
+        [NotMapped]
+        public ICollection<Kind> BeschikbareDeelnemers { get; set; } = new List<Kind>();
     }
 
 
