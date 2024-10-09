@@ -88,6 +88,8 @@
 	<!-- Beschikbare Monitoren -->
 	<div class="col-md-6">
 		<h2>Beschikbare Monitoren</h2>
+		@if (Model.BeschikbareMonitoren.Any())
+		{
 		<table class="table">
 			<thead>
 				<tr>
@@ -113,6 +115,13 @@
 				}
 			</tbody>
 		</table>
+		}
+		else
+		{
+			<div class="alert alert-warning">
+				Geen monitoren beschikbaar.
+			</div>
+		}
 	</div>
 </div>
 <div class="row">
@@ -164,6 +173,8 @@
 	<!-- Beschikbare Deelnemers -->
 	<div class="col-md-6">
 		<h2>Beschikbare Deelnemers</h2>
+		@if (Model.BeschikbareDeelnemers.Any())
+		{
 		<table class="table">
 			<thead>
 				<tr>
@@ -194,6 +205,13 @@
 				}
 			</tbody>
 		</table>
+		}
+		else
+		{
+			<div class="alert alert-warning">
+				Geen deelnemers beschikbaar.
+			</div>
+		}
 	</div>
 
 	<p>
