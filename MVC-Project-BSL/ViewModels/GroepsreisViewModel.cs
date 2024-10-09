@@ -8,9 +8,11 @@ namespace MVC_Project_BSL.ViewModels
         public int Id { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
         public DateTime Begindatum { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
         public DateTime Einddatum { get; set; }
 
         [Required]
