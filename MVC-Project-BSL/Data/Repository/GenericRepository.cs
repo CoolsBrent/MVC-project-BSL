@@ -83,5 +83,15 @@ namespace MVC_Project_BSL.Data.Repository
         {
             _context.SaveChanges();
         }
-    }
+		public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+		{
+			return await _dbSet.AnyAsync(predicate);
+		}
+		public async Task<TEntity?> GetByPersoonIdAsync(string persoonId)
+		{
+			// Zorg ervoor dat TEntity een eigenschap heeft met de naam "PersoonId"
+			return await _dbSet.FirstOrDefaultAsync(e => EF.Property<string>(e, "PersoonId") == persoonId);
+		}
+
+	}
 }

@@ -14,8 +14,10 @@ namespace MVC_Project_BSL.ViewModels
         // Een geselecteerde gebruiker
         public string SelectedUserId { get; set; }
 
-        // De rol die je wilt toewijzen aan de geselecteerde gebruiker
-        public string SelectedRole { get; set; }
+		public int SelectedChildId { get; set; }
+
+		// De rol die je wilt toewijzen aan de geselecteerde gebruiker
+		public string SelectedRole { get; set; }
 
         // De rollen van de geselecteerde gebruiker
         public IList<string> UserRoles { get; set; } = new List<string>();

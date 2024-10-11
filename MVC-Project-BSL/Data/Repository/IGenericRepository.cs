@@ -16,7 +16,9 @@ namespace MVC_Project_BSL.Data.Repository
         Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes);
 		
 		Task<TEntity?> GetByIdAsync(int id);
+		Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate);
 		Task<TEntity?> GetByStringIdAsync(string id);
+        Task<TEntity?> GetByPersoonIdAsync(string id);
 		Task AddAsync(TEntity entity);
         void Update(TEntity entity);
         void Delete(TEntity entity);

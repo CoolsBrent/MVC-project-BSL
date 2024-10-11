@@ -215,33 +215,6 @@
 	</div>
 
 
-<h2>Geregistreerde Monitoren</h2>
-@if (Model.Monitoren.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Naam</th>
-                <th>Hoofdmonitor</th> <!-- Voeg een kolom toe voor hoofdmonitor -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var monitor in Model.Monitoren)
-            {
-                <tr>
-                    <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Zorg ervoor dat Persoon correct is ingesteld -->
-                    <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Toon of het een hoofdmonitor is -->
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-warning">
-        Geen monitoren geregistreerd voor deze groepsreis.
-    </div>
-}
 
 <p>
     <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Terug naar Home</a>
