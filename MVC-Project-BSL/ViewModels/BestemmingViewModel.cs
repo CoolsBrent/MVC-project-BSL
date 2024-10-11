@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using MVC_Project_BSL.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.ViewModels
 {
@@ -26,10 +26,13 @@ namespace MVC_Project_BSL.ViewModels
         [Range(0, 120, ErrorMessage = "Maximale leeftijd moet tussen 0 en 120 liggen.")]
         public int MaxLeeftijd { get; set; }
 
-        [Required(ErrorMessage = "Selecteer minstens één foto.")]
-        public List<IFormFile> FotoBestanden { get; set; } = new List<IFormFile>();
+        // Voor het uploaden van nieuwe foto's
+        public List<IFormFile> FotoBestanden { get; set; }
 
-        // Voor de Edit view om bestaande foto's weer te geven
-        public List<Foto> BestaandeFotos { get; set; } = new List<Foto>();
+        // Voor het weergeven van bestaande foto's
+        public List<Foto> BestaandeFotos { get; set; }
+
+        // Voor het bijhouden welke foto's verwijderd moeten worden
+        public List<int> VerwijderFotosIds { get; set; } = new List<int>();
     }
 }

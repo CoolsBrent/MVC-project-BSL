@@ -8,6 +8,10 @@ namespace MVC_Project_BSL.Data.Repository
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
+        //Om te controleren of er reeds bestaande foto's zijn in de EDIT
+        IQueryable<TEntity> GetQueryable(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? queryFunc = null);
+
         // Nieuwe GetAllAsync-methode met ondersteuning voor Include
         Task<IEnumerable<TEntity>> GetAllAsync(
             Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null);

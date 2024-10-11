@@ -106,8 +106,8 @@ namespace MVC_Project_BSL.Controllers
                 else
                 {
                     // Voeg een ModelState error toe als er geen foto's zijn geüpload
-                    ModelState.AddModelError("FotoBestanden", "Selecteer minstens één foto.");
-                    return View(model);
+                        ModelState.AddModelError("FotoBestanden", "Selecteer minstens één foto.");
+                        return View(model);
                 }
 
                 await _unitOfWork.BestemmingRepository.AddAsync(bestemming);
@@ -143,6 +143,18 @@ namespace MVC_Project_BSL.Controllers
             return View(model);
         }
 
+
+        private async Task LaadBestaandeFotos(BestemmingViewModel model, int id)
+        {
+            var bestemming = await _unitOfWork.BestemmingRepository.GetQueryable(
+                query => query.Include(b => b.Fotos).Where(b => b.Id == id))
+                .FirstOrDefaultAsync();
+
+            model.BestaandeFotos = bestemming?.Fotos.ToList() ?? new List<Foto>();
+        }
+
+
+
         // POST: Bestemming/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -153,68 +165,111 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Haal de bestemming op inclusief de foto's
+            var bestemming = await _unitOfWork.BestemmingRepository.GetQueryable(
+                query => query.Include(b => b.Fotos))
+                .FirstOrDefaultAsync(b => b.Id == id);
+
+            if (bestemming == null)
             {
-                var bestemming = await _unitOfWork.BestemmingRepository.GetAllAsync(
-                    query => query.Include(b => b.Fotos))
-                    .ContinueWith(t => t.Result.FirstOrDefault(b => b.Id == id));
+                return NotFound();
+            }
 
-                if (bestemming == null)
+            // Controleer of de fotos correct zijn geladen
+            var aantalFotos = bestemming.Fotos.Count; // Voor debugging
+            Console.WriteLine("Aantal foto's:" + aantalFotos);
+
+            // Update de bestemmingsgegevens
+            bestemming.Code = model.Code;
+            bestemming.BestemmingsNaam = model.BestemmingsNaam;
+            bestemming.Beschrijving = model.Beschrijving;
+            bestemming.MinLeeftijd = model.MinLeeftijd;
+            bestemming.MaxLeeftijd = model.MaxLeeftijd;
+
+            // Verwijder geselecteerde foto's
+            if (model.VerwijderFotosIds != null && model.VerwijderFotosIds.Any())
+            {
+                var fotosTeVerwijderen = bestemming.Fotos.Where(f => model.VerwijderFotosIds.Contains(f.Id)).ToList();
+
+                foreach (var foto in fotosTeVerwijderen)
                 {
-                    return NotFound();
-                }
-
-                bestemming.Code = model.Code;
-                bestemming.BestemmingsNaam = model.BestemmingsNaam;
-                bestemming.Beschrijving = model.Beschrijving;
-                bestemming.MinLeeftijd = model.MinLeeftijd;
-                bestemming.MaxLeeftijd = model.MaxLeeftijd;
-
-                // Verwerk de foto-upload
-                if (model.FotoBestanden != null && model.FotoBestanden.Count > 0)
-                {
-                    foreach (var bestand in model.FotoBestanden)
+                    // Verwijder het bestand van de schijf
+                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", foto.Naam);
+                    if (System.IO.File.Exists(filePath))
                     {
-                        if (bestand.Length > 0)
+                        System.IO.File.Delete(filePath);
+                    }
+                    // Verwijder de foto uit de collectie en de database
+                    bestemming.Fotos.Remove(foto);
+                    _unitOfWork.FotoRepository.Delete(foto);
+                }
+            }
+
+            // Controleer of er na het verwijderen nog bestaande foto's over zijn
+            var heeftNogFotos = bestemming.Fotos.Any();
+
+            // Controleer of er nieuwe foto's zijn geüpload
+            var nieuweFotosGeupload = model.FotoBestanden != null && model.FotoBestanden.Count > 0;
+
+            // Als er geen bestaande foto's zijn en er zijn geen nieuwe foto's geüpload, voeg een ModelState-fout toe
+            if (!heeftNogFotos && !nieuweFotosGeupload)
+            {
+                ModelState.AddModelError("FotoBestanden", "Selecteer minstens één foto.");
+                // Laad de bestaande foto's opnieuw
+                await LaadBestaandeFotos(model, id);
+                return View(model);
+            }
+
+            // Verwerk de nieuwe foto-upload
+            if (nieuweFotosGeupload)
+            {
+                foreach (var bestand in model.FotoBestanden)
+                {
+                    if (bestand.Length > 0)
+                    {
+                        try
                         {
-                            try
+                            var fileName = Path.GetFileNameWithoutExtension(bestand.FileName);
+                            var extension = Path.GetExtension(bestand.FileName);
+                            var uniqueFileName = $"{fileName}_{Guid.NewGuid()}{extension}";
+                            var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
+                            var filePath = Path.Combine(uploads, uniqueFileName);
+
+                            // Controleer of de map bestaat, zo niet, maak deze aan
+                            if (!Directory.Exists(uploads))
                             {
-                                var fileName = Path.GetFileName(bestand.FileName);
-                                var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
-                                var filePath = Path.Combine(uploads, fileName);
-
-                                // Controleer of de map bestaat, zo niet, maak deze aan
-                                if (!Directory.Exists(uploads))
-                                {
-                                    Directory.CreateDirectory(uploads);
-                                }
-
-                                using (var stream = new FileStream(filePath, FileMode.Create))
-                                {
-                                    await bestand.CopyToAsync(stream);
-                                }
-
-                                bestemming.Fotos.Add(new Foto
-                                {
-                                    Naam = fileName,
-                                    Bestemming = bestemming
-                                });
+                                Directory.CreateDirectory(uploads);
                             }
-                            catch (Exception ex)
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
                             {
-                                // Log de fout en voeg een ModelState error toe
-                                ModelState.AddModelError("FotoBestanden", $"Er is een fout opgetreden bij het uploaden van de foto {bestand.FileName}: {ex.Message}");
-                                return View(model);
+                                await bestand.CopyToAsync(stream);
                             }
+
+                            bestemming.Fotos.Add(new Foto
+                            {
+                                Naam = uniqueFileName,
+                                Bestemming = bestemming
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log de fout en voeg een ModelState error toe
+                            ModelState.AddModelError("FotoBestanden", $"Er is een fout opgetreden bij het uploaden van de foto {bestand.FileName}: {ex.Message}");
+                            // Laad de bestaande foto's opnieuw
+                            await LaadBestaandeFotos(model, id);
+                            return View(model);
                         }
                     }
                 }
-
-                _unitOfWork.BestemmingRepository.Update(bestemming);
-                _unitOfWork.SaveChanges();
-                return RedirectToAction(nameof(Index));
             }
-            return View(model);
+
+            // Update de bestemming in de database
+            _unitOfWork.BestemmingRepository.Update(bestemming);
+            _unitOfWork.SaveChanges();
+
+            // Redirect naar de Index pagina
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Bestemming/Delete/5
