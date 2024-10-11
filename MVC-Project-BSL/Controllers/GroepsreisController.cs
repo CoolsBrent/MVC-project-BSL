@@ -65,15 +65,7 @@ namespace MVC_Project_BSL.Controllers
                 await _unitOfWork.GroepsreisRepository.AddAsync(groepsreis);
 
                 _unitOfWork.SaveChanges();
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
-                Console.WriteLine("Gelukt");
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -143,15 +135,6 @@ namespace MVC_Project_BSL.Controllers
             {
                 return NotFound();
             }
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
-            Console.WriteLine("Gelukt");
             return View(groepsreis);
         }
 

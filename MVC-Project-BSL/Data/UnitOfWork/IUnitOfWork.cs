@@ -10,6 +10,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         IGenericRepository<Activiteit> ActiviteitRepository { get; }
         IGenericRepository<Models.Monitor> MonitorRepository { get; }
         IGenericRepository<Kind> KindRepository { get; }
+        IGenericRepository<Foto> FotoRepository { get; }
 
         public void SaveChanges();
     }

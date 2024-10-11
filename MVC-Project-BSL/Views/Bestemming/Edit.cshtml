@@ -1,0 +1,71 @@
+﻿@model MVC_Project_BSL.ViewModels.BestemmingViewModel
+
+<h1>Bestemming Bewerken</h1>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Code"></label>
+        <input asp-for="Code" class="form-control" />
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BestemmingsNaam"></label>
+        <input asp-for="BestemmingsNaam" class="form-control" />
+        <span asp-validation-for="BestemmingsNaam" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Beschrijving"></label>
+        <textarea asp-for="Beschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Beschrijving" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MinLeeftijd"></label>
+        <input asp-for="MinLeeftijd" class="form-control" />
+        <span asp-validation-for="MinLeeftijd" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MaxLeeftijd"></label>
+        <input asp-for="MaxLeeftijd" class="form-control" />
+        <span asp-validation-for="MaxLeeftijd" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label>Huidige Foto's</label>
+        @if (Model.BestaandeFotos != null && Model.BestaandeFotos.Any())
+        {
+            <div class="row">
+                @foreach (var foto in Model.BestaandeFotos)
+                {
+                    <div class="col-md-3">
+                        <img src="~/images/@foto.Naam" class="img-thumbnail" alt="@foto.Naam" />
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>Geen foto's beschikbaar.</p>
+        }
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FotoBestanden">Nieuwe Foto's Toevoegen</label>
+        <input asp-for="FotoBestanden" type="file" class="form-control" multiple />
+        <span asp-validation-for="FotoBestanden" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Opslaan" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

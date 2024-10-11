@@ -1,0 +1,39 @@
+﻿@model MVC_Project_BSL.Models.Bestemming
+
+@{
+    ViewData["Title"] = "Bestemming Verwijderen";
+}
+
+<h1>Bestemming Verwijderen</h1>
+
+<h3>Weet je zeker dat je deze bestemming wilt verwijderen?</h3>
+
+<div>
+    <h4>Bestemming</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Code</dt>
+        <dd class="col-sm-10">@Model.Code</dd>
+
+        <dt class="col-sm-2">Naam</dt>
+        <dd class="col-sm-10">@Model.BestemmingsNaam</dd>
+
+        <dt class="col-sm-2">Beschrijving</dt>
+        <dd class="col-sm-10">@Model.Beschrijving</dd>
+
+        <dt class="col-sm-2">Minimale Leeftijd</dt>
+        <dd class="col-sm-10">@Model.MinLeeftijd</dd>
+
+        <dt class="col-sm-2">Maximale Leeftijd</dt>
+        <dd class="col-sm-10">@Model.MaxLeeftijd</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <input type="submit" value="Verwijderen" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+    </div>
+</form>

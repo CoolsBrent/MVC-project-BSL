@@ -16,6 +16,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
             ActiviteitRepository = new GenericRepository<Activiteit>(_context);
             MonitorRepository = new GenericRepository<Models.Monitor>(_context);
             KindRepository = new GenericRepository<Kind>(_context);
+            FotoRepository = new GenericRepository<Foto>(_context);
         }
 
         public IGenericRepository<Groepsreis> GroepsreisRepository { get; }
@@ -23,6 +24,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         public IGenericRepository<Activiteit> ActiviteitRepository { get; private set; }
         public IGenericRepository<Models.Monitor> MonitorRepository { get; private set; }
         public IGenericRepository<Kind> KindRepository { get; private set; }
+        public IGenericRepository<Foto> FotoRepository { get; }
 
         public void SaveChanges()
         {

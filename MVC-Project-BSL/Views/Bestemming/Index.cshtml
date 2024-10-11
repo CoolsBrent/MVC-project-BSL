@@ -1,0 +1,46 @@
+﻿@model IEnumerable<MVC_Project_BSL.Models.Bestemming>
+
+<h1>Bestemmingen</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nieuwe Bestemming</a>
+</p>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-warning">
+        Er zijn momenteel geen bestemmingen beschikbaar.
+    </div>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Naam</th>
+                <th>Beschrijving</th>
+                <th>Min. Leeftijd</th>
+                <th>Max. Leeftijd</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var bestemming in Model)
+            {
+                <tr>
+                    <td>@bestemming.Code</td>
+                    <td>@bestemming.BestemmingsNaam</td>
+                    <td>@bestemming.Beschrijving</td>
+                    <td>@bestemming.MinLeeftijd</td>
+                    <td>@bestemming.MaxLeeftijd</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@bestemming.Id" class="btn btn-info">Details</a>
+                        <a asp-action="Edit" asp-route-id="@bestemming.Id" class="btn btn-warning">Bewerken</a>
+                        <a asp-action="Delete" asp-route-id="@bestemming.Id" class="btn btn-danger">Verwijderen</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
