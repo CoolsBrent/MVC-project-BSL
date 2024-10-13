@@ -58,7 +58,7 @@
     <!-- Nieuwe foto's toevoegen -->
     <div class="form-group">
         <label asp-for="FotoBestanden">Nieuwe Foto's Toevoegen</label>
-        <input asp-for="FotoBestanden" type="file" class="form-control" multiple />
+        <input asp-for="FotoBestanden" type="file" class="form-control" multiple data-val="false"/>
         <span asp-validation-for="FotoBestanden" class="text-danger"></span>
     </div>
 

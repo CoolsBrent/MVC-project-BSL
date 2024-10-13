@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.ViewModels
@@ -27,10 +28,11 @@ namespace MVC_Project_BSL.ViewModels
         public int MaxLeeftijd { get; set; }
 
         // Voor het uploaden van nieuwe foto's
-        public List<IFormFile> FotoBestanden { get; set; }
+        public List<IFormFile> FotoBestanden { get; set; } = new List<IFormFile>();
 
         // Voor het weergeven van bestaande foto's
-        public List<Foto> BestaandeFotos { get; set; }
+        [BindNever]
+        public List<Foto> BestaandeFotos { get; set; } = new List<Foto>();
 
         // Voor het bijhouden welke foto's verwijderd moeten worden
         public List<int> VerwijderFotosIds { get; set; } = new List<int>();
