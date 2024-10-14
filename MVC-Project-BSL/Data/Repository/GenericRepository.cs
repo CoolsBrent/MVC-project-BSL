@@ -9,7 +9,7 @@ namespace MVC_Project_BSL.Data.Repository
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
         protected readonly DbSet<TEntity> _dbSet;
 
         public GenericRepository(ApplicationDbContext context)
@@ -17,6 +17,21 @@ namespace MVC_Project_BSL.Data.Repository
             _context = context;
             _dbSet = _context.Set<TEntity>();
         }
+
+        //Om te controleren of er reeds bestaande foto's zijn in de EDIT
+        public IQueryable<TEntity> GetQueryable(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? queryFunc = null)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (queryFunc != null)
+            {
+                query = queryFunc(query);
+            }
+
+            return query;
+        }
+
 
         // Nieuwe methode met ondersteuning voor include
         public async Task<IEnumerable<TEntity>> GetAllAsync(

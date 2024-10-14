@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MVC_Project_BSL.Models;
 
-namespace MVC_Project_BSL.Models
+namespace MVC_Project_BSL.ViewModels
 {
-    public class Bestemming
+    public class BestemmingViewModel
     {
         public int Id { get; set; }
 
@@ -24,7 +27,14 @@ namespace MVC_Project_BSL.Models
         [Range(0, 120, ErrorMessage = "Maximale leeftijd moet tussen 0 en 120 liggen.")]
         public int MaxLeeftijd { get; set; }
 
-        public ICollection<Foto> Fotos { get; set; } = new List<Foto>();
-        public ICollection<Groepsreis> Groepsreizen { get; set; } = new List<Groepsreis>();
+        // Voor het uploaden van nieuwe foto's
+        public List<IFormFile> FotoBestanden { get; set; } = new List<IFormFile>();
+
+        // Voor het weergeven van bestaande foto's
+        [BindNever]
+        public List<Foto> BestaandeFotos { get; set; } = new List<Foto>();
+
+        // Voor het bijhouden welke foto's verwijderd moeten worden
+        public List<int> VerwijderFotosIds { get; set; } = new List<int>();
     }
 }
