@@ -130,7 +130,9 @@ namespace MVC_Project_BSL.Controllers
         // GET: Groepsreis/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable(
+                query => query.Include(g => g.Bestemming))
+                .FirstOrDefaultAsync(g => g.Id == id);
             if (groepsreis == null)
             {
                 return NotFound();

@@ -1,82 +1,107 @@
 ﻿@using System.Globalization
 @model IEnumerable<MVC_Project_BSL.Models.Groepsreis>
 
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumY1TUEAOhyFjT3zLpa0CiYmVcjpib3zxC6X5w2a" crossorigin="anonymous">
+
+<!-- Bootstrap Icons CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+
 <h1>Groepsreizen</h1>
+
+
+<p>
+    <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe groepsreis toevoegen">
+        <i class="bi bi-plus-circle h4 text-white"></i>
+    </a>
+</p>
 
 @if (!Model.Any())
 {
-        <div class="alert alert-warning">
-            Er zijn momenteel geen groepsreizen beschikbaar. <br />
-            <a asp-action="Create" class="btn btn-primary">Voeg een nieuwe groepsreis toe</a>
-        </div>
+    <div class="alert alert-warning">
+        Er zijn momenteel geen groepsreizen beschikbaar. <br />
+        <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe Groepsreis">
+            <i class="bi bi-plus-circle h4 text-white"></i>
+        </a>
+    </div>
 }
 else
 {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Begindatum</th>
-                    <th>Einddatum</th>
-                    <th>Bestemming</th>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Begindatum</th>
+                <th>Einddatum</th>
+                <th>Bestemming</th>
                 <th>Beschrijving</th>
-                    <th>Leeftijdscategorie</th>
-                    <th>Prijs</th>
-                    <th>Acties</th>
-                </tr>
-            </thead>
-            <tbody>
+                <th>Leeftijdscategorie</th>
+                <th>Prijs</th>
+                <th>Acties</th>
+            </tr>
+        </thead>
+        <tbody>
             @foreach (var groepsreis in Model)
             {
-                        <tr>
-                            <td>@groepsreis.Begindatum.ToShortDateString()</td>
-                            <td>@groepsreis.Einddatum.ToShortDateString()</td>
-                            <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
-                            <td>@groepsreis.Bestemming?.Beschrijving</td>
-                            <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
-                            <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
-                            <td>
-                                <!-- Bekijken knop -->
-                                <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary">
-                                    Bekijken
-                                </a>
+                <tr>
+                    <td>@groepsreis.Begindatum.ToShortDateString()</td>
+                    <td>@groepsreis.Einddatum.ToShortDateString()</td>
+                    <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
+                    <td>@groepsreis.Bestemming?.Beschrijving</td>
+                    <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
+                    <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
+                    <td>
+                        <!-- Bekijken knop -->
+                        <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary" data-bs-toggle="tooltip" title="Bekijken">
+                            <i class="bi bi-eye h4 text-white"></i>
+                        </a>
 
-                                <!-- Bewerken knop -->
-                                <a asp-action="Edit" asp-route-id="@groepsreis.Id" class="btn btn-warning">
-                                    Bewerken
-                                </a>
+                        <!-- Bewerken knop -->
+                        <a asp-action="Edit" asp-route-id="@groepsreis.Id" class="btn btn-secondary" data-bs-toggle="tooltip" title="Bewerken">
+                            <i class="bi bi-pencil-square h4"></i>
+                        </a>
 
-                                <!-- Verwijderknop die de modal activeert -->
-                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@groepsreis.Id">
-                                    Verwijderen
-                                </button>
+                        <!-- Verwijderknop die de modal activeert -->
+                        <a asp-action="Delete" asp-route-id="@groepsreis.Id" class="btn btn-danger" data-bs-toggle="tooltip" title="Verwijderen">
+                            <i class="bi bi-trash h4"></i>
+                        </a>
 
-                                <!-- Bootstrap modal voor verwijderbevestiging -->
-                                <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel">Bevestig Verwijderen</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                Weet je zeker dat je de groepsreis naar @groepsreis.Bestemming?.BestemmingsNaam wilt verwijderen?
-                                            </div>
-                                            <div class="modal-footer">
-                                                <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
-                                                    <input type="submit" value="Verwijderen" class="btn btn-danger" />
-                                                </form>
-                                            </div>
-                                        </div>
+                        <!-- Bootstrap modal voor verwijderbevestiging -->
+                        <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@groepsreis.Id" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel-@groepsreis.Id">Bevestig Verwijderen</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Weet je zeker dat je de groepsreis naar @groepsreis.Bestemming?.BestemmingsNaam wilt verwijderen?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                                            <input type="submit" value="Verwijderen" class="btn btn-danger" />
+                                        </form>
                                     </div>
                                 </div>
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
             }
-            </tbody>
-        </table>
-
-        <p>
-            <a asp-action="Create" class="btn btn-primary">Nieuwe Groepsreis</a>
-        </p>
+        </tbody>
+    </table>
 }
+
+<!-- Bootstrap JS (inclusief Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+
+<script>
+    // Initialiseer tooltips
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    });
+</script>
