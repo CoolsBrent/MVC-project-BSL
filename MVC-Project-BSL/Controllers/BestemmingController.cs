@@ -23,7 +23,10 @@ namespace MVC_Project_BSL.Controllers
         // GET: Bestemming
         public async Task<IActionResult> Index()
         {
-            var bestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
+            var bestemmingen = await _unitOfWork.BestemmingRepository.GetQueryable(
+            query => query.Include(b => b.Fotos))
+                .ToListAsync();
+
             return View(bestemmingen);
         }
 

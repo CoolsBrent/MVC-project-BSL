@@ -1,9 +1,17 @@
 ﻿@model IEnumerable<MVC_Project_BSL.Models.Bestemming>
 
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/css/bootstrap.min.css" integrity="sha384-..." crossorigin="anonymous">
+
+<!-- Bootstrap Icons CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
 <h1>Bestemmingen</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Nieuwe Bestemming</a>
+    <a asp-action="Create" class="btn btn-primary" data-toggle="tooltip" title="Nieuwe bestemming toevoegen">
+        <i class="bi bi-plus-circle h4 text-white"></i>
+    </a>
 </p>
 
 @if (!Model.Any())
@@ -17,6 +25,7 @@ else
     <table class="table">
         <thead>
             <tr>
+                <th>Foto</th>
                 <th>Code</th>
                 <th>Naam</th>
                 <th>Beschrijving</th>
@@ -29,18 +38,50 @@ else
             @foreach (var bestemming in Model)
             {
                 <tr>
+                    <td>
+                        @if (bestemming.Fotos != null && bestemming.Fotos.Any())
+                        {
+                            var eersteFoto = bestemming.Fotos.FirstOrDefault();
+                            <div class="image-container">
+                                <img src="~/images/@eersteFoto.Naam" alt="Foto van @bestemming.BestemmingsNaam" class="img-thumbnail" />
+                            </div>
+                        }
+                        else
+                        {
+                            <span>Geen foto</span>
+                        }
+                    </td>
                     <td>@bestemming.Code</td>
                     <td>@bestemming.BestemmingsNaam</td>
                     <td>@bestemming.Beschrijving</td>
                     <td>@bestemming.MinLeeftijd</td>
                     <td>@bestemming.MaxLeeftijd</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@bestemming.Id" class="btn btn-info">Details</a>
-                        <a asp-action="Edit" asp-route-id="@bestemming.Id" class="btn btn-warning">Bewerken</a>
-                        <a asp-action="Delete" asp-route-id="@bestemming.Id" class="btn btn-danger">Verwijderen</a>
+                        <!-- Details -->
+                        <a asp-action="Details" asp-route-id="@bestemming.Id" class="btn btn-primary" data-toggle="tooltip" title="Details">
+                            <i class="bi bi-info-circle h4 text-white"></i>
+                        </a>
+                        <!-- Bewerken -->
+                        <a asp-action="Edit" asp-route-id="@bestemming.Id" class="btn btn-secondary" data-toggle="tooltip" title="Bewerken">
+                            <i class="bi bi-pencil-square h4"></i>
+                        </a>
+                        <!-- Verwijderen -->
+                        <a asp-action="Delete" asp-route-id="@bestemming.Id" class="btn btn-danger" data-toggle="tooltip" title="Verwijderen">
+                            <i class="bi bi-trash h4"></i>
+                        </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 }
+
+<!-- Voeg jQuery en Bootstrap JS toe voor tooltips -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-..." crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.6.2/js/bootstrap.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+</script>

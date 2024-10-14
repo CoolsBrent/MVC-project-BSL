@@ -92,3 +92,22 @@ body {
         transform: scale(1.05);
     }
 
+
+    /*Bestemmingen*/
+
+.image-container {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    position: relative;
+}
+
+    .image-container img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        height: auto;
+        width: 100%;
+        transform: translate(-50%, -50%);
+    }
+
