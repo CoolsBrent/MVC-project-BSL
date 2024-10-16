@@ -112,3 +112,10 @@ footer {
     margin-top: auto; /* Duwt de footer naar onderen */
     width: 100%;
 }
+
+
+.large-thumbnail {
+    width: 100%; /* Vult de breedte van de container */
+    height: auto; /* Behoudt de aspect ratio */
+    max-width: 600px; /* Limiteert de breedte tot maximaal 600px */
+}
