@@ -1,43 +1,48 @@
+/* Algemene instellingen */
 html {
-  font-size: 14px;
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+html, body {
+    height: 100%; /* Zorg ervoor dat html en body de volledige hoogte van het scherm innemen */
+    margin: 0; /* Verwijder eventuele marges */
+    display: flex;
+    flex-direction: column; /* Flexbox om het lichaam in kolommen te structureren */
 }
 
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-}
-.bg-navbar {
-    background-color: #3C3C3C !important; /* Achtergrondkleur instellen met hogere prioriteit */
-}
-
-/* Algemene body stijl */
 body {
     background-color: white; /* Witte achtergrond */
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1; /* Zorgt ervoor dat de main de resterende ruimte inneemt */
+}
+
+/* Stijlen voor de focus van knoppen en formulieren */
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus,
+.form-control:focus, .form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 /* Navbar styling */
 .bg-navbar {
-    background-color: #3C3C3C; /* Accentkleur voor de navbar */
+    background-color: #3C3C3C !important; /* Achtergrondkleur navbar */
 }
 
 /* Button styling */
 .btn-primary {
     background-color: #d4592b; /* Accentkleur voor primaire knoppen */
-    border-color: #d4592b; /* Accentkleur voor de rand van knoppen */
+    border-color: #d4592b; /* Accentkleur rand knoppen */
 }
 
     .btn-primary:hover {
@@ -45,17 +50,15 @@ body {
         border-color: #3C3C3C; /* Donkere accentkleur bij hover */
     }
 
-/* Card styling voor groepsreizen */
+/* Styling voor kaarten (cards) */
 .card {
-    border: 1px solid #d4592b; /* Accentkleur rand voor kaarten */
-    transition: transform 0.2s; /* Voeg een lichte overgang toe */
+    border: 1px solid #d4592b; /* Accentkleur rand kaarten */
+    transition: transform 0.3s; /* Smooth transition bij hover */
 }
 
     .card:hover {
         transform: scale(1.05); /* Vergroot de kaart bij hover */
     }
-
-
 
 /* Formulier styling */
 .form-row {
@@ -68,7 +71,7 @@ body {
 
 /* CSS voor de hero section */
 .hero-section {
-    background-image: url('/images/hero-bg.jpg'); /* Zorg dat je een mooie achtergrondafbeelding hebt */
+    background-image: url('/images/hero-bg.jpg'); /* Achtergrondafbeelding */
     background-size: cover;
     background-position: center;
     width: 100%;
@@ -84,17 +87,7 @@ body {
         font-family: 'Playfair Display', serif;
     }
 
-.card {
-    transition: transform 0.3s;
-}
-
-    .card:hover {
-        transform: scale(1.05);
-    }
-
-
-    /*Bestemmingen*/
-
+/* Bestemmingen */
 .image-container {
     width: 100px;
     height: 100px;
@@ -111,3 +104,11 @@ body {
         transform: translate(-50%, -50%);
     }
 
+/* Footer styling */
+footer {
+    background-color: #3C3C3C;
+    padding: 1rem;
+    text-align: center;
+    margin-top: auto; /* Duwt de footer naar onderen */
+    width: 100%;
+}
