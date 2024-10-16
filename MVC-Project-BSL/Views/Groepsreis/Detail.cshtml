@@ -1,16 +1,67 @@
 ﻿@model MVC_Project_BSL.Models.Groepsreis
 
-<h1>Details van de Groepsreis</h1>
+<h1>De reis naar @Model.Bestemming?.BestemmingsNaam</h1>
 
+<!-- Foto en beschrijving naast elkaar -->
+<div class="row">
+	<!-- Linkerzijde: Foto's (50% breedte) -->
+	<div class="col-md-6">
+		@if (Model.Bestemming?.Fotos != null && Model.Bestemming.Fotos.Any())
+		{
+			<div class="row">
+				@foreach (var foto in Model.Bestemming.Fotos)
+				{
+					<div class="col-12 mb-3">
+						<!-- Volledige breedte in de 50% kolom, met wat marge -->
+						<img src="~/images/@foto.Naam" alt="Foto van @Model.Bestemming.BestemmingsNaam"
+							 class="large-thumbnail img-thumbnail img-fluid" />
+					</div>
+				}
+			</div>
+		}
+		else
+		{
+			<p>Geen foto's beschikbaar</p>
+		}
+	</div>
+
+	<!-- Rechterzijde: Beschrijving (50% breedte) -->
+	<div class="col-md-6 d-flex flex-column">
+		<h2>@Model.Bestemming?.BestemmingsNaam</h2>
+		<p>@Model.Bestemming?.Beschrijving</p>
+
+		<h5>Activiteiten</h5>
+		@if (Model.Activiteiten != null && Model.Activiteiten.Any())
+		{
+			<ul>
+				@foreach (var activiteit in Model.Activiteiten)
+				{
+					<li>
+						<strong>@activiteit.Naam</strong>: @activiteit.Beschrijving
+					</li>
+				}
+			</ul>
+		}
+		else
+		{
+			<p>Nog geen activiteiten beschikbaar voor deze reis.</p>
+		}
+	</div>
+
+</div>
+
+<hr />
+
+
+<!-- Details van de groepsreis -->
 <div>
-    <h4>Groepsreis</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Begindatum</dt>
-        <dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
+	<h4>Details</h4>
+	<dl class="row">
+		<dt class="col-sm-2">Begindatum</dt>
+		<dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
 
-        <dt class="col-sm-2">Einddatum</dt>
-        <dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
+		<dt class="col-sm-2">Einddatum</dt>
+		<dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
 
 		<dt class="col-sm-2">Prijs</dt>
 		<dd class="col-sm-10">@Model.Prijs.ToString("C")</dd>
@@ -18,16 +69,11 @@
 		<dt class="col-sm-2">Leeftijdscategorie</dt>
 		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
-		<dt class="col-sm-2">Bestemming</dt>
-		<dd class="col-sm-10">@Model.Bestemming?.BestemmingsNaam</dd>
-
-		<dt class="col-sm-2">Beschrijving</dt>
-		<dd class="col-sm-10">@Model.Bestemming?.Beschrijving</dd>
-
 		<dt class="col-sm-2">Aantal Deelnemers</dt>
 		<dd class="col-sm-10">@Model.Kinderen.Count()</dd>
 	</dl>
 </div>
+
 <div class="row">
 	<!-- Ingeschreven Monitoren -->
 	<div class="col-md-6">
@@ -246,4 +292,3 @@ else
 <p>
     <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Terug naar Home</a>
 </p>
-
