@@ -1,7 +1,8 @@
-﻿using MVC_Project_BSL.Models;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using MVC_Project_BSL.Attributes;
+using MVC_Project_BSL.Models;
 
 public class Onkosten
 {
@@ -22,7 +23,7 @@ public class Onkosten
     public string? Foto { get; set; }
 
     [NotMapped]
-    [ValidateNever]
+    [RequiredIfNoFoto(ErrorMessage = "Het uploaden van een foto is verplicht.")]
     public IFormFile? FotoFile { get; set; }
 
     public int GroepsreisId { get; set; }

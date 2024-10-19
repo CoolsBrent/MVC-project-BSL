@@ -9,6 +9,14 @@
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
+    @if (ViewData.ModelState.ErrorCount > 0)
+    {
+        <div class="alert alert-warning">
+            Let op: Als u vergeten bent iets in te vullen, moet u het bestand opnieuw selecteren.
+        </div>
+    }
+
+
     <input type="hidden" asp-for="Id" />
 
     <div class="form-group">
@@ -72,7 +80,8 @@
                             <span asp-validation-for="Onkosten[@i].Datum" class="text-danger"></span>
                         </td>
                         <td>
-                            <input type="file" class="form-control" name="Onkosten[@i].FotoFile" />
+                            <input type="file" class="form-control" name="Onkosten[@i].FotoFile" data-val="true" data-val-requiredifnofoto="Het uploaden van een foto is verplicht." data-foto="@Model.Onkosten[i].Foto" />
+                            <span asp-validation-for="Onkosten[@i].FotoFile" class="text-danger"></span>
                             @if (!string.IsNullOrEmpty(Model.Onkosten[i].Foto))
                             {
                                 <img src="@Model.Onkosten[i].Foto" alt="Huidige Foto" style="max-width:100px;" />
@@ -123,12 +132,26 @@
 </form>
 
 @section Scripts {
-    @await Html.PartialAsync("_ValidationScriptsPartial")
-
     <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+    @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
         $(document).ready(function () {
+            // Voeg de custom validator toe
+            $.validator.addMethod("requiredifnofoto", function (value, element, parameters) {
+                var foto = $(element).data("foto");
+                // Als Foto leeg is, is FotoFile verplicht
+                if (!foto) {
+                    return value && value.length > 0;
+                }
+                return true;
+            });
+
+            $.validator.unobtrusive.adapters.add("requiredifnofoto", [], function (options) {
+                options.rules["requiredifnofoto"] = {};
+                options.messages["requiredifnofoto"] = options.message;
+            });
+
             var onkostenCounter = @Model.Onkosten?.Count() ?? 0;
 
             // Voeg nieuwe onkost toe
@@ -143,11 +166,15 @@
                     '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Bedrag" data-valmsg-replace="true"></span></td>' +
                     '<td><input class="form-control" type="date" name="Onkosten[' + index + '].Datum" />' +
                     '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Datum" data-valmsg-replace="true"></span></td>' +
-                    '<td><input type="file" class="form-control" name="Onkosten[' + index + '].FotoFile" /></td>' +
+                    '<td><input type="file" class="form-control" name="Onkosten[' + index + '].FotoFile" data-val="true" data-val-requiredifnofoto="Het uploaden van een foto is verplicht." data-foto="" />' +
+                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].FotoFile" data-valmsg-replace="true"></span></td>' +
                     '<td><button type="button" class="btn btn-danger remove-onkost">Verwijderen</button></td>' +
                     '<input type="hidden" name="Onkosten[' + index + '].GroepsreisId" value="@Model.Id" />' +
                     '</tr>';
                 $('#onkostenTable tbody').append(newRow);
+
+                // Re-initialiseer de validatie voor de nieuw toegevoegde elementen
+                $.validator.unobtrusive.parse('#onkostenTable');
             });
 
             // Verwijder onkost
