@@ -92,15 +92,15 @@
 					@foreach (var monitor in Model.Monitoren)
 					{
 						<tr>
-							<td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
-							<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
+							<td>@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
+							<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
 							<td class="text-center align-middle">
-								@if (!monitor.IsHoofdMonitor)
+								@if (!monitor.Monitor.IsHoofdMonitor)
 								{
 									<!-- Knop om hoofdmonitor te maken -->
 									<form asp-action="MaakHoofdmonitor" method="post" style="display:inline;">
 										<input type="hidden" name="groepsreisId" value="@Model.Id" />
-										<input type="hidden" name="monitorId" value="@monitor.Id" />
+										<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
 										<button type="submit" class="btn btn-success btn-sm me-1">Maak Hoofdmonitor</button>
 									</form>
 								}
@@ -108,13 +108,13 @@
 								{
 									<form asp-action="MaakGewoneMonitor" method="post" style="display:inline;">
 										<input type="hidden" name="groepsreisId" value="@Model.Id" />
-										<input type="hidden" name="monitorId" value="@monitor.Id" />
+										<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
 										<button type="submit" class="btn btn-success btn-sm me-1">Maak monitor</button>
 									</form>
 								}
 								<form asp-action="DeleteMonitor" method="post" style="display:inline;">
 									<input type="hidden" name="groepsreisId" value="@Model.Id" />
-									<input type="hidden" name="monitorId" value="@monitor.Id" />
+									<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
 									<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
 								</form>
 							</td>
@@ -148,7 +148,7 @@
 				@foreach (var monitor in Model.BeschikbareMonitoren)
 				{
 					<tr>
-						<td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
+						<td>@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
 						<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
 						<td>
 							<form asp-action="AddMonitor" method="post" style="display:inline;">
@@ -185,19 +185,19 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var kind in Model.Deelnemers)
+					@foreach (var deelnemer in Model.Deelnemers)
 					{
-						var geboortedatum = kind.Kind.Geboortedatum;
+						var geboortedatum = deelnemer.Kind.Geboortedatum;
 						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
 						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
 						<tr>
-							<td>@kind.Kind.Voornaam @kind.Kind.Naam</td> <!-- Toon naam van het kind -->
+							<td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
 							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
 							<td>
 								<form asp-action="DeleteDeelnemer" method="post">
 									<input type="hidden" name="groepsreisId" value="@Model.Id" />
-									<input type="hidden" name="kindId" value="@kind.Id" />
+									<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
 									<button type="submit" class="btn btn-danger">Verwijderen</button>
 								</form>
 							</td>
@@ -219,75 +219,52 @@
 	<!-- Beschikbare Deelnemers -->
 	<div class="col-md-6">
 		<h2>Beschikbare Deelnemers</h2>
-		@if (Model.BeschikbareDeelnemers.Any())
-		{
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Naam</th>
-					<th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
-					<th>Actie</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var kind in Model.BeschikbareDeelnemers)
-				{
-					var geboortedatum = kind.Geboortedatum;
-					var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-					if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
-
-					<tr>
-						<td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
-						<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
-						<td>
-							<form asp-action="VoegDeelnemerToe" method="post">
-								<input type="hidden" name="groepsreisId" value="@Model.Id" />
-								<input type="hidden" name="kindId" value="@kind.Id" />
-								<button type="submit" class="btn btn-primary">Toevoegen</button>
-							</form>
-						</td>
-					</tr>
-
-				}
-			</tbody>
-		</table>
-		}
-		else
+		<!-- Controleer of er beschikbare deelnemers zijn -->
+		@if (!Model.BeschikbareDeelnemers.Any())
 		{
 			<div class="alert alert-warning">
 				Geen deelnemers beschikbaar.
 			</div>
 		}
+		else
+		{
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Naam</th>
+						<th>Leeftijd</th>
+						<th>Actie</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var kind in Model.BeschikbareDeelnemers)
+					{
+						// Controleer of het kind al een deelnemer is
+						bool isDeelnemer = Model.Deelnemers.Any(d => d.KindId == kind.Id);
+						if (isDeelnemer) continue; // Sla dit kind over als het al een deelnemer is
+
+						var geboortedatum = kind.Geboortedatum;
+						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+						<tr>
+							<td>@kind.Voornaam @kind.Naam</td>
+							<td>@leeftijd jaar</td>
+							<td>
+								<form asp-action="VoegDeelnemerToe" method="post">
+									<input type="hidden" name="groepsreisId" value="@Model.Id" />
+									<input type="hidden" name="kindId" value="@kind.Id" />
+									<button type="submit" class="btn btn-success">Toevoegen</button>
+								</form>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+
 	</div>
 
-
-<h2>Geregistreerde Monitoren</h2>
-@if (Model.Monitoren.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Naam</th>
-                <th>Hoofdmonitor</th> <!-- Voeg een kolom toe voor hoofdmonitor -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var monitor in Model.Monitoren)
-            {
-                <tr>
-                    <td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Zorg ervoor dat Persoon correct is ingesteld -->
-                    <td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Toon of het een hoofdmonitor is -->
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <div class="alert alert-warning">
-        Geen monitoren geregistreerd voor deze groepsreis.
-    </div>
-}
 
 <p>
     <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Terug naar Home</a>

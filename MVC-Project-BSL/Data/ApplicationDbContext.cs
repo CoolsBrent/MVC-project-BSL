@@ -19,7 +19,7 @@ namespace MVC_Project_BSL.Data
         public DbSet<Programma> Programmas { get; set; }
         public DbSet<Bestemming> Bestemmingen { get; set; }
         public DbSet<Groepsreis> Groepsreizen { get; set; }
-        public DbSet<Models.Monitor> Monitoren { get; set; }
+        public DbSet<Monitor> Monitoren { get; set; }
         public DbSet<Kind> Kinderen { get; set; }
         public DbSet<Foto> Fotos { get; set; }
         public DbSet<Deelnemer> Deelnemers { get; set; }
@@ -69,18 +69,22 @@ namespace MVC_Project_BSL.Data
                 .WithMany(g => g.Deelnemers)
                 .HasForeignKey(d => d.GroepsreisDetailId);
 
-            // R7 + R10: Groepsreis - Monitor (many-to-many)
-            modelBuilder.Entity<Models.Monitor>()
-                .HasOne(m => m.Persoon)
-                .WithMany(u => u.Monitoren)
-                .HasForeignKey(m => m.PersoonId);
-            modelBuilder.Entity<Models.Monitor>()
-                .HasOne(m => m.GroepsreisDetail)
-                .WithMany()
-                .HasForeignKey(m => m.GroepsreisDetailId);
+			modelBuilder.Entity<GroepsreisMonitor>()
+	   .HasKey(gm => new { gm.GroepsreisId, gm.MonitorId });
 
-            // R9: Opleiding - Opleiding (self-referencing)
-            modelBuilder.Entity<Opleiding>()
+			modelBuilder.Entity<GroepsreisMonitor>()
+				.HasOne(gm => gm.Groepsreis)
+				.WithMany(g => g.Monitoren)
+				.HasForeignKey(gm => gm.GroepsreisId);
+
+			modelBuilder.Entity<GroepsreisMonitor>()
+				.HasOne(gm => gm.Monitor)
+				.WithMany(m => m.Groepsreizen)
+				.HasForeignKey(gm => gm.MonitorId);
+
+
+			// R9: Opleiding - Opleiding (self-referencing)
+			modelBuilder.Entity<Opleiding>()
                 .HasOne<Opleiding>()
                 .WithMany()
                 .HasForeignKey(o => o.OpleidingVereist);
