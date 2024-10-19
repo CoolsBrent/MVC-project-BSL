@@ -128,12 +128,21 @@ footer {
         color: inherit; /* Houd dezelfde kleur als bij normale toestand */
         text-decoration: none; /* Houd de onderstreping weg */
     }
-@media (min-width: 768px) {
-    aside {
-        transition: margin-left 0.3s ease;
+.hero-section-dashboard {
+    background-image: url('/images/dashboard.jpg'); /* Achtergrondafbeelding */
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 275px
+}
+
+    .hero-section-dashboard h1 h2 {
+        font-size: 3rem;
+        font-family: 'Playfair Display', serif;
     }
 
-    .collapse.show + main {
-        margin-left: 250px; /* Pas deze waarde aan op basis van de breedte van je aside */
+    .hero-section-dashboard p {
+        font-size: 1.5rem;
+        font-family: 'Playfair Display', serif;
     }
-}
+
