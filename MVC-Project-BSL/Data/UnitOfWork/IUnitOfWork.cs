@@ -9,6 +9,8 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         IGenericRepository<Bestemming> BestemmingRepository { get; }
         IGenericRepository<Activiteit> ActiviteitRepository { get; }
         IGenericRepository<Models.Monitor> MonitorRepository { get; }
+        IGenericRepository<Deelnemer> DeelnemerRepository { get; }
+        IGenericRepository<Programma> ProgrammaRepository { get; }
         IGenericRepository<Kind> KindRepository { get; }
         IGenericRepository<Foto> FotoRepository { get; }
 

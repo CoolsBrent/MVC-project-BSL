@@ -2,17 +2,17 @@
 {
     public class Kind
     {
-        public int Id { get; set; }
+        public int Id { get; set; } // Primary Key
+        public string PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
+
         public string Naam { get; set; }
         public string Voornaam { get; set; }
         public DateTime Geboortedatum { get; set; }
-        public string Allergieen { get; set; }
+        public string Allergieën { get; set; }
         public string Medicatie { get; set; }
 
-        public string PersoonId { get; set; }
+        // Navigatie-eigenschappen
         public CustomUser Persoon { get; set; }
-
-        public ICollection<Groepsreis> Groepsreizen { get; set; }
     }
 
 }

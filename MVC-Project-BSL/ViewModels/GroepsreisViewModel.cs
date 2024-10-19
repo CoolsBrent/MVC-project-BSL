@@ -45,6 +45,11 @@ namespace MVC_Project_BSL.ViewModels
         public int? MaxLeeftijdFilter { get; set; }
         public DateTime? BegindatumFilter { get; set; }
 
+        public List<Groepsreis> GeboekteGroepsReizen { get; set; } = new List<Groepsreis> { };
+        public List<Groepsreis> ToekomstigeGroepsReizen { get; set; } = new List<Groepsreis> { };
+        public List<Groepsreis> AlleGroepsReizen { get; set; } = new List<Groepsreis> { };
+
+
     }
 }
 

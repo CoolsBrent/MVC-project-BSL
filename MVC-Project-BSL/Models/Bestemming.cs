@@ -24,7 +24,7 @@ namespace MVC_Project_BSL.Models
         [Range(0, 120, ErrorMessage = "Maximale leeftijd moet tussen 0 en 120 liggen.")]
         public int MaxLeeftijd { get; set; }
 
-        public ICollection<Foto> Fotos { get; set; } = new List<Foto>();
-        public ICollection<Groepsreis> Groepsreizen { get; set; } = new List<Groepsreis>();
+        public ICollection<Foto> Fotos { get; set; }
+        public ICollection<Groepsreis> Groepsreizen { get; set; }
     }
 }

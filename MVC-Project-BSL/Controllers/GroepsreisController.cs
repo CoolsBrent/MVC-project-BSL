@@ -53,10 +53,10 @@ namespace MVC_Project_BSL.Controllers
 			{
 
 				// Zorg ervoor dat de collecties altijd zijn geïnitialiseerd om fouten te voorkomen
-				groepsreis.Kinderen = groepsreis.Kinderen ?? new List<Kind>();
+				groepsreis.Deelnemers = groepsreis.Deelnemers ?? new List<Deelnemer>();
 				groepsreis.Monitoren = groepsreis.Monitoren ?? new List<Models.Monitor>();
 				groepsreis.Onkosten = groepsreis.Onkosten ?? new List<Onkosten>();
-				groepsreis.Activiteiten = groepsreis.Activiteiten ?? new List<Activiteit>();
+				groepsreis.Programmas = groepsreis.Programmas ?? new List<Programma>();
 
 
 				// Sla de nieuwe groepsreis op als het formulier geldig is
@@ -85,7 +85,7 @@ namespace MVC_Project_BSL.Controllers
 			}
 			ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
 
-			ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Activiteiten);
+			ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Programmas);
 			return View(groepsreis);
 		}
 
@@ -121,7 +121,7 @@ namespace MVC_Project_BSL.Controllers
 			}
 			ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
 
-			ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Activiteiten);
+			ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Programmas);
 			return View(groepsreis);
 		}
 
@@ -174,7 +174,7 @@ namespace MVC_Project_BSL.Controllers
 							   .ThenInclude(m => m.Persoon) // Persoon van Monitoren ophalen
 							   .Include(g => g.Bestemming)
 							   .ThenInclude(b => b.Fotos)
-							   .Include(g => g.Kinderen));
+							   .Include(g => g.Deelnemers));
 
 			// Zoek de specifieke groepsreis met het gegeven id
 			var groepsreis = groepsreizen.FirstOrDefault(g => g.Id == id);
@@ -186,7 +186,7 @@ namespace MVC_Project_BSL.Controllers
 					.Select(g => g.First())
 					.ToList();
 
-			var ingeschrevenDeelnemers = groepsreis?.Kinderen.Select(m => m.Id).ToList();
+			var ingeschrevenDeelnemers = groepsreis?.Deelnemers.Select(m => m.Id).ToList();
 			var uniekeDeelnemers = deelnemers
 					.Where(m => !ingeschrevenDeelnemers.Contains(m.Id))  // Selecteer de eerste unieke deelnemer per groep (PersoonId)
 					.ToList();
@@ -203,75 +203,85 @@ namespace MVC_Project_BSL.Controllers
 			return View(groepsreis);
 		}
 
-		[HttpPost]
-		public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
-		{
-			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
-			var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+        [HttpPost]
+        public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
+        {
+            // Haal de groepsreis op
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
 
-			if (groepsreis == null || kind == null)
-			{
-				return NotFound();
-			}
+            // Haal het kind op
+            var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
 
-			// Voeg het kind toe aan de groepsreis
-			groepsreis.Kinderen.Add(kind);
+            // Controleer of zowel de groepsreis als het kind bestaan
+            if (groepsreis == null || kind == null)
+            {
+                return NotFound();
+            }
 
-			// Sla de wijzigingen op
-			_unitOfWork.SaveChanges();
+            // Maak een nieuwe deelnemer aan en koppel deze aan het kind
+            var deelnemer = new Deelnemer
+            {
+                KindId = kind.Id,
+                GroepsreisDetailId = groepsreis.Id // Zorg ervoor dat je de juiste property gebruikt
+            };
 
-			return RedirectToAction("Detail", new { id = groepsreisId });
-		}
-		[HttpPost]
-		public async Task<IActionResult> DeleteDeelnemer(int groepsreisId, int kindId)
-		{
-			Debug.WriteLine($"Verzoek ontvangen om kind met ID {kindId} te verwijderen uit groepsreis met ID {groepsreisId}.");
+            // Voeg de deelnemer toe aan de groepsreis
+            groepsreis.Deelnemers.Add(deelnemer);
+            // Verwijder het kind uit de Kind-tabel
+            _unitOfWork.KindRepository.Delete(kind);
 
-			// Groepsreis ophalen inclusief de kinderen
-			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(
-			groepsreisId, g => g.Kinderen);
-			var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+            // Sla de wijzigingen op
+            _unitOfWork.SaveChanges();
 
-			if (groepsreis == null)
-			{
-				Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
-				return NotFound();
-			}
+            // Redirect naar de detailpagina van de groepsreis
+            return RedirectToAction("Detail", new { id = groepsreisId });
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteDeelnemer(int groepsreisId, int kindId)
+        {
+            Debug.WriteLine($"Verzoek ontvangen om kind met ID {kindId} te verwijderen uit groepsreis met ID {groepsreisId}.");
 
-			if (kind == null)
-			{
-				Debug.WriteLine($"Kind met ID {kindId} niet gevonden.");
-				return NotFound();
-			}
+            // Groepsreis ophalen inclusief de deelnemers
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(
+                groepsreisId, g => g.Deelnemers);
 
-			// Kinderen loggen die in de groepsreis zitten
-			Debug.WriteLine("Huidige kinderen in groepsreis:");
-			foreach (var k in groepsreis.Kinderen)
-			{
-				Debug.WriteLine($"Kind ID: {k.Id}, Naam: {k.Naam}");  // Bijvoorbeeld: log ook de naam van het kind
-			}
+            // Controleer of de groepsreis bestaat
+            if (groepsreis == null)
+            {
+                Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
+                return NotFound();
+            }
 
-			// Verwijder het kind uit de groepsreis
-			if (groepsreis.Kinderen.Contains(kind))
-			{
-				Debug.WriteLine($"Kind met ID {kindId} gevonden in groepsreis. Verwijderen...");
-				groepsreis.Kinderen.Remove(kind);
+            // Zoek de deelnemer met het gegeven kindId
+            var deelnemer = groepsreis.Deelnemers.FirstOrDefault(d => d.KindId == kindId);
 
-				// Wijzigingen opslaan
-				Debug.WriteLine("Wijzigingen opslaan...");
-				_unitOfWork.SaveChanges();
-				Debug.WriteLine($"Kind met ID {kindId} succesvol verwijderd uit groepsreis met ID {groepsreisId}.");
-			}
-			else
-			{
-				Debug.WriteLine($"Kind met ID {kindId} is geen deelnemer aan groepsreis met ID {groepsreisId}.");
-			}
+            // Controleer of de deelnemer bestaat
+            if (deelnemer == null)
+            {
+                Debug.WriteLine($"Kind met ID {kindId} is geen deelnemer aan groepsreis met ID {groepsreisId}.");
+                return NotFound();
+            }
 
-			return RedirectToAction("Detail", new { id = groepsreisId });
-		}
+            // Verwijder de deelnemer uit de groepsreis
+            Debug.WriteLine($"Kind met ID {kindId} gevonden in groepsreis. Verwijderen...");
+            groepsreis.Deelnemers.Remove(deelnemer);
 
+            var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+            if (kind == null)
+            {
+                Debug.WriteLine($"Kind met ID {kindId} niet gevonden.");
+                return NotFound();
+            }
+            await _unitOfWork.KindRepository.AddAsync(kind);
 
-		[HttpPost]
+            // Wijzigingen opslaan
+            _unitOfWork.SaveChanges();
+            Debug.WriteLine($"Kind met ID {kindId} succesvol verwijderd uit groepsreis met ID {groepsreisId}.");
+
+            return RedirectToAction("Detail", new { id = groepsreisId });
+        }
+
+        [HttpPost]
 		public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, string monitorId)
 		{
 			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);

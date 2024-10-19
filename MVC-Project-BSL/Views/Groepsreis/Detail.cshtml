@@ -31,13 +31,13 @@
 		<p>@Model.Bestemming?.Beschrijving</p>
 
 		<h5>Activiteiten</h5>
-		@if (Model.Activiteiten != null && Model.Activiteiten.Any())
+		@if (Model.Programmas != null && Model.Programmas.Any())
 		{
 			<ul>
-				@foreach (var activiteit in Model.Activiteiten)
+				@foreach (var activiteit in Model.Programmas)
 				{
 					<li>
-						<strong>@activiteit.Naam</strong>: @activiteit.Beschrijving
+						<strong>@activiteit.Activiteit.Naam</strong>: @activiteit.Activiteit.Beschrijving
 					</li>
 				}
 			</ul>
@@ -70,7 +70,7 @@
 		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
 		<dt class="col-sm-2">Aantal Deelnemers</dt>
-		<dd class="col-sm-10">@Model.Kinderen.Count()</dd>
+		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
 	</dl>
 </div>
 
@@ -174,7 +174,7 @@
 	<!-- Ingeschreven Deelnemers -->
 	<div class="col-md-6">
 		<h2>Ingeschreven Deelnemers</h2>
-		@if (Model.Kinderen.Any())
+		@if (Model.Deelnemers.Any())
 		{
 			<table class="table">
 				<thead>
@@ -185,14 +185,14 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var kind in Model.Kinderen)
+					@foreach (var kind in Model.Deelnemers)
 					{
-						var geboortedatum = kind.Geboortedatum;
+						var geboortedatum = kind.Kind.Geboortedatum;
 						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
 						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
 						<tr>
-							<td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
+							<td>@kind.Kind.Voornaam @kind.Kind.Naam</td> <!-- Toon naam van het kind -->
 							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
 							<td>
 								<form asp-action="DeleteDeelnemer" method="post">
