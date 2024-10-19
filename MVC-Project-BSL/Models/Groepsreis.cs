@@ -27,7 +27,7 @@ namespace MVC_Project_BSL.Models
         // Zorg ervoor dat deze collecties worden geïnitialiseerd om lege lijsten te vermijden
         public ICollection<Kind> Kinderen { get; set; } = new List<Kind>();
         public ICollection<Monitor> Monitoren { get; set; } = new List<Monitor>();
-        public ICollection<Onkosten> Onkosten { get; set; } = new List<Onkosten>();
+        public List<Onkosten> Onkosten { get; set; } = new List<Onkosten>();
         public ICollection<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
         [NotMapped]
         public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();

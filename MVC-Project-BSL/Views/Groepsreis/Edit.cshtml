@@ -6,7 +6,9 @@
 
 <h2>Bewerk Groepsreis</h2>
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
     <input type="hidden" asp-for="Id" />
 
     <div class="form-group">
@@ -26,19 +28,132 @@
         <input asp-for="Prijs" class="form-control" />
         <span asp-validation-for="Prijs" class="text-danger"></span>
     </div>
-    
+
     <div class="form-group">
         <label asp-for="BestemmingId" class="control-label">Bestemming</label>
         <select asp-for="BestemmingId" asp-items="ViewBag.Bestemmingen" class="form-control"></select>
         <span asp-validation-for="BestemmingId" class="text-danger"></span>
     </div>
 
+    <!-- Onkosten Sectie -->
+    <h3>Onkosten</h3>
+
+    @if (Model.Onkosten != null && Model.Onkosten.Any())
+    {
+        <table class="table" id="onkostenTable">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Omschrijving</th>
+                    <th>Bedrag</th>
+                    <th>Datum</th>
+                    <th>Foto</th>
+                    <th>Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Onkosten.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.TextBoxFor(m => m.Onkosten[i].Titel, new { @class = "form-control" })
+                            <span asp-validation-for="Onkosten[@i].Titel" class="text-danger"></span>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Onkosten[i].Omschrijving, new { @class = "form-control" })
+                            <span asp-validation-for="Onkosten[@i].Omschrijving" class="text-danger"></span>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Onkosten[i].Bedrag, new { @class = "form-control", type = "number", step = "0.01" })
+                            <span asp-validation-for="Onkosten[@i].Bedrag" class="text-danger"></span>
+                        </td>
+                        <td>
+                            @Html.TextBoxFor(m => m.Onkosten[i].Datum, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            <span asp-validation-for="Onkosten[@i].Datum" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input type="file" class="form-control" name="Onkosten[@i].FotoFile" />
+                            @if (!string.IsNullOrEmpty(Model.Onkosten[i].Foto))
+                            {
+                                <img src="@Model.Onkosten[i].Foto" alt="Huidige Foto" style="max-width:100px;" />
+                            }
+                            @Html.HiddenFor(m => m.Onkosten[i].Foto)
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger remove-onkost">Verwijderen</button>
+                        </td>
+
+                        <!-- Hidden fields -->
+                        @Html.HiddenFor(m => m.Onkosten[i].Id)
+                        @Html.HiddenFor(m => m.Onkosten[i].GroepsreisId)
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Er zijn nog geen onkosten toegevoegd.</p>
+        <table class="table" id="onkostenTable">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Omschrijving</th>
+                    <th>Bedrag</th>
+                    <th>Datum</th>
+                    <th>Foto</th>
+                    <th>Acties</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    }
+
+    <!-- Voeg nieuwe onkost toe -->
+    <button type="button" class="btn btn-primary" id="btnAddOnkost">Voeg onkost toe</button>
+
+    <!-- Totaal onkosten -->
+    <p><strong>Totaal Onkosten:</strong> @(Model.Onkosten?.Sum(o => o.Bedrag) ?? 0)</p>
+
     <div class="form-group mt-2">
         <input type="submit" value="Opslaan" class="btn btn-primary" />
         <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
     </div>
+
 </form>
 
 @section Scripts {
     @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            var onkostenCounter = @Model.Onkosten?.Count() ?? 0;
+
+            // Voeg nieuwe onkost toe
+            $('#btnAddOnkost').click(function () {
+                var index = onkostenCounter++;
+                var newRow = '<tr>' +
+                    '<td><input class="form-control" name="Onkosten[' + index + '].Titel" />' +
+                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Titel" data-valmsg-replace="true"></span></td>' +
+                    '<td><input class="form-control" name="Onkosten[' + index + '].Omschrijving" />' +
+                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Omschrijving" data-valmsg-replace="true"></span></td>' +
+                    '<td><input class="form-control" type="number" step="1" name="Onkosten[' + index + '].Bedrag" />' +
+                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Bedrag" data-valmsg-replace="true"></span></td>' +
+                    '<td><input class="form-control" type="date" name="Onkosten[' + index + '].Datum" />' +
+                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Datum" data-valmsg-replace="true"></span></td>' +
+                    '<td><input type="file" class="form-control" name="Onkosten[' + index + '].FotoFile" /></td>' +
+                    '<td><button type="button" class="btn btn-danger remove-onkost">Verwijderen</button></td>' +
+                    '<input type="hidden" name="Onkosten[' + index + '].GroepsreisId" value="@Model.Id" />' +
+                    '</tr>';
+                $('#onkostenTable tbody').append(newRow);
+            });
+
+            // Verwijder onkost
+            $(document).on('click', '.remove-onkost', function () {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
 }
