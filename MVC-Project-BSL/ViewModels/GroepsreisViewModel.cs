@@ -48,9 +48,10 @@ namespace MVC_Project_BSL.ViewModels
         public List<Groepsreis> GeboekteGroepsReizen { get; set; } = new List<Groepsreis> { };
         public List<Groepsreis> ToekomstigeGroepsReizen { get; set; } = new List<Groepsreis> { };
         public List<Groepsreis> AlleGroepsReizen { get; set; } = new List<Groepsreis> { };
+		public List<Bestemming> AlleBestemmingen { get; set; } = new List<Bestemming> { };
 
 
-    }
+}
 }
 
 

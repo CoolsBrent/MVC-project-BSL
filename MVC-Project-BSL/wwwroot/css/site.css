@@ -128,3 +128,12 @@ footer {
         color: inherit; /* Houd dezelfde kleur als bij normale toestand */
         text-decoration: none; /* Houd de onderstreping weg */
     }
+@media (min-width: 768px) {
+    aside {
+        transition: margin-left 0.3s ease;
+    }
+
+    .collapse.show + main {
+        margin-left: 250px; /* Pas deze waarde aan op basis van de breedte van je aside */
+    }
+}

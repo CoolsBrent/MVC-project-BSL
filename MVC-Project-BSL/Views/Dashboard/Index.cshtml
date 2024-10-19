@@ -27,10 +27,35 @@
 			<a href="@Url.Action("Index", "Opleidingen")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
 		</div>
 	</div>
+}
+
+<form method="get" asp-action="Index" class="mb-4 d-flex justify-content-center">
+	<div class="d-flex">
+		<!-- Filter op Bestemming -->
+		<div class="form-group me-2">
+			<select class="form-control" name="bestemming">
+				<option value="">Alle bestemmingen</option>
+				@foreach (var bestemming in Model.AlleBestemmingen)
+				{
+					<option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
+				}
+			</select>
+		</div>
+
+		<div class="form-group">
+			<button type="submit" class="btn btn-primary">
+				<i class="bi bi-sliders"></i>
+			</button>
+		</div>
+	</div>
+</form>
+
+@if (User.IsInRole("Beheerder"))
+{
 	<div class="row mb-4">
 		@if (!Model.AlleGroepsReizen.Any())
 		{
-			<p>Geen ingeschreven groepsreizen gevonden.</p>
+			<p>Geen groepsreizen gevonden.</p>
 		}
 		else
 		{
@@ -47,9 +72,9 @@
 						<div class="card-body">
 							<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
 							<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-							<p class="card-text">Datum: @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-							<p class="card-text">Leeftijd: @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-							<p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+							<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+							<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+							<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
 						</div>
 					</a>
 				</div>
@@ -57,8 +82,11 @@
 		}
 	</div>
 }
-else
+
+
+@if (!User.IsInRole("Beheerder"))
 {
+	<div class="row mb-4">
 	@if (!Model.GeboekteGroepsReizen.Any())
 	{
 		<p>Geen ingeschreven groepsreizen gevonden.</p>
@@ -78,14 +106,16 @@ else
 					<div class="card-body">
 						<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
 						<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-						<p class="card-text">Datum: @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-						<p class="card-text">Leeftijd: @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-						<p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+							<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+							<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+						<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
 					</div>
 				</a>
 			</div>
 		}
 	}
+	</div>
+	<div class="row mb-4">
 	@if (!Model.ToekomstigeGroepsReizen.Any())
 	{
 		<p>Geen toekomstige groepsreizen gevonden.</p>
@@ -105,14 +135,15 @@ else
 					<div class="card-body">
 						<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
 						<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-						<p class="card-text">Datum: @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-						<p class="card-text">Leeftijd: @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-						<p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+							<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+							<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+						<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
 					</div>
 				</div>
 			</div>
 		}
 	}
+	</div>
 }
 
 
