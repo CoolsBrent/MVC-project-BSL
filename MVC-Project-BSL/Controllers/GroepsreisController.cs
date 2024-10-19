@@ -133,7 +133,20 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound();
             }
 
-            // Controleer of het model geldig is
+            // Handmatige validatie voor FotoFile
+            for (int i = 0; i < groepsreis.Onkosten.Count; i++)
+            {
+                var onkost = groepsreis.Onkosten[i];
+                if (onkost.Id == 0 || string.IsNullOrEmpty(onkost.Foto))
+                {
+                    // Nieuwe onkost of onkost zonder bestaande foto
+                    if (onkost.FotoFile == null || onkost.FotoFile.Length == 0)
+                    {
+                        ModelState.AddModelError($"Onkosten[{i}].FotoFile", "Het uploaden van een foto is verplicht.");
+                    }
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 // Log ModelState fouten
