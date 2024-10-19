@@ -4,6 +4,7 @@ using MVC_Project_BSL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC_Project_BSL.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241018213059_NieuweModels")]
+    partial class NieuweModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,21 +270,6 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.ToTable("Groepsreizen");
                 });
 
-            modelBuilder.Entity("MVC_Project_BSL.Models.GroepsreisMonitor", b =>
-                {
-                    b.Property<int>("GroepsreisId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MonitorId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("GroepsreisId", "MonitorId");
-
-                    b.HasIndex("MonitorId");
-
-                    b.ToTable("GroepsreisMonitor");
-                });
-
             modelBuilder.Entity("MVC_Project_BSL.Models.Kind", b =>
                 {
                     b.Property<int>("Id")
@@ -318,6 +306,35 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.HasIndex("PersoonId");
 
                     b.ToTable("Kinderen");
+                });
+
+            modelBuilder.Entity("MVC_Project_BSL.Models.Monitor", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("GroepsreisDetailId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GroepsreisId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsHoofdMonitor")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PersoonId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroepsreisDetailId");
+
+                    b.HasIndex("GroepsreisId");
+
+                    b.HasIndex("PersoonId");
+
+                    b.ToTable("Monitoren");
                 });
 
             modelBuilder.Entity("MVC_Project_BSL.Models.Onkosten", b =>
@@ -564,25 +581,6 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Monitor", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsHoofdMonitor")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PersoonId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PersoonId");
-
-                    b.ToTable("Monitoren");
-                });
-
             modelBuilder.Entity("MVC_Project_BSL.Models.Deelnemer", b =>
                 {
                     b.HasOne("MVC_Project_BSL.Models.Groepsreis", "GroepsreisDetail")
@@ -624,25 +622,6 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.Navigation("Bestemming");
                 });
 
-            modelBuilder.Entity("MVC_Project_BSL.Models.GroepsreisMonitor", b =>
-                {
-                    b.HasOne("MVC_Project_BSL.Models.Groepsreis", "Groepsreis")
-                        .WithMany("Monitoren")
-                        .HasForeignKey("GroepsreisId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Monitor", "Monitor")
-                        .WithMany("Groepsreizen")
-                        .HasForeignKey("MonitorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Groepsreis");
-
-                    b.Navigation("Monitor");
-                });
-
             modelBuilder.Entity("MVC_Project_BSL.Models.Kind", b =>
                 {
                     b.HasOne("MVC_Project_BSL.Models.CustomUser", "Persoon")
@@ -650,6 +629,29 @@ namespace MVC_Project_BSL.Data.Migrations
                         .HasForeignKey("PersoonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Persoon");
+                });
+
+            modelBuilder.Entity("MVC_Project_BSL.Models.Monitor", b =>
+                {
+                    b.HasOne("MVC_Project_BSL.Models.Groepsreis", "GroepsreisDetail")
+                        .WithMany()
+                        .HasForeignKey("GroepsreisDetailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MVC_Project_BSL.Models.Groepsreis", null)
+                        .WithMany("Monitoren")
+                        .HasForeignKey("GroepsreisId");
+
+                    b.HasOne("MVC_Project_BSL.Models.CustomUser", "Persoon")
+                        .WithMany("Monitoren")
+                        .HasForeignKey("PersoonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GroepsreisDetail");
 
                     b.Navigation("Persoon");
                 });
@@ -763,17 +765,6 @@ namespace MVC_Project_BSL.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Monitor", b =>
-                {
-                    b.HasOne("MVC_Project_BSL.Models.CustomUser", "Persoon")
-                        .WithMany("Monitoren")
-                        .HasForeignKey("PersoonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Persoon");
-                });
-
             modelBuilder.Entity("MVC_Project_BSL.Models.Activiteit", b =>
                 {
                     b.Navigation("Programmas");
@@ -809,11 +800,6 @@ namespace MVC_Project_BSL.Data.Migrations
             modelBuilder.Entity("MVC_Project_BSL.Models.Opleiding", b =>
                 {
                     b.Navigation("OpleidingPersonen");
-                });
-
-            modelBuilder.Entity("Monitor", b =>
-                {
-                    b.Navigation("Groepsreizen");
                 });
 #pragma warning restore 612, 618
         }

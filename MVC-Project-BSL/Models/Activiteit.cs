@@ -6,7 +6,7 @@
         public string Naam { get; set; }
         public string Beschrijving { get; set; }
 
-        public ICollection<Groepsreis> Groepsreizen { get; set; }
+        public ICollection<Programma> Programmas { get; set; }
     }
 
 }

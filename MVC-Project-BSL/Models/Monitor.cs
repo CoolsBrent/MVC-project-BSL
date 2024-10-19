@@ -1,14 +1,11 @@
-﻿namespace MVC_Project_BSL.Models
+﻿using MVC_Project_BSL.Models;
+
+public class Monitor
 {
-    public class Monitor
-    {
-        public string Id { get; set; }
-        public bool IsHoofdMonitor { get; set; } = false;
+	public string Id { get; set; } // Unieke identifier voor de monitor
+	public string PersoonId { get; set; } // Verwijzing naar de persoon
+	public bool IsHoofdMonitor { get; set; } // Geeft aan of de monitor hoofdmonitor is
 
-        public string PersoonId { get; set; }
-        public CustomUser Persoon { get; set; }
-
-        public ICollection<Groepsreis> Groepsreizen { get; set; } = new List<Groepsreis>();
-    }
-
+	public CustomUser Persoon { get; set; } // Navigatie-eigenschap naar de gebruiker
+	public ICollection<GroepsreisMonitor> Groepsreizen { get; set; } = new List<GroepsreisMonitor>(); // Collectie van groepsreizen
 }

@@ -23,16 +23,14 @@ namespace MVC_Project_BSL.Models
         public int BestemmingId { get; set; }
         public Bestemming? Bestemming { get; set; }
 
-
-        // Zorg ervoor dat deze collecties worden geïnitialiseerd om lege lijsten te vermijden
-        public ICollection<Kind> Kinderen { get; set; } = new List<Kind>();
-        public ICollection<Monitor> Monitoren { get; set; } = new List<Monitor>();
-        public ICollection<Onkosten> Onkosten { get; set; } = new List<Onkosten>();
-        public ICollection<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
+        public ICollection<GroepsreisMonitor>? Monitoren { get; set; }
+        public ICollection<Programma>? Programmas { get; set; }
+        public ICollection<Onkosten>? Onkosten { get; set; }
+        public ICollection<Deelnemer>? Deelnemers { get; set; }
         [NotMapped]
         public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
         [NotMapped]
-        public ICollection<Kind> BeschikbareDeelnemers { get; set; } = new List<Kind>();
+        public ICollection<Kind> BeschikbareDeelnemers{ get; set; } = new List<Kind>();
     }
 
 

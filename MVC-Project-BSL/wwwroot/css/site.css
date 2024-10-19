@@ -77,7 +77,7 @@ main {
     width: 100%;
 }
 
-    .hero-section h1 {
+    .hero-section h1 h2 {
         font-size: 3rem;
         font-family: 'Playfair Display', serif;
     }
@@ -119,3 +119,30 @@ footer {
     height: auto; /* Behoudt de aspect ratio */
     max-width: 600px; /* Limiteert de breedte tot maximaal 600px */
 }
+.no-link {
+    color: inherit; /* Neem de kleur van de parent element */
+    text-decoration: none; /* Verwijder de onderstreping */
+    cursor: pointer; /* Zorg ervoor dat de cursor er zoals een hand uitziet */
+}
+    .no-link:hover {
+        color: inherit; /* Houd dezelfde kleur als bij normale toestand */
+        text-decoration: none; /* Houd de onderstreping weg */
+    }
+.hero-section-dashboard {
+    background-image: url('/images/dashboard.jpg'); /* Achtergrondafbeelding */
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 275px
+}
+
+    .hero-section-dashboard h1 h2 {
+        font-size: 3rem;
+        font-family: 'Playfair Display', serif;
+    }
+
+    .hero-section-dashboard p {
+        font-size: 1.5rem;
+        font-family: 'Playfair Display', serif;
+    }
+
