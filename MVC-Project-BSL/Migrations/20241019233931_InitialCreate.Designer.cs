@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace MVC_Project_BSL.Data.Migrations
+namespace MVC_Project_BSL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241002213241_AddUserRoles")]
-    partial class AddUserRoles
+    [Migration("20241019233931_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -338,42 +338,6 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.ToTable("Monitoren");
                 });
 
-            modelBuilder.Entity("MVC_Project_BSL.Models.Onkosten", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<float>("Bedrag")
-                        .HasColumnType("real");
-
-                    b.Property<DateTime>("Datum")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Foto")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("GroepsreisId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Omschrijving")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Titel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroepsreisId");
-
-                    b.ToTable("Onkosten");
-                });
-
             modelBuilder.Entity("MVC_Project_BSL.Models.Opleiding", b =>
                 {
                     b.Property<int>("Id")
@@ -505,10 +469,12 @@ namespace MVC_Project_BSL.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -545,10 +511,12 @@ namespace MVC_Project_BSL.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -556,6 +524,41 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("Onkosten", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<float>("Bedrag")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("Datum")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Foto")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GroepsreisId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Omschrijving")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Titel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroepsreisId");
+
+                    b.ToTable("Onkosten");
                 });
 
             modelBuilder.Entity("ActiviteitGroepsreis", b =>
@@ -647,17 +650,6 @@ namespace MVC_Project_BSL.Data.Migrations
                     b.Navigation("Persoon");
                 });
 
-            modelBuilder.Entity("MVC_Project_BSL.Models.Onkosten", b =>
-                {
-                    b.HasOne("MVC_Project_BSL.Models.Groepsreis", "Groepsreis")
-                        .WithMany("Onkosten")
-                        .HasForeignKey("GroepsreisId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Groepsreis");
-                });
-
             modelBuilder.Entity("MVC_Project_BSL.Models.OpleidingPersoon", b =>
                 {
                     b.HasOne("MVC_Project_BSL.Models.Opleiding", "Opleiding")
@@ -726,6 +718,17 @@ namespace MVC_Project_BSL.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Onkosten", b =>
+                {
+                    b.HasOne("MVC_Project_BSL.Models.Groepsreis", "Groepsreis")
+                        .WithMany("Onkosten")
+                        .HasForeignKey("GroepsreisId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Groepsreis");
                 });
 
             modelBuilder.Entity("MVC_Project_BSL.Models.Bestemming", b =>
