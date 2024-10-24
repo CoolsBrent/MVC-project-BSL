@@ -138,8 +138,8 @@ namespace MVC_Project_BSL.Controllers
 			Debug.WriteLine($"Removing old role data for user {userId} with roles: {string.Join(", ", userRoles)}");
 
 			// Verkrijg de Kinderen van de gebruiker
-			var kinderen = await _unitOfWork.KindRepository.GetAllAsync();
-			var gefilterdeKinderen = kinderen.Where(k => k.PersoonId == userId).ToList();
+			var deelnemers = await _unitOfWork.DeelnemerRepository.GetAllAsync();
+			var gefilterdeDeelnemers = deelnemers.Where(k => k.Kind.PersoonId == userId).ToList();
 			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync();
 			var gefilterdeMonitoren = monitoren.Where(k => k.PersoonId == userId).ToList();
 
@@ -148,16 +148,16 @@ namespace MVC_Project_BSL.Controllers
 				
 				foreach (var monitor in gefilterdeMonitoren)
 				{
-					Debug.WriteLine($"Deelnemer gevonden voor user {userId} (Kind ID: {monitor.Id}), verwijderen...");
+					Debug.WriteLine($"Deelnemer gevonden voor user {userId} (Deelnemer ID: {monitor.Id}), verwijderen...");
 					_unitOfWork.MonitorRepository.Delete(monitor);
 				}
 			}
             if (userRoles.Contains("Deelnemer"))
             {
-				foreach (var kind in gefilterdeKinderen)
+				foreach (var deelnemer in gefilterdeDeelnemers)
 				{
-					Debug.WriteLine($"Deelnemer gevonden voor user {userId} (Kind ID: {kind.Id}), verwijderen...");
-					_unitOfWork.KindRepository.Delete(kind);
+					Debug.WriteLine($"Deelnemer gevonden voor user {userId} (Deelnemer ID: {deelnemer.Id}), verwijderen...");
+					_unitOfWork.DeelnemerRepository.Delete(deelnemer);
 				}
 			}
 
@@ -176,11 +176,12 @@ namespace MVC_Project_BSL.Controllers
 
 			if (roleName == "Monitor")
 			{
-				var monitorExists = await _unitOfWork.MonitorRepository.AnyAsync(m => m.PersoonId == userId);
-				if (!monitorExists)
+                var monitorExists = await _unitOfWork.MonitorRepository.AnyAsync(m => m.PersoonId == userId);
+
+                if (!monitorExists)
 				{
 					Debug.WriteLine($"No existing monitor data found for user {userId}, adding new monitor data...");
-					var monitor = new Models.Monitor
+					var monitor = new Monitor
 					{
 						Id = Guid.NewGuid().ToString(),
 						PersoonId = userId,
@@ -199,22 +200,20 @@ namespace MVC_Project_BSL.Controllers
 			}
 			else if (roleName == "Deelnemer")
 			{
-				var deelnemerExists = await _unitOfWork.KindRepository.AnyAsync(d => d.PersoonId == userId);
+				var deelnemerExists = await _unitOfWork.DeelnemerRepository.AnyAsync(d => d.KindId.ToString() == userId);
 				if (!deelnemerExists)
 				{
 					Debug.WriteLine($"No existing deelnemer data found for user {userId}, adding new deelnemer data...");
-					var kind = new Kind
+					var deelnemer = new Deelnemer
 					{
-						Naam = user.Naam,
-						Voornaam = user.Voornaam,
-						Geboortedatum = user.Geboortedatum,
-						Allergieen = "",
-						Medicatie = "",
-						PersoonId = userId,
-						Persoon = user
+						KindId = kindId,
+						Opmerkingen = "",
+						ReviewScore = 0,
+						Review = ""
 					};
+					
 
-					await _unitOfWork.KindRepository.AddAsync(kind);
+					await _unitOfWork.DeelnemerRepository.AddAsync(deelnemer);
 					_unitOfWork.SaveChanges();
 					Debug.WriteLine($"New deelnemer data added for user {userId}");
 				}

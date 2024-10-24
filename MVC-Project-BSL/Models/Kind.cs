@@ -1,18 +1,18 @@
 ﻿namespace MVC_Project_BSL.Models
 {
-    public class Kind
-    {
-        public int Id { get; set; }
-        public string Naam { get; set; }
-        public string Voornaam { get; set; }
-        public DateTime Geboortedatum { get; set; }
-        public string Allergieen { get; set; }
-        public string Medicatie { get; set; }
+	public class Kind
+	{
+		public int Id { get; set; } // Primary Key
+		public string PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
 
-        public string PersoonId { get; set; }
-        public CustomUser Persoon { get; set; }
+		public string Naam { get; set; }
+		public string Voornaam { get; set; }
+		public DateTime Geboortedatum { get; set; }
+		public string Allergieën { get; set; }
+		public string Medicatie { get; set; }
 
-        public ICollection<Groepsreis> Groepsreizen { get; set; }
-    }
+		// Navigatie-eigenschappen
+		public CustomUser Persoon { get; set; }
+	}
 
 }

@@ -9,7 +9,7 @@ namespace MVC_Project_BSL.Data.Repository
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
         protected readonly DbSet<TEntity> _dbSet;
 
         public GenericRepository(ApplicationDbContext context)
@@ -17,6 +17,21 @@ namespace MVC_Project_BSL.Data.Repository
             _context = context;
             _dbSet = _context.Set<TEntity>();
         }
+
+        //Om te controleren of er reeds bestaande foto's zijn in de EDIT
+        public IQueryable<TEntity> GetQueryable(
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? queryFunc = null)
+        {
+            IQueryable<TEntity> query = _dbSet;
+
+            if (queryFunc != null)
+            {
+                query = queryFunc(query);
+            }
+
+            return query;
+        }
+
 
         // Nieuwe methode met ondersteuning voor include
         public async Task<IEnumerable<TEntity>> GetAllAsync(
@@ -37,13 +52,13 @@ namespace MVC_Project_BSL.Data.Repository
         {
             return await _dbSet.FindAsync(id);
         }
-		public async Task<TEntity?> GetByStringIdAsync(string id)
-		{
-			return await _dbSet.FindAsync(id);
-		}
+        public async Task<TEntity?> GetByStringIdAsync(string id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
 
-		// Nieuwe methode om een entiteit op te halen met inclusies
-		public async Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes)
+        // Nieuwe methode om een entiteit op te halen met inclusies
+        public async Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _dbSet;
 
@@ -55,9 +70,9 @@ namespace MVC_Project_BSL.Data.Repository
 
             return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
-	
 
-		public async Task AddAsync(TEntity entity)
+
+        public async Task AddAsync(TEntity entity)
         {
             try
             {
@@ -87,11 +102,5 @@ namespace MVC_Project_BSL.Data.Repository
 		{
 			return await _dbSet.AnyAsync(predicate);
 		}
-		public async Task<TEntity?> GetByPersoonIdAsync(string persoonId)
-		{
-			// Zorg ervoor dat TEntity een eigenschap heeft met de naam "PersoonId"
-			return await _dbSet.FirstOrDefaultAsync(e => EF.Property<string>(e, "PersoonId") == persoonId);
-		}
-
 	}
 }
