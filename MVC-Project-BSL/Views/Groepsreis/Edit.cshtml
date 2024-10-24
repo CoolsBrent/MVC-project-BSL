@@ -33,9 +33,15 @@
 
     <div class="form-group">
         <label asp-for="Prijs" class="control-label"></label>
-        <input asp-for="Prijs" class="form-control" />
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">€</span>
+            </div>
+            <input asp-for="Prijs" class="form-control" type="number" step="1" />
+        </div>
         <span asp-validation-for="Prijs" class="text-danger"></span>
     </div>
+
 
     <div class="form-group">
         <label asp-for="BestemmingId" class="control-label">Bestemming</label>

@@ -1,4 +1,5 @@
-﻿@model MVC_Project_BSL.Models.Groepsreis
+﻿@using System.Globalization
+@model MVC_Project_BSL.Models.Groepsreis
 
 <h1>De reis naar @Model.Bestemming?.BestemmingsNaam</h1>
 
@@ -64,7 +65,7 @@
 		<dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
 
 		<dt class="col-sm-2">Prijs</dt>
-		<dd class="col-sm-10">@Model.Prijs.ToString("C")</dd>
+		<dd class="col-sm-10">@Model.Prijs.ToString("C", new CultureInfo("nl-BE"))</dd>
 
 		<dt class="col-sm-2">Leeftijdscategorie</dt>
 		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>

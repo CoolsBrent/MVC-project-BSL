@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
+using MVC_Project_BSL.ViewModels;
 using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
@@ -21,9 +22,21 @@ namespace MVC_Project_BSL.Controllers
 		// GET: Groepsreis
 		public async Task<IActionResult> Index()
 		{
-			var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query => query.Include(g => g.Bestemming));
-			return View(groepsreizen);
+			var actieveGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Bestemming).Where(g => !g.IsArchived));
+
+			var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Bestemming).Where(g => g.IsArchived));
+
+			var viewModel = new GroepsreisViewModel
+			{
+				ActieveGroepsreizen = actieveGroepsreizen,
+				GearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen
+			};
+
+			return View(viewModel);
 		}
+
 
 		// GET: Groepsreis/Create
 		public IActionResult Create()
@@ -364,6 +377,45 @@ namespace MVC_Project_BSL.Controllers
 
 			return View(groepsreis);
 		}
+
+		// POST: Groepsreis/Archive/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Archive(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
+
+			groepsreis.IsArchived = true;
+			_unitOfWork.GroepsreisRepository.Update(groepsreis);
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction(nameof(Index));
+		}
+
+		// POST: Groepsreis/Activate/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Activate(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
+
+			groepsreis.IsArchived = false;
+			_unitOfWork.GroepsreisRepository.Update(groepsreis);
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction(nameof(Index));
+		}
+
+
+		//DEELNEMERS EN MONITOREN
 
 		[HttpPost]
 		public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
