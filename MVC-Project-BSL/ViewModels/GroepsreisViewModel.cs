@@ -39,7 +39,11 @@ namespace MVC_Project_BSL.ViewModels
         public List<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
 
 
-        public List<Monitor> Monitoren { get; set; } = new List<Monitor>();
+	    public IEnumerable<Groepsreis> ActieveGroepsreizen { get; set; }
+		public IEnumerable<Groepsreis> GearchiveerdeGroepsreizen { get; set; }
+
+
+	public List<Monitor> Monitoren { get; set; } = new List<Monitor>(); 
         // Filteropties die vanuit de view worden gebruikt
         public int? MinLeeftijdFilter { get; set; }
         public int? MaxLeeftijdFilter { get; set; }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
+using MVC_Project_BSL.ViewModels;
 using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
@@ -23,9 +24,21 @@ namespace MVC_Project_BSL.Controllers
 		// GET: Groepsreis
 		public async Task<IActionResult> Index()
 		{
-			var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query => query.Include(g => g.Bestemming));
-			return View(groepsreizen);
+			var actieveGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Bestemming).Where(g => !g.IsArchived));
+
+			var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Bestemming).Where(g => g.IsArchived));
+
+			var viewModel = new GroepsreisViewModel
+			{
+				ActieveGroepsreizen = actieveGroepsreizen,
+				GearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen
+			};
+
+			return View(viewModel);
 		}
+
 
 		// GET: Groepsreis/Create
 		public IActionResult Create()
@@ -367,17 +380,53 @@ namespace MVC_Project_BSL.Controllers
 			}
 
 
-            return View(groepsreis);
-        }
+			return View(groepsreis);
+		}
 
-        [HttpPost]
-        public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
-        {
-            // Haal de groepsreis op inclusief de deelnemers
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
+		// POST: Groepsreis/Archive/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Archive(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
 
-            // Haal het kind op
-            var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+			groepsreis.IsArchived = true;
+			_unitOfWork.GroepsreisRepository.Update(groepsreis);
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction(nameof(Index));
+		}
+
+		// POST: Groepsreis/Activate/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Activate(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
+
+			groepsreis.IsArchived = false;
+			_unitOfWork.GroepsreisRepository.Update(groepsreis);
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction(nameof(Index));
+		}
+
+
+		//DEELNEMERS EN MONITOREN
+
+		[HttpPost]
+		public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
+			var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
 
             // Controleer of zowel de groepsreis als het kind bestaan
             if (groepsreis == null || kind == null)

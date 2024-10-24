@@ -1,15 +1,13 @@
 ﻿@using System.Globalization
-@model IEnumerable<MVC_Project_BSL.Models.Groepsreis>
+@model MVC_Project_BSL.ViewModels.GroepsreisViewModel
 
-<!-- Bootstrap CSS -->
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.6.0/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumY1TUEAOhyFjT3zLpa0CiYmVcjpib3zxC6X5w2a" crossorigin="anonymous">
+<!-- Bootstrap 5.3.0 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUa6z4mVz3+N4I4hUGnhxjM2Ue1bN/Mbt1AqP+PnERtviC3BtUGi5NfCq3Q" crossorigin="anonymous">
 
 <!-- Bootstrap Icons CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-
 <h1>Groepsreizen</h1>
-
 
 <p>
     <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe groepsreis toevoegen">
@@ -17,7 +15,7 @@
     </a>
 </p>
 
-@if (!Model.Any())
+@if (!Model.ActieveGroepsreizen.Any() && !Model.GearchiveerdeGroepsreizen.Any())
 {
     <div class="alert alert-warning">
         Er zijn momenteel geen groepsreizen beschikbaar. <br />
@@ -28,73 +26,168 @@
 }
 else
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Begindatum</th>
-                <th>Einddatum</th>
-                <th>Bestemming</th>
-                <th>Beschrijving</th>
-                <th>Leeftijdscategorie</th>
-                <th>Prijs</th>
-                <th>Acties</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var groepsreis in Model)
-            {
+    <!-- Actieve Groepsreizen -->
+    <h2>Actieve Groepsreizen</h2>
+    @if (!Model.ActieveGroepsreizen.Any())
+    {
+        <p>Er zijn geen actieve groepsreizen.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>@groepsreis.Begindatum.ToShortDateString()</td>
-                    <td>@groepsreis.Einddatum.ToShortDateString()</td>
-                    <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
-                    <td>@groepsreis.Bestemming?.Beschrijving</td>
-                    <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
-                    <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
-                    <td>
-                        <!-- Bekijken knop -->
-                        <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary" data-bs-toggle="tooltip" title="Bekijken">
-                            <i class="bi bi-eye h4 text-white"></i>
-                        </a>
+                    <th>Begindatum</th>
+                    <th>Einddatum</th>
+                    <th>Bestemming</th>
+                    <th>Beschrijving</th>
+                    <th>Leeftijdscategorie</th>
+                    <th>Prijs</th>
+                    <th>Acties</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var groepsreis in Model.ActieveGroepsreizen)
+                {
+                    <tr>
+                        <td>@groepsreis.Begindatum.ToShortDateString()</td>
+                        <td>@groepsreis.Einddatum.ToShortDateString()</td>
+                        <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
+                        <td>@groepsreis.Bestemming?.Beschrijving</td>
+                        <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
+                        <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
+                        <td>
+                            <!-- Bekijken knop -->
+                            <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Bekijken">
+                                <i class="bi bi-eye h5 text-white"></i>
+                            </a>
 
-                        <!-- Bewerken knop -->
-                        <a asp-action="Edit" asp-route-id="@groepsreis.Id" class="btn btn-secondary" data-bs-toggle="tooltip" title="Bewerken">
-                            <i class="bi bi-pencil-square h4"></i>
-                        </a>
+                            <!-- Bewerken knop -->
+                            <a asp-action="Edit" asp-route-id="@groepsreis.Id" class="btn btn-secondary me-1" data-bs-toggle="tooltip" title="Bewerken">
+                                <i class="bi bi-pencil-square h5"></i>
+                            </a>
 
-                        <!-- Verwijderknop die de modal activeert -->
-                        <a asp-action="Delete" asp-route-id="@groepsreis.Id" class="btn btn-danger" data-bs-toggle="tooltip" title="Verwijderen">
-                            <i class="bi bi-trash h4"></i>
-                        </a>
+                            <!-- Archiveren knop -->
+                            <form asp-action="Archive" asp-route-id="@groepsreis.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-warning me-1" data-bs-toggle="tooltip" title="Archiveren">
+                                    <i class="bi bi-archive h5"></i>
+                                </button>
+                            </form>
 
-                        <!-- Bootstrap modal voor verwijderbevestiging -->
-                        <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@groepsreis.Id" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel-@groepsreis.Id">Bevestig Verwijderen</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Weet je zeker dat je de groepsreis naar @groepsreis.Bestemming?.BestemmingsNaam wilt verwijderen?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
+                            <!-- Verwijderknop -->
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@groepsreis.Id" data-bs-toggle="tooltip" title="Verwijderen">
+                                <i class="bi bi-trash h5"></i>
+                            </button>
+
+                            <!-- Bootstrap modal voor verwijderbevestiging -->
+                            <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@groepsreis.Id" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel-@groepsreis.Id">Bevestig Verwijderen</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Weet je zeker dat je de groepsreis naar <strong>@groepsreis.Bestemming?.BestemmingsNaam</strong> wilt verwijderen?
+                                        </div>
+                                        <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
-                                            <input type="submit" value="Verwijderen" class="btn btn-danger" />
-                                        </form>
+                                            <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="submit" value="Verwijderen" class="btn btn-danger" />
+                                            </form>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </td>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+    <!-- Gearchiveerde Groepsreizen -->
+    <h2>Gearchiveerde Groepsreizen</h2>
+    @if (!Model.GearchiveerdeGroepsreizen.Any())
+    {
+        <p>Er zijn geen gearchiveerde groepsreizen.</p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Begindatum</th>
+                    <th>Einddatum</th>
+                    <th>Bestemming</th>
+                    <th>Beschrijving</th>
+                    <th>Leeftijdscategorie</th>
+                    <th>Prijs</th>
+                    <th>Acties</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var groepsreis in Model.GearchiveerdeGroepsreizen)
+                {
+                    <tr>
+                        <td>@groepsreis.Begindatum.ToShortDateString()</td>
+                        <td>@groepsreis.Einddatum.ToShortDateString()</td>
+                        <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
+                        <td>@groepsreis.Bestemming?.Beschrijving</td>
+                        <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
+                        <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
+                        <td>
+                            <!-- Bekijken knop -->
+                            <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Bekijken">
+                                <i class="bi bi-eye h5 text-white"></i>
+                            </a>
+
+                            <!-- Activeren knop -->
+                            <form asp-action="Activate" asp-route-id="@groepsreis.Id" method="post" style="display:inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success me-1" data-bs-toggle="tooltip" title="Activeren">
+                                    <i class="bi bi-arrow-counterclockwise h5"></i>
+                                </button>
+                            </form>
+
+                            <!-- Verwijderknop -->
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal-@groepsreis.Id" data-bs-toggle="tooltip" title="Verwijderen">
+                                <i class="bi bi-trash h5"></i>
+                            </button>
+
+                            <!-- Bootstrap modal voor verwijderbevestiging -->
+                            <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@groepsreis.Id" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="deleteModalLabel-@groepsreis.Id">Bevestig Verwijderen</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Weet je zeker dat je de groepsreis naar <strong>@groepsreis.Bestemming?.BestemmingsNaam</strong> wilt verwijderen?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                                            <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <input type="submit" value="Verwijderen" class="btn btn-danger" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 }
 
-<!-- Bootstrap JS (inclusief Popper) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-..." crossorigin="anonymous"></script>
+<!-- Bootstrap 5.3.0 JS (inclusief Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeo0AEKN0dVPr5QK3qtCbhX5cZ1mJJ0k/tVxMn56X50lYqFm" crossorigin="anonymous"></script>
 
 <script>
     // Initialiseer tooltips

@@ -22,10 +22,10 @@ namespace MVC_Project_BSL.Models
 		[Required(ErrorMessage = "Bestemming is verplicht.")]
 		public int BestemmingId { get; set; }
 		public Bestemming? Bestemming { get; set; }
-
+		public bool IsArchived { get; set; } = false; // Standaard actief
 		public ICollection<GroepsreisMonitor>? Monitoren { get; set; }
 		public ICollection<Programma>? Programmas { get; set; }
-		public ICollection<Onkosten>? Onkosten { get; set; }
+		public List<Onkosten>? Onkosten { get; set; } = new List<Onkosten>();
 		public ICollection<Deelnemer>? Deelnemers { get; set; }
 		[NotMapped]
 		public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
