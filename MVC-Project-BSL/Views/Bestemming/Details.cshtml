@@ -1,0 +1,52 @@
+﻿@model MVC_Project_BSL.Models.Bestemming
+
+@{
+    ViewData["Title"] = "Details van Bestemming";
+}
+
+<h1>Details van Bestemming</h1>
+
+<div>
+    <h4>Bestemming</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Code</dt>
+        <dd class="col-sm-10">@Model.Code</dd>
+
+        <dt class="col-sm-2">Naam</dt>
+        <dd class="col-sm-10">@Model.BestemmingsNaam</dd>
+
+        <dt class="col-sm-2">Beschrijving</dt>
+        <dd class="col-sm-10">@Model.Beschrijving</dd>
+
+        <dt class="col-sm-2">Minimale Leeftijd</dt>
+        <dd class="col-sm-10">@Model.MinLeeftijd</dd>
+
+        <dt class="col-sm-2">Maximale Leeftijd</dt>
+        <dd class="col-sm-10">@Model.MaxLeeftijd</dd>
+
+        <dt class="col-sm-2">Foto's</dt>
+        <dd class="col-sm-10">
+            @if (Model.Fotos != null && Model.Fotos.Any())
+            {
+                <div class="row">
+                    @foreach (var foto in Model.Fotos)
+                    {
+                        <div class="col-md-3">
+                            <img src="~/images/@foto.Naam" class="img-thumbnail" alt="@foto.Naam" />
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p>Geen foto's beschikbaar.</p>
+            }
+        </dd>
+    </dl>
+</div>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Bewerken</a>
+    <a asp-action="Index" class="btn btn-secondary">Terug naar overzicht</a>
+</p>

@@ -1,16 +1,67 @@
 ﻿@model MVC_Project_BSL.Models.Groepsreis
 
-<h1>Details van de Groepsreis</h1>
+<h1>De reis naar @Model.Bestemming?.BestemmingsNaam</h1>
 
+<!-- Foto en beschrijving naast elkaar -->
+<div class="row">
+	<!-- Linkerzijde: Foto's (50% breedte) -->
+	<div class="col-md-6">
+		@if (Model.Bestemming?.Fotos != null && Model.Bestemming.Fotos.Any())
+		{
+			<div class="row">
+				@foreach (var foto in Model.Bestemming.Fotos)
+				{
+					<div class="col-12 mb-3">
+						<!-- Volledige breedte in de 50% kolom, met wat marge -->
+						<img src="~/images/@foto.Naam" alt="Foto van @Model.Bestemming.BestemmingsNaam"
+							 class="large-thumbnail img-thumbnail img-fluid" />
+					</div>
+				}
+			</div>
+		}
+		else
+		{
+			<p>Geen foto's beschikbaar</p>
+		}
+	</div>
+
+	<!-- Rechterzijde: Beschrijving (50% breedte) -->
+	<div class="col-md-6 d-flex flex-column">
+		<h2>@Model.Bestemming?.BestemmingsNaam</h2>
+		<p>@Model.Bestemming?.Beschrijving</p>
+
+		<h5>Activiteiten</h5>
+		@if (Model.Programmas != null && Model.Programmas.Any())
+		{
+			<ul>
+				@foreach (var activiteit in Model.Programmas)
+				{
+					<li>
+						<strong>@activiteit.Activiteit.Naam</strong>: @activiteit.Activiteit.Beschrijving
+					</li>
+				}
+			</ul>
+		}
+		else
+		{
+			<p>Nog geen activiteiten beschikbaar voor deze reis.</p>
+		}
+	</div>
+
+</div>
+
+<hr />
+
+
+<!-- Details van de groepsreis -->
 <div>
-    <h4>Groepsreis</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Begindatum</dt>
-        <dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
+	<h4>Details</h4>
+	<dl class="row">
+		<dt class="col-sm-2">Begindatum</dt>
+		<dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
 
-        <dt class="col-sm-2">Einddatum</dt>
-        <dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
+		<dt class="col-sm-2">Einddatum</dt>
+		<dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
 
 		<dt class="col-sm-2">Prijs</dt>
 		<dd class="col-sm-10">@Model.Prijs.ToString("C")</dd>
@@ -18,16 +69,11 @@
 		<dt class="col-sm-2">Leeftijdscategorie</dt>
 		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
-		<dt class="col-sm-2">Bestemming</dt>
-		<dd class="col-sm-10">@Model.Bestemming?.BestemmingsNaam</dd>
-
-		<dt class="col-sm-2">Beschrijving</dt>
-		<dd class="col-sm-10">@Model.Bestemming?.Beschrijving</dd>
-
 		<dt class="col-sm-2">Aantal Deelnemers</dt>
 		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
 	</dl>
 </div>
+
 <div class="row">
 	<!-- Ingeschreven Monitoren -->
 	<div class="col-md-6">
@@ -102,7 +148,7 @@
 				@foreach (var monitor in Model.BeschikbareMonitoren)
 				{
 					<tr>
-						<td>@monitor.Persoon?.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
+						<td>@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
 						<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
 						<td>
 							<form asp-action="AddMonitor" method="post" style="display:inline;">
@@ -139,19 +185,19 @@
 					</tr>
 				</thead>
 				<tbody>
-					@foreach (var kind in Model.Deelnemers)
+					@foreach (var deelnemer in Model.Deelnemers)
 					{
-						var geboortedatum = kind.Kind.Geboortedatum;
+						var geboortedatum = deelnemer.Kind.Geboortedatum;
 						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
 						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
 						<tr>
-							<td>@kind.Kind.Voornaam @kind.Kind.Naam</td> <!-- Toon naam van het kind -->
+							<td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
 							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
 							<td>
 								<form asp-action="DeleteDeelnemer" method="post">
 									<input type="hidden" name="groepsreisId" value="@Model.Id" />
-									<input type="hidden" name="kindId" value="@kind.Id" />
+									<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
 									<button type="submit" class="btn btn-danger">Verwijderen</button>
 								</form>
 							</td>
@@ -173,50 +219,53 @@
 	<!-- Beschikbare Deelnemers -->
 	<div class="col-md-6">
 		<h2>Beschikbare Deelnemers</h2>
-		@if (Model.BeschikbareDeelnemers.Any())
-		{
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Naam</th>
-					<th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
-					<th>Actie</th>
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var kind in Model.BeschikbareDeelnemers)
-				{
-					var geboortedatum = kind.Kind.Persoon.Geboortedatum;
-					var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-					if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
-
-					<tr>
-						<td>@kind.Kind.Persoon.Voornaam @kind.Kind.Persoon.Naam</td> <!-- Toon naam van het kind -->
-						<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
-						<td>
-							<form asp-action="VoegDeelnemerToe" method="post">
-								<input type="hidden" name="groepsreisId" value="@Model.Id" />
-								<input type="hidden" name="kindId" value="@kind.Kind.Persoon.Id" />
-								<button type="submit" class="btn btn-primary">Toevoegen</button>
-							</form>
-						</td>
-					</tr>
-
-				}
-			</tbody>
-		</table>
-		}
-		else
+		<!-- Controleer of er beschikbare deelnemers zijn -->
+		@if (!Model.BeschikbareDeelnemers.Any())
 		{
 			<div class="alert alert-warning">
 				Geen deelnemers beschikbaar.
 			</div>
 		}
-	</div>
+		else
+		{
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Naam</th>
+						<th>Leeftijd</th>
+						<th>Actie</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var kind in Model.BeschikbareDeelnemers)
+					{
+						// Controleer of het kind al een deelnemer is
+						bool isDeelnemer = Model.Deelnemers.Any(d => d.KindId == kind.Id);
+						if (isDeelnemer) continue; // Sla dit kind over als het al een deelnemer is
 
+						var geboortedatum = kind.Geboortedatum;
+						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+						<tr>
+							<td>@kind.Voornaam @kind.Naam</td>
+							<td>@leeftijd jaar</td>
+							<td>
+								<form asp-action="VoegDeelnemerToe" method="post">
+									<input type="hidden" name="groepsreisId" value="@Model.Id" />
+									<input type="hidden" name="kindId" value="@kind.Id" />
+									<button type="submit" class="btn btn-success">Toevoegen</button>
+								</form>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+
+	</div>
 
 
 <p>
     <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Terug naar Home</a>
 </p>
-

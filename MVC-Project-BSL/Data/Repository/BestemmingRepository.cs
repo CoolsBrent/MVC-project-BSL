@@ -1,4 +1,5 @@
-﻿using MVC_Project_BSL.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.Data.Repository
 {
