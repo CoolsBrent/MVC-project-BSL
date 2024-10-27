@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace MVC_Project_BSL.Data.Migrations
+namespace MVC_Project_BSL.Migrations
 {
     /// <inheritdoc />
-    public partial class AddUserRoles2 : Migration
+    public partial class DeelnemerNNA : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

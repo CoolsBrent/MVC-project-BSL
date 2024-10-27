@@ -4,19 +4,22 @@ using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
 using System.Diagnostics;
+using System.Threading;
 
 namespace MVC_Project_BSL.Controllers
 {
     // [Authorize(Roles = "Beheerder")]
     public class RoleManagementController : Controller
     {
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly UserManager<CustomUser> _userManager;
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly MonitorService _monitorService;
 
-		public RoleManagementController(RoleManager<IdentityRole> roleManager, UserManager<CustomUser> userManager, IUnitOfWork unitOfWork)
+		public RoleManagementController(MonitorService monitorService, RoleManager<IdentityRole<int>> roleManager, UserManager<CustomUser> userManager, IUnitOfWork unitOfWork)
         {
-            _roleManager = roleManager;
+			_monitorService = monitorService;
+			_roleManager = roleManager;
             _userManager = userManager;
 			_unitOfWork = unitOfWork;
 		}
@@ -55,7 +58,7 @@ namespace MVC_Project_BSL.Controllers
 			var kindId = model.SelectedChildId;
 			if (ModelState.IsValid)
 			{
-				var user = await _userManager.FindByIdAsync(userId);
+				var user = await _userManager.FindByIdAsync(userId.ToString());
 				if (user == null)
 				{
 					Debug.WriteLine("Gebruiker niet gevonden.");
@@ -133,17 +136,17 @@ namespace MVC_Project_BSL.Controllers
 		}
 
 		// Functie voor het verwijderen van oude rolgegevens
-		private async Task RemoveOldRoleData(IEnumerable<string> userRoles, string userId)
+		private async Task RemoveOldRoleData(IEnumerable<string> userRoles, int userId)
 		{
 			Debug.WriteLine($"Removing old role data for user {userId} with roles: {string.Join(", ", userRoles)}");
 
 			// Verkrijg de Kinderen van de gebruiker
 			var deelnemers = await _unitOfWork.DeelnemerRepository.GetAllAsync();
-			var gefilterdeDeelnemers = deelnemers.Where(k => k.Kind.PersoonId == userId).ToList();
+			var gefilterdeDeelnemers = deelnemers.Where(k => k.KindId == userId).ToList();
 			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync();
 			var gefilterdeMonitoren = monitoren.Where(k => k.PersoonId == userId).ToList();
 
-			if (userRoles.Contains("Monitor"))
+			if (userRoles.Contains("Monitor") || userRoles.Contains("Hoofdmonitor"))
 			{
 				
 				foreach (var monitor in gefilterdeMonitoren)
@@ -152,6 +155,7 @@ namespace MVC_Project_BSL.Controllers
 					_unitOfWork.MonitorRepository.Delete(monitor);
 				}
 			}
+
             if (userRoles.Contains("Deelnemer"))
             {
 				foreach (var deelnemer in gefilterdeDeelnemers)
@@ -170,60 +174,53 @@ namespace MVC_Project_BSL.Controllers
 		}
 
 		// Functie voor het toevoegen van nieuwe rolgegevens
-		private async Task AddNewRoleData(string roleName, string userId, CustomUser user)
+		private async Task AddNewRoleData(string roleName, int userId, CustomUser user)
 		{
 			Debug.WriteLine($"Adding new role data for user {userId} with role {roleName}");
 
-			if (roleName == "Monitor")
+			// Check if the user already has a Monitor record in the database
+			var monitor = await _unitOfWork.MonitorRepository.GetFirstOrDefaultAsync(m => m.PersoonId == userId);
+
+
+			if (monitor == null)
 			{
-                var monitorExists = await _unitOfWork.MonitorRepository.AnyAsync(m => m.PersoonId == userId);
-
-                if (!monitorExists)
+				// No existing Monitor record, so create a new one with the correct role
+				Debug.WriteLine($"No existing monitor data found for user {userId}, adding new monitor data...");
+				monitor = new Monitor
 				{
-					Debug.WriteLine($"No existing monitor data found for user {userId}, adding new monitor data...");
-					var monitor = new Monitor
-					{
-						Id = Guid.NewGuid().ToString(),
-						PersoonId = userId,
-						Persoon = user,
-						IsHoofdMonitor = false
-					};
+					PersoonId = userId,
+					Persoon = user,
+					IsHoofdMonitor = roleName == "Hoofdmonitor"
+				};
 
-					await _unitOfWork.MonitorRepository.AddAsync(monitor);
-					_unitOfWork.SaveChanges();
-					Debug.WriteLine($"New monitor data added for user {userId}");
-				}
-				else
-				{
-					Debug.WriteLine($"Monitor data already exists for user {userId}");
-				}
+				await _unitOfWork.MonitorRepository.AddAsync(monitor);
+				Debug.WriteLine($"New monitor data added for user {userId}");
 			}
-			else if (roleName == "Deelnemer")
+			else
 			{
-				var deelnemerExists = await _unitOfWork.DeelnemerRepository.AnyAsync(d => d.KindId.ToString() == userId);
-				if (!deelnemerExists)
-				{
-					Debug.WriteLine($"No existing deelnemer data found for user {userId}, adding new deelnemer data...");
-					var deelnemer = new Deelnemer
-					{
-						KindId = kindId,
-						Opmerkingen = "",
-						ReviewScore = 0,
-						Review = ""
-					};
-					
-
-					await _unitOfWork.DeelnemerRepository.AddAsync(deelnemer);
-					_unitOfWork.SaveChanges();
-					Debug.WriteLine($"New deelnemer data added for user {userId}");
-				}
-				else
-				{
-					Debug.WriteLine($"Deelnemer data already exists for user {userId}");
-				}
+				// Update the existing monitor record's IsHoofdMonitor property
+				Debug.WriteLine($"Updating existing monitor data for user {userId} to role {roleName}...");
+				monitor.IsHoofdMonitor = roleName == "Hoofdmonitor";
+				_unitOfWork.MonitorRepository.Update(monitor);
+				Debug.WriteLine($"Monitor data updated for user {userId}");
 			}
+
+			// Save changes to the database
+			_unitOfWork.SaveChanges();
+		}
+		[HttpPost]
+		public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, int monitorId)
+		{
+			var result = await _monitorService.MaakHoofdmonitor(groepsreisId, monitorId);
+			return result;
 		}
 
+		[HttpPost]
+		public async Task<IActionResult> MaakGewoneMonitor(int groepsreisId, int monitorId)
+		{
+			var result = await _monitorService.MaakGewoneMonitor(groepsreisId, monitorId);
+			return result;
+		}
 
 	}
 }

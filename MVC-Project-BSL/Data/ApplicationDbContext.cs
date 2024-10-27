@@ -5,7 +5,7 @@ using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.Data
 {
-	public class ApplicationDbContext : IdentityDbContext<CustomUser, IdentityRole, string>
+	public class ApplicationDbContext : IdentityDbContext<CustomUser, IdentityRole<int>, int>
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			: base(options)

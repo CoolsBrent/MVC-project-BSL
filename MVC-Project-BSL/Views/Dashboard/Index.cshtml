@@ -2,7 +2,7 @@
     ViewData["Title"] = "Dashboard";
 }
 ﻿@using System.Globalization
-@model IEnumerable<MVC_Project_BSL.Models.Groepsreis>
+@model MVC_Project_BSL.ViewModels.GroepsreisViewModel
 
 <h2>Welkom op je dashboard, @User.Identity.Name!</h2>
 <!-- Knoppen voor beheer -->
@@ -21,7 +21,7 @@
     </div>
 </div>
 
-@if (!Model.Any())
+@if (!Model.AlleGroepsReizen.Any())
 {
     <div class="alert alert-warning">
         Er zijn momenteel geen groepsreizen beschikbaar. <br />
@@ -43,7 +43,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var groepsreis in Model)
+            @foreach (var groepsreis in Model.AlleGroepsReizen)
             {
                 <div class="col-md-4 mb-4">
                     <a href="@Url.Action("Detail", "Groepsreis", new { id = groepsreis.Id })" class="card no-link">

@@ -3,7 +3,7 @@
 	public class Kind
 	{
 		public int Id { get; set; } // Primary Key
-		public string PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
+		public int PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
 
 		public string Naam { get; set; }
 		public string Voornaam { get; set; }

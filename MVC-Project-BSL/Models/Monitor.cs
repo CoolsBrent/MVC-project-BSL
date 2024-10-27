@@ -2,8 +2,8 @@
 
 public class Monitor
 {
-	public string Id { get; set; } // Unieke identifier voor de monitor
-	public string PersoonId { get; set; } // Verwijzing naar de persoon
+	public int Id { get; set; } // Unieke identifier voor de monitor
+	public int PersoonId { get; set; } // Verwijzing naar de persoon
 	public bool IsHoofdMonitor { get; set; } // Geeft aan of de monitor hoofdmonitor is
 
 	public CustomUser Persoon { get; set; } // Navigatie-eigenschap naar de gebruiker

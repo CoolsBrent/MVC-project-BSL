@@ -2,7 +2,7 @@
 
 namespace MVC_Project_BSL.Models
 {
-	public class CustomUser : IdentityUser
+	public class CustomUser : IdentityUser<int>
 	{
 		public string Naam { get; set; }
 		public string Voornaam { get; set; }

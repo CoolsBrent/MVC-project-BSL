@@ -186,17 +186,17 @@
 			<tbody>
 				@foreach (var kind in Model.BeschikbareDeelnemers)
 				{
-					var geboortedatum = kind.Geboortedatum;
+					var geboortedatum = kind.Kind.Persoon.Geboortedatum;
 					var leeftijd = DateTime.Now.Year - geboortedatum.Year;
 					if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
 					<tr>
-						<td>@kind.Voornaam @kind.Naam</td> <!-- Toon naam van het kind -->
+						<td>@kind.Kind.Persoon.Voornaam @kind.Kind.Persoon.Naam</td> <!-- Toon naam van het kind -->
 						<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
 						<td>
 							<form asp-action="VoegDeelnemerToe" method="post">
 								<input type="hidden" name="groepsreisId" value="@Model.Id" />
-								<input type="hidden" name="kindId" value="@kind.Id" />
+								<input type="hidden" name="kindId" value="@kind.Kind.Persoon.Id" />
 								<button type="submit" class="btn btn-primary">Toevoegen</button>
 							</form>
 						</td>

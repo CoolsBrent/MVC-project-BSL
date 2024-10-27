@@ -11,12 +11,14 @@ namespace MVC_Project_BSL.Controllers
     public class GroepsreisController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+		private readonly MonitorService _monitorService;
 
-        public GroepsreisController(IUnitOfWork unitOfWork)
+		public GroepsreisController(IUnitOfWork unitOfWork, MonitorService monitorService)
         {
 
             _unitOfWork = unitOfWork;
-        }
+			_monitorService = monitorService;
+		}
 
         // GET: Groepsreis
         public async Task<IActionResult> Index()
@@ -186,13 +188,15 @@ namespace MVC_Project_BSL.Controllers
                     .Select(g => g.First())
                     .ToList();
 
-            var ingeschrevenDeelnemers = groepsreis?.Deelnemers.Select(m => m.KindId).ToList();
-            var uniekeDeelnemers = deelnemers
-                    .Where(m => !ingeschrevenDeelnemers.Contains(m.Id))  // Selecteer de eerste unieke deelnemer per groep (PersoonId)
-                    .ToList();
+			var ingeschrevenDeelnemers = groepsreis?.Deelnemers.Select(m => m.Kind.PersoonId).ToList();
+			var beschikbareDeelnemers = await _unitOfWork.DeelnemerRepository.GetAllAsync(query =>
+	 query.Include(d => d.Kind)
+		  .ThenInclude(k => k.Persoon)
+		  .Where(d => d.Kind != null && d.Kind.Persoon.IsActief)
+		);
 
-            groepsreis.BeschikbareMonitoren = uniekeMonitoren.ToList();
-            groepsreis.BeschikbareDeelnemers = uniekeDeelnemers.ToList();
+			groepsreis.BeschikbareMonitoren = uniekeMonitoren.ToList();
+            groepsreis.BeschikbareDeelnemers = beschikbareDeelnemers.ToList();
 
             if (groepsreis == null)
             {
@@ -283,71 +287,27 @@ namespace MVC_Project_BSL.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, string monitorId)
-        {
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+		[HttpPost]
+		public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, int monitorId)
+		{
+			var result = await _monitorService.MaakHoofdmonitor(groepsreisId, monitorId);
+			return result;
+		}
 
-            if (groepsreis == null)
-            {
-                return NotFound("Groepsreis niet gevonden");
-            }
-
-            // Zet alle monitoren terug naar niet-hoofdmonitor
-            foreach (var gm in groepsreis.Monitoren)
-            {
-                if (gm.Monitor != null) // Controleer of de Monitor niet null is
-                {
-                    gm.Monitor.IsHoofdMonitor = false;
-                }
-            }
-
-            var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
-            if (geselecteerdeMonitor == null)
-            {
-                return NotFound("Monitor niet gevonden");
-            }
-
-            // Zet de geselecteerde monitor als hoofdmonitor
-            geselecteerdeMonitor.IsHoofdMonitor = true;
-
-            // Wijzigingen opslaan
-            _unitOfWork.SaveChanges(); // Gebruik de async versie
-
-            return RedirectToAction("Detail", new { id = groepsreisId });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> MaakGewoneMonitor(int groepsreisId, string monitorId)
-        {
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
-
-            if (groepsreis == null)
-            {
-                return NotFound("Groepsreis niet gevonden");
-            }
-
-            var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
-            if (geselecteerdeMonitor == null)
-            {
-                return NotFound("Monitor niet gevonden");
-            }
-
-            // Zet de hoofdmonitor-status terug naar "niet hoofdmonitor"
-            geselecteerdeMonitor.IsHoofdMonitor = false;
-
-            _unitOfWork.SaveChanges();
-
-            return RedirectToAction("Detail", new { id = groepsreisId });
-        }
-        [HttpPost]
-        public async Task<IActionResult> DeleteMonitor(int groepsreisId, string monitorId)
+		[HttpPost]
+		public async Task<IActionResult> MaakGewoneMonitor(int groepsreisId, int monitorId)
+		{
+			var result = await _monitorService.MaakGewoneMonitor(groepsreisId, monitorId);
+			return result;
+		}
+		[HttpPost]
+        public async Task<IActionResult> DeleteMonitor(int groepsreisId, int monitorId)
         {
             Debug.WriteLine($"Verzoek ontvangen om monitor met ID {monitorId} te verwijderen uit groepsreis met ID {groepsreisId}.");
 
             // Groepsreis ophalen inclusief de ingeschreven monitoren
             var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
-            var monitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
+            var monitor = await _unitOfWork.MonitorRepository.GetByIdAsync(monitorId);
 
             if (groepsreis == null)
             {
@@ -391,11 +351,11 @@ namespace MVC_Project_BSL.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMonitor(int groepsreisId, string monitorId)
+        public async Task<IActionResult> AddMonitor(int groepsreisId, int monitorId)
         {
             // Groepsreis ophalen inclusief de ingeschreven monitoren
             var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
-            var monitor = await _unitOfWork.MonitorRepository.GetByStringIdAsync(monitorId);
+            var monitor = await _unitOfWork.MonitorRepository.GetByIdAsync(monitorId);
 
             if (groepsreis == null || monitor == null)
             {

@@ -102,5 +102,10 @@ namespace MVC_Project_BSL.Data.Repository
 		{
 			return await _dbSet.AnyAsync(predicate);
 		}
+		public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+		{
+			return await _dbSet.FirstOrDefaultAsync(predicate);
+		}
+
 	}
 }

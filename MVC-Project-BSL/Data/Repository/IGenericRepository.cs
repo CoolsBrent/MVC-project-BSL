@@ -27,5 +27,6 @@ namespace MVC_Project_BSL.Data.Repository
         void Update(TEntity entity);
         void Delete(TEntity entity);
         void Save();
-    }
+		Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+	}
 }
