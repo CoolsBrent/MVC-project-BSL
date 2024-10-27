@@ -20,39 +20,39 @@ namespace MVC_Project_BSL.Controllers
 			_monitorService = monitorService;
 		}
 
-        // GET: Groepsreis
-        public async Task<IActionResult> Index()
-        {
-            var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query => query.Include(g => g.Bestemming));
-            return View(groepsreizen);
-        }
+		// GET: Groepsreis
+		public async Task<IActionResult> Index()
+		{
+			var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query => query.Include(g => g.Bestemming));
+			return View(groepsreizen);
+		}
 
-        // GET: Groepsreis/Create
-        public IActionResult Create()
-        {
-            // Zorg ervoor dat je de bestemmingen ophaalt vanuit de Bestemming repository of DbSet
-            ViewBag.Bestemmingen = new SelectList(_unitOfWork.BestemmingRepository.GetAllAsync().Result, "Id", "BestemmingsNaam");
-            ViewBag.Activiteiten = new SelectList(_unitOfWork.ActiviteitRepository.GetAllAsync().Result, "Id", "Naam");
+		// GET: Groepsreis/Create
+		public IActionResult Create()
+		{
+			// Zorg ervoor dat je de bestemmingen ophaalt vanuit de Bestemming repository of DbSet
+			ViewBag.Bestemmingen = new SelectList(_unitOfWork.BestemmingRepository.GetAllAsync().Result, "Id", "BestemmingsNaam");
+			ViewBag.Activiteiten = new SelectList(_unitOfWork.ActiviteitRepository.GetAllAsync().Result, "Id", "Naam");
 
-            return View();
-        }
+			return View();
+		}
 
-        // POST: Groepsreis/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Groepsreis groepsreis)
-        {
-            // Log elke validatiefout
-            foreach (var modelState in ModelState)
-            {
-                foreach (var error in modelState.Value.Errors)
-                {
-                    Console.WriteLine($"Fout in {modelState.Key}: {error.ErrorMessage}");
-                }
-            }
+		// POST: Groepsreis/Create
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Create(Groepsreis groepsreis)
+		{
+			// Log elke validatiefout
+			foreach (var modelState in ModelState)
+			{
+				foreach (var error in modelState.Value.Errors)
+				{
+					Console.WriteLine($"Fout in {modelState.Key}: {error.ErrorMessage}");
+				}
+			}
 
-            if (ModelState.IsValid)
-            {
+			if (ModelState.IsValid)
+			{
 
                 // Zorg ervoor dat de collecties altijd zijn geïnitialiseerd om fouten te voorkomen
                 groepsreis.Deelnemers = groepsreis.Deelnemers ?? new List<Deelnemer>();
@@ -61,67 +61,67 @@ namespace MVC_Project_BSL.Controllers
                 groepsreis.Programmas = groepsreis.Programmas ?? new List<Programma>();
 
 
-                // Sla de nieuwe groepsreis op als het formulier geldig is
-                await _unitOfWork.GroepsreisRepository.AddAsync(groepsreis);
+				// Sla de nieuwe groepsreis op als het formulier geldig is
+				await _unitOfWork.GroepsreisRepository.AddAsync(groepsreis);
 
-                _unitOfWork.SaveChanges();
+				_unitOfWork.SaveChanges();
 
-                return RedirectToAction(nameof(Index));
-            }
+				return RedirectToAction(nameof(Index));
+			}
 
-            // Als het formulier niet geldig is, moet je de bestemmingen opnieuw in de ViewBag laden
-            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
-            ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam");
+			// Als het formulier niet geldig is, moet je de bestemmingen opnieuw in de ViewBag laden
+			ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+			ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam");
 
-            // Geef het formulier opnieuw weer met de ingevulde gegevens
-            return View(groepsreis);
-        }
+			// Geef het formulier opnieuw weer met de ingevulde gegevens
+			return View(groepsreis);
+		}
 
-        // GET: Groepsreis/Edit/5
-        public async Task<IActionResult> Edit(int id)
-        {
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
-            if (groepsreis == null)
-            {
-                return NotFound();
-            }
-            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+		// GET: Groepsreis/Edit/5
+		public async Task<IActionResult> Edit(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
+			ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
 
             ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Programmas);
             return View(groepsreis);
         }
 
-        // POST: Groepsreis/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Groepsreis groepsreis)
-        {
-            if (id != groepsreis.Id)
-            {
-                return NotFound();
-            }
+		// POST: Groepsreis/Edit/5
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Edit(int id, Groepsreis groepsreis)
+		{
+			if (id != groepsreis.Id)
+			{
+				return NotFound();
+			}
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _unitOfWork.GroepsreisRepository.Update(groepsreis);
-                    _unitOfWork.SaveChanges();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await GroepsreisExists(groepsreis.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
+			if (ModelState.IsValid)
+			{
+				try
+				{
+					_unitOfWork.GroepsreisRepository.Update(groepsreis);
+					_unitOfWork.SaveChanges();
+				}
+				catch (DbUpdateConcurrencyException)
+				{
+					if (!await GroepsreisExists(groepsreis.Id))
+					{
+						return NotFound();
+					}
+					else
+					{
+						throw;
+					}
+				}
+				return RedirectToAction(nameof(Index));
+			}
+			ViewBag.Bestemmingen = new SelectList(await _unitOfWork.BestemmingRepository.GetAllAsync(), "Id", "BestemmingsNaam", groepsreis.BestemmingId);
 
             ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Programmas);
             return View(groepsreis);
@@ -140,34 +140,34 @@ namespace MVC_Project_BSL.Controllers
             return View(groepsreis);
         }
 
-        // POST: Groepsreis/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
-            if (groepsreis != null)
-            {
-                _unitOfWork.GroepsreisRepository.Delete(groepsreis);
-                _unitOfWork.SaveChanges();
-            }
-            return RedirectToAction(nameof(Index));
-        }
+		// POST: Groepsreis/Delete/5
+		[HttpPost, ActionName("Delete")]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> DeleteConfirmed(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			if (groepsreis != null)
+			{
+				_unitOfWork.GroepsreisRepository.Delete(groepsreis);
+				_unitOfWork.SaveChanges();
+			}
+			return RedirectToAction(nameof(Index));
+		}
 
-        private async Task<bool> GroepsreisExists(int id)
-        {
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
-            return groepsreis != null;
-        }
-        // GET: Groepsreis/Detail/5
-        public async Task<IActionResult> Detail(int id)
-        {
+		private async Task<bool> GroepsreisExists(int id)
+		{
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+			return groepsreis != null;
+		}
+		// GET: Groepsreis/Detail/5
+		public async Task<IActionResult> Detail(int id)
+		{
 
-            var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
-                query => query.Include(m => m.Persoon));
+			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
 
-            var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
-                query => query.Include(m => m.Persoon));
+			var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
 
 
             // Haal alle groepsreizen op met de bijbehorende monitoren en hun personen
@@ -178,30 +178,28 @@ namespace MVC_Project_BSL.Controllers
                                .ThenInclude(b => b.Fotos)
                                .Include(g => g.Deelnemers));
 
-            // Zoek de specifieke groepsreis met het gegeven id
-            var groepsreis = groepsreizen.FirstOrDefault(g => g.Id == id);
+			// Zoek de specifieke groepsreis met het gegeven id
+			var groepsreis = groepsreizen.FirstOrDefault(g => g.Id == id);
 
-            var ingeschrevenMonitoren = groepsreis?.Monitoren.Select(m => m.Monitor.PersoonId).ToList();
-            var uniekeMonitoren = monitoren
-                    .Where(m => !ingeschrevenMonitoren.Contains(m.PersoonId))
-                    .GroupBy(m => m.PersoonId)
-                    .Select(g => g.First())
+			var ingeschrevenMonitoren = groepsreis?.Monitoren.Select(m => m.Monitor.PersoonId).ToList();
+			var uniekeMonitoren = monitoren
+					.Where(m => !ingeschrevenMonitoren.Contains(m.PersoonId))
+					.GroupBy(m => m.PersoonId)
+					.Select(g => g.First())
+					.ToList();
+
+			var ingeschrevenDeelnemers = groepsreis?.Deelnemers.Select(m => m.KindId).ToList();
+            var uniekeDeelnemers = deelnemers
+                    .Where(m => !ingeschrevenDeelnemers.Contains(m.Id))  // Selecteer de eerste unieke deelnemer per groep (PersoonId)
                     .ToList();
 
-			var ingeschrevenDeelnemers = groepsreis?.Deelnemers.Select(m => m.Kind.PersoonId).ToList();
-			var beschikbareDeelnemers = await _unitOfWork.DeelnemerRepository.GetAllAsync(query =>
-	 query.Include(d => d.Kind)
-		  .ThenInclude(k => k.Persoon)
-		  .Where(d => d.Kind != null && d.Kind.Persoon.IsActief)
-		);
-
 			groepsreis.BeschikbareMonitoren = uniekeMonitoren.ToList();
-            groepsreis.BeschikbareDeelnemers = beschikbareDeelnemers.ToList();
+			groepsreis.BeschikbareDeelnemers = uniekeDeelnemers.ToList();
 
-            if (groepsreis == null)
-            {
-                return NotFound();
-            }
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
 
 
             return View(groepsreis);
@@ -258,11 +256,11 @@ namespace MVC_Project_BSL.Controllers
             // Groepsreis ophalen inclusief de deelnemers
             var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Deelnemers);
 
-            if (groepsreis == null)
-            {
-                Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
-                return NotFound();
-            }
+			if (groepsreis == null)
+			{
+				Debug.WriteLine($"Groepsreis met ID {groepsreisId} niet gevonden.");
+				return NotFound();
+			}
 
             // Log de deelnemers
             Debug.WriteLine($"Deelnemers in groepsreis {groepsreisId}: {string.Join(", ", groepsreis.Deelnemers.Select(d => d.KindId))}");
@@ -283,8 +281,8 @@ namespace MVC_Project_BSL.Controllers
             _unitOfWork.SaveChanges();
             Debug.WriteLine($"Kind met ID {kindId} succesvol verwijderd uit groepsreis met ID {groepsreisId}.");
 
-            return RedirectToAction("Detail", new { id = groepsreisId });
-        }
+			return RedirectToAction("Detail", new { id = groepsreisId });
+		}
 
 
 		[HttpPost]
