@@ -146,18 +146,19 @@ namespace MVC_Project_BSL.Controllers
 			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync();
 			var gefilterdeMonitoren = monitoren.Where(k => k.PersoonId == userId).ToList();
 
-			if (userRoles.Contains("Monitor") || userRoles.Contains("Hoofdmonitor"))
+			// Verwijder monitor data als de rol niet langer "Monitor" of "Hoofdmonitor" is
+			if (userRoles.Contains("Hoofdmonitor") || userRoles.Contains("Monitor"))
 			{
-				
 				foreach (var monitor in gefilterdeMonitoren)
 				{
-					Debug.WriteLine($"Deelnemer gevonden voor user {userId} (Deelnemer ID: {monitor.Id}), verwijderen...");
+					Debug.WriteLine($"Monitor gevonden voor user {userId} (Monitor ID: {monitor.Id}), verwijderen...");
 					_unitOfWork.MonitorRepository.Delete(monitor);
 				}
 			}
 
-            if (userRoles.Contains("Deelnemer"))
-            {
+			// Verwijder deelnemers alleen als de rol "Deelnemer" is
+			if (userRoles.Contains("Deelnemer"))
+			{
 				foreach (var deelnemer in gefilterdeDeelnemers)
 				{
 					Debug.WriteLine($"Deelnemer gevonden voor user {userId} (Deelnemer ID: {deelnemer.Id}), verwijderen...");
@@ -165,13 +166,11 @@ namespace MVC_Project_BSL.Controllers
 				}
 			}
 
-            // Verwijder alle Kinderen die aan deze gebruiker zijn gekoppeld
-           
-
 			// Sla de wijzigingen op
-			 _unitOfWork.SaveChanges();
-			Debug.WriteLine("Alle deelnemers verwijderd voor de gebruiker.");
+			_unitOfWork.SaveChanges();
+			Debug.WriteLine("Alle oude rol gegevens verwijderd voor de gebruiker.");
 		}
+
 
 		// Functie voor het toevoegen van nieuwe rolgegevens
 		private async Task AddNewRoleData(string roleName, int userId, CustomUser user)
@@ -180,7 +179,15 @@ namespace MVC_Project_BSL.Controllers
 
 			// Check if the user already has a Monitor record in the database
 			var monitor = await _unitOfWork.MonitorRepository.GetFirstOrDefaultAsync(m => m.PersoonId == userId);
-
+			if (roleName == "Deelnemer")
+			{
+				if (monitor != null)
+				{
+					Debug.WriteLine($"Removing monitor data for user {userId} as they are now a Deelnemer...");
+					_unitOfWork.MonitorRepository.Delete(monitor);
+				}
+				return; // Exit early as we don't need to do anything else for 'Deelnemer'
+			}
 
 			if (monitor == null)
 			{
