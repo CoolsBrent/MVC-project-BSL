@@ -9,18 +9,20 @@ using System.Security.Claims;
 
 namespace MVC_Project_BSL.Controllers
 {
-    [Authorize]
-    public class DashboardController : Controller
-    {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<CustomUser> _userManager;
 
-        public DashboardController(IUnitOfWork unitOfWork, UserManager<CustomUser> userManager)
-        {
+	[Authorize]
+	public class DashboardController : Controller
+	{
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly UserManager<CustomUser> _userManager;
 
-            _unitOfWork = unitOfWork;
-            _userManager = userManager;
-        }
+		public DashboardController(IUnitOfWork unitOfWork, UserManager<CustomUser> userManager)
+		{
+
+			_unitOfWork = unitOfWork;
+			_userManager = userManager;
+		}
+
 		// GET: Groepsreis
 		public async Task<IActionResult> Index(string bestemming)
 		{
@@ -175,7 +177,7 @@ namespace MVC_Project_BSL.Controllers
 					{
 						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
 						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-						
+
 					}
 
 					// Sorteren op Begindatum
@@ -198,4 +200,6 @@ namespace MVC_Project_BSL.Controllers
 
 
 	}
+
 }
+

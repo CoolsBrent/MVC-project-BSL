@@ -1,4 +1,5 @@
-﻿namespace MVC_Project_BSL.Models
+﻿
+namespace MVC_Project_BSL.Models
 {
     public class Deelnemer
     {

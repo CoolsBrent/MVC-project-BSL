@@ -11,9 +11,10 @@ public partial class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+		builder.Services.AddScoped<MonitorService>();
 
-        // Add services to the container.
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+		// Add services to the container.
+		var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
         // Voeg ApplicationDbContext en SQL Server toe
@@ -27,7 +28,7 @@ public partial class Program
 
         // Gebruik CustomUser in plaats van IdentityUser
         builder.Services.AddDefaultIdentity<CustomUser>(options => options.SignIn.RequireConfirmedAccount = false)
-            .AddRoles<IdentityRole>()
+            .AddRoles<IdentityRole<int>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
@@ -64,7 +65,7 @@ public partial class Program
         //Aanmaken van rollen bij opstart
         using (var scope = app.Services.CreateScope())
         {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
 
             var roles = new[] { "Deelnemer", "Monitor", "Hoofdmonitor", "Verantwoordelijke", "Beheerder" };
 
@@ -72,7 +73,7 @@ public partial class Program
             {
                 if (!await roleManager.RoleExistsAsync(role))
                 {
-                    await roleManager.CreateAsync(new IdentityRole(role));
+                    await roleManager.CreateAsync(new IdentityRole<int>(role));
                 }
             }
         }

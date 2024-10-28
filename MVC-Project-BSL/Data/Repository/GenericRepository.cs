@@ -52,13 +52,13 @@ namespace MVC_Project_BSL.Data.Repository
         {
             return await _dbSet.FindAsync(id);
         }
-		public async Task<TEntity?> GetByStringIdAsync(string id)
-		{
-			return await _dbSet.FindAsync(id);
-		}
+        public async Task<TEntity?> GetByStringIdAsync(string id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
 
-		// Nieuwe methode om een entiteit op te halen met inclusies
-		public async Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes)
+        // Nieuwe methode om een entiteit op te halen met inclusies
+        public async Task<TEntity?> GetByIdWithIncludesAsync(int id, params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _dbSet;
 
@@ -70,9 +70,9 @@ namespace MVC_Project_BSL.Data.Repository
 
             return await query.FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
         }
-	
 
-		public async Task AddAsync(TEntity entity)
+
+        public async Task AddAsync(TEntity entity)
         {
             try
             {
@@ -98,5 +98,14 @@ namespace MVC_Project_BSL.Data.Repository
         {
             _context.SaveChanges();
         }
-    }
+		public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+		{
+			return await _dbSet.AnyAsync(predicate);
+		}
+		public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+		{
+			return await _dbSet.FirstOrDefaultAsync(predicate);
+		}
+
+	}
 }
