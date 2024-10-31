@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MVC_Project_BSL.Migrations
 {
     /// <inheritdoc />
-    public partial class OnkostenArchiveren_Update : Migration
+    public partial class Test : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -116,7 +116,7 @@ namespace MVC_Project_BSL.Migrations
                         column: x => x.OpleidingVereist,
                         principalTable: "Opleidingen",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
