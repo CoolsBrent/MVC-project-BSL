@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MVC_Project_BSL.Migrations
 {
     /// <inheritdoc />
-    public partial class CustomuserId : Migration
+    public partial class Test : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -298,7 +298,8 @@ namespace MVC_Project_BSL.Migrations
                     Begindatum = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Einddatum = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Prijs = table.Column<float>(type: "real", nullable: false),
-                    BestemmingId = table.Column<int>(type: "int", nullable: false)
+                    BestemmingId = table.Column<int>(type: "int", nullable: false),
+                    IsArchived = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -395,12 +396,12 @@ namespace MVC_Project_BSL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GroepsreisId = table.Column<int>(type: "int", nullable: false),
                     Titel = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Omschrijving = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bedrag = table.Column<float>(type: "real", nullable: false),
                     Datum = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Foto = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Foto = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GroepsreisId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
