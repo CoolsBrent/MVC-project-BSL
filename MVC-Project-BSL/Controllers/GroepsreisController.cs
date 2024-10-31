@@ -112,7 +112,7 @@ namespace MVC_Project_BSL.Controllers
                 await _unitOfWork.ActiviteitRepository.GetAllAsync(),
                 "Id",
                 "Naam",
-                groepsreis.Activiteiten);
+                groepsreis.Programmas);
 
             return View(groepsreis);
         }
@@ -182,7 +182,7 @@ namespace MVC_Project_BSL.Controllers
                     await _unitOfWork.ActiviteitRepository.GetAllAsync(),
                     "Id",
                     "Naam",
-                    groepsreis.Activiteiten);
+                    groepsreis.Programmas);
 
                 return View(groepsreis);
             }
@@ -301,9 +301,8 @@ namespace MVC_Project_BSL.Controllers
         }
 
 
-            ViewBag.Activiteiten = new SelectList(await _unitOfWork.ActiviteitRepository.GetAllAsync(), "Id", "Naam", groepsreis.Programmas);
-            return View(groepsreis);
-        }
+      
+        
 
         // GET: Groepsreis/Delete/5
         public async Task<IActionResult> Delete(int id)
