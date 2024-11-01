@@ -9,9 +9,9 @@
         <div class="col-md-12">
             <h2 class="text-center mb-4">Persoonlijke Gegevens Beheren</h2>
 
-            <form asp-action="Edit" method="post">
+            <!-- Formulier voor persoonlijke gegevens van de gebruiker -->
+            <form asp-action="EditGebruiker" method="post">
                 @Html.AntiForgeryToken()
-                <!-- Persoonlijke gegevens van de gebruiker -->
                 <div class="card mb-4 shadow-lg">
                     <div class="card-header bg-navbar text-white">
                         <h4 class="my-0">Persoonlijke Gegevens</h4>
@@ -64,90 +64,82 @@
                             </div>
                         }
                     </div>
+                    <!-- Opslaan knop voor gebruiker -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-save"></i> Opslaan Gebruiker
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Gegevens van kinderen -->
-                <div class="card mb-4 shadow-lg">
-                    <div class="card-header bg-secondary text-white">
-                        <h4 class="my-0">Gezinsleden Beheren</h4>
-                    </div>
-                    <div class="card-body bg-light">
-                        @for (int i = 0; i < Model.Kinderen.Count; i++)
-                        {
-                            <div class="card mb-3 shadow-sm border-0">
-                                <div class="card-body">
-                                    <h5 class="card-title">Kind @(i + 1)</h5>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label asp-for="Kinderen[i].Naam" class="form-label">Naam</label>
-                                            <input asp-for="Kinderen[i].Naam" class="form-control" />
-                                            <span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
-                                        </div>
+                
+            </form>
 
-                                        <div class="form-group col-md-6">
-                                            <label asp-for="Kinderen[i].Voornaam" class="form-label">Voornaam</label>
-                                            <input asp-for="Kinderen[i].Voornaam" class="form-control" />
-                                            <span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
-                                        </div>
-                                    </div>
+            <!-- Formulieren voor gegevens van kinderen -->
+            <div class="row">
+            @for (int i = 0; i < Model.Kinderen.Count; i++)
+            {
+                <div class="col-md-6 mb-4">
+                <form asp-action="EditKind" asp-controller="PersoonlijkeGegevens" method="post" class="mt-4">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Kinderen[i].Id" />
 
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label asp-for="Kinderen[i].Geboortedatum" class="form-label">Geboortedatum</label>
-                                            <input asp-for="Kinderen[i].Geboortedatum" class="form-control" type="date" />
-                                            <span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
-                                        </div>
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-body">
+                            <h5 class="card-title">Kind @(i + 1)</h5>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="Naam-@i" class="form-label">Naam</label>
+                                    <input type="text" name="Naam" id="Naam-@i" class="form-control" value="@Model.Kinderen[i].Naam" />
+                                    <span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
+                                </div>
 
-                                        <div class="form-group col-md-6">
-                                            <label asp-for="Kinderen[i].Allergieën" class="form-label">Allergieën</label>
-                                            <input asp-for="Kinderen[i].Allergieën" class="form-control" />
-                                            <span asp-validation-for="Kinderen[i].Allergieën" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group mb-3">
-                                        <label asp-for="Kinderen[i].Medicatie" class="form-label">Medicatie</label>
-                                        <input asp-for="Kinderen[i].Medicatie" class="form-control" />
-                                        <span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
-                                    </div>
-
-                                    <button type="submit" formaction="@Url.Action("DeleteChild", "PersoonlijkeGegevens", new { id = Model.Kinderen[i].Id })"
-                                            class="btn btn-danger"
-                                            onclick="return confirm('Weet je zeker dat je dit kind wilt verwijderen?');">
-                                        <i class="bi bi-trash-fill"></i> Verwijderen
-                                    </button>
+                                <div class="form-group col-md-6">
+                                    <label for="Voornaam-@i" class="form-label">Voornaam</label>
+                                    <input type="text" name="Voornaam" id="Voornaam-@i" class="form-control" value="@Model.Kinderen[i].Voornaam" />
+                                    <span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
                                 </div>
                             </div>
-                        }
-                    </div>
-                </div>
 
-                <!-- Modal -->
-                <div class="modal fade" id="succesModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Status</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="Geboortedatum-@i" class="form-label">Geboortedatum</label>
+                                    <input type="date" name="Geboortedatum" id="Geboortedatum-@i" class="form-control" value="@Model.Kinderen[i].Geboortedatum.ToString("yyyy-MM-dd")" />
+                                    <span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="Allergieën-@i" class="form-label">Allergieën</label>
+                                    <input type="text" name="Allergieën" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieën" />
+                                    <span asp-validation-for="Kinderen[i].Allergieën" class="text-danger"></span>
+                                </div>
                             </div>
-                            <div class="modal-body">
-                                Gegevens zijn succesvol opgeslagen!
+
+                            <div class="form-group col-md-6">
+                                <label for="Medicatie-@i" class="form-label">Medicatie</label>
+                                <input type="text" name="Medicatie" id="Medicatie-@i" class="form-control" value="@Model.Kinderen[i].Medicatie" />
+                                <span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+
+                            <div class="d-flex mt-3">
+                                <!-- Opslaan knop voor kind -->
+                                <button type="submit" class="btn btn-primary me-3">
+                                    <i class="bi bi-save"></i> Opslaan Kind
+                                </button>
+
+                                <!-- Verwijder knop voor kind -->
+                                <button type="submit" formaction="@Url.Action("DeleteChild", "PersoonlijkeGegevens", new { id = Model.Kinderen[i].Id })"
+                                        class="btn btn-danger"
+                                        onclick="return confirm('Weet je zeker dat je dit kind wilt verwijderen?');">
+                                    <i class="bi bi-trash-fill"></i> Verwijderen
+                                </button>
                             </div>
                         </div>
                     </div>
+                </form>
                 </div>
-
-                <!-- Opslaan knop -->
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        <i class="bi bi-save"></i> Opslaan
-                    </button>
-                </div>
-
-            </form>
+            }
+            </div>
         </div>
     </div>
 </div>

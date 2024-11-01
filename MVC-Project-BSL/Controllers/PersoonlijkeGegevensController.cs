@@ -93,18 +93,18 @@ namespace MVC_Project_BSL.Controllers
             return View(viewModel);
         }
 
-        // Edit POST actie: Verwerken van het bewerken van persoonlijke gegevens
+        // Edit POST actie: Verwerken van het bewerken van persoonlijke gegevens van de gebruiker
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(PersoonlijkeGegevensViewModel model)
+        public async Task<IActionResult> EditGebruiker(PersoonlijkeGegevensViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return View("Edit", model);
             }
 
             var userId = int.Parse(_userManager.GetUserId(User));
-            var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
+            var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(userId);
 
             if (user == null)
             {
@@ -120,46 +120,58 @@ namespace MVC_Project_BSL.Controllers
             user.RekeningNummer = model.RekeningNummer;
             user.IsActief = model.IsActief;
 
-            // Update kind gegevens
-            foreach (var kindModel in model.Kinderen)
-            {
-                var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindModel.Id);
-                if (kind != null)
-                {
-                    kind.Naam = kindModel.Naam;
-                    kind.Voornaam = kindModel.Voornaam;
-                    kind.Geboortedatum = kindModel.Geboortedatum;
-                    kind.Allergieën = kindModel.Allergieën;
-                    kind.Medicatie = kindModel.Medicatie;
-                    kind.PersoonId = kindModel.PersoonId;
-
-                    // Markeer het kind als gewijzigd via de UnitOfWork (met de juiste repository)
-                    _unitOfWork.KindRepository.Update(kind);
-                    _unitOfWork.SaveChanges();
-                }
-            }
-
             // Update gebruiker
             _unitOfWork.CustomUserRepository.Update(user);
-
-            // Probeer wijzigingen op te slaan
-            try
-            {
-                _unitOfWork.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Fout tijdens opslaan: " + ex.Message);
-                throw;
-            }
+            _unitOfWork.SaveChanges();
 
             // Vernieuw de gebruiker in de sessie
             await _signInManager.RefreshSignInAsync(user);
 
-            TempData["SuccessMessage"] = "Gegevens zijn correct opgeslagen!";
-
+            TempData["SuccessMessage"] = "Gebruiker gegevens zijn correct opgeslagen!";
             return RedirectToAction(nameof(Index));
         }
+
+        // Edit POST actie: Verwerken van het bewerken van gegevens van kinderen
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditKind(KindGegevensViewModel kindModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var userId = int.Parse(_userManager.GetUserId(User));
+            var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
+
+            if (user == null)
+            {
+                return NotFound("Gebruiker niet gevonden.");
+            }
+
+            // Zoek het kind in de database
+            var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindModel.Id);
+            if (kind == null || kind.PersoonId != userId)
+            {
+                return NotFound("Kind niet gevonden of behoort niet tot de gebruiker.");
+            }
+
+            // Update de kind gegevens
+            kind.Naam = kindModel.Naam;
+            kind.Voornaam = kindModel.Voornaam;
+            kind.Geboortedatum = kindModel.Geboortedatum;
+            kind.Allergieën = kindModel.Allergieën;
+            kind.Medicatie = kindModel.Medicatie;
+
+            // Update het kind via UnitOfWork
+            _unitOfWork.KindRepository.Update(kind);
+            _unitOfWork.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Gegevens van kind '{kind.Voornaam} {kind.Naam}' zijn correct opgeslagen!";
+            return RedirectToAction(nameof(Index));
+        }
+
 
 
 
