@@ -83,10 +83,11 @@
                 <form asp-action="EditKind" asp-controller="PersoonlijkeGegevens" method="post" class="mt-4">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="Id" value="@Model.Kinderen[i].Id" />
-
+                            <div class="card-header bg-navbar text-white">
+                                <h4 class="my-0">Kind @(i + 1)</h4>
+                            </div>
                     <div class="card mb-3 shadow-sm border-0">
                         <div class="card-body">
-                            <h5 class="card-title">Kind @(i + 1)</h5>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     <label for="Naam-@i" class="form-label">Naam</label>
