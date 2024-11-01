@@ -1,0 +1,168 @@
+﻿@model MVC_Project_BSL.ViewModels.PersoonlijkeGegevensViewModel
+
+@{
+    ViewData["Title"] = "Persoonlijke Gegevens Beheren";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-center mb-4">Persoonlijke Gegevens Beheren</h2>
+
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <!-- Persoonlijke gegevens van de gebruiker -->
+                <div class="card mb-4 shadow-lg">
+                    <div class="card-header bg-navbar text-white">
+                        <h4 class="my-0">Persoonlijke Gegevens</h4>
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="form-row">
+                            <div class="form-group col-mb-3">
+                                <label asp-for="Naam" class="form-label">Naam</label>
+                                <input asp-for="Naam" class="form-control" />
+                                <span asp-validation-for="Naam" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-mb-3">
+                                <label asp-for="Voornaam" class="form-label">Voornaam</label>
+                                <input asp-for="Voornaam" class="form-control" />
+                                <span asp-validation-for="Voornaam" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-mb-3">
+                                <label asp-for="Geboortedatum" class="form-label">Geboortedatum</label>
+                                <input asp-for="Geboortedatum" class="form-control" type="date" />
+                                <span asp-validation-for="Geboortedatum" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-mb-3">
+                                <label asp-for="Huisdokter" class="form-label">Huisdokter</label>
+                                <input asp-for="Huisdokter" class="form-control" />
+                                <span asp-validation-for="Huisdokter" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-mb-3">
+                                <label asp-for="TelefoonNummer" class="form-label">Telefoonnummer</label>
+                                <input asp-for="TelefoonNummer" class="form-control" />
+                                <span asp-validation-for="TelefoonNummer" class="text-danger"></span>
+                            </div>
+                            <div class="form-group col-mb-3">
+                                <label asp-for="RekeningNummer" class="form-label">Rekeningnummer</label>
+                                <input asp-for="RekeningNummer" class="form-control" />
+                                <span asp-validation-for="RekeningNummer" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        @if (User.IsInRole("Beheerder"))
+                        {
+                            <div class="form-check mb-3">
+                                <input asp-for="IsActief" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsActief" class="form-check-label">Actief</label>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Gegevens van kinderen -->
+                <div class="card mb-4 shadow-lg">
+                    <div class="card-header bg-secondary text-white">
+                        <h4 class="my-0">Gezinsleden Beheren</h4>
+                    </div>
+                    <div class="card-body bg-light">
+                        @for (int i = 0; i < Model.Kinderen.Count; i++)
+                        {
+                            <div class="card mb-3 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title">Kind @(i + 1)</h5>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="Kinderen[i].Naam" class="form-label">Naam</label>
+                                            <input asp-for="Kinderen[i].Naam" class="form-control" />
+                                            <span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="Kinderen[i].Voornaam" class="form-label">Voornaam</label>
+                                            <input asp-for="Kinderen[i].Voornaam" class="form-control" />
+                                            <span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="Kinderen[i].Geboortedatum" class="form-label">Geboortedatum</label>
+                                            <input asp-for="Kinderen[i].Geboortedatum" class="form-control" type="date" />
+                                            <span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
+                                        </div>
+
+                                        <div class="form-group col-md-6">
+                                            <label asp-for="Kinderen[i].Allergieën" class="form-label">Allergieën</label>
+                                            <input asp-for="Kinderen[i].Allergieën" class="form-control" />
+                                            <span asp-validation-for="Kinderen[i].Allergieën" class="text-danger"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group mb-3">
+                                        <label asp-for="Kinderen[i].Medicatie" class="form-label">Medicatie</label>
+                                        <input asp-for="Kinderen[i].Medicatie" class="form-control" />
+                                        <span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
+                                    </div>
+
+                                    <button type="submit" formaction="@Url.Action("DeleteChild", "PersoonlijkeGegevens", new { id = Model.Kinderen[i].Id })"
+                                            class="btn btn-danger"
+                                            onclick="return confirm('Weet je zeker dat je dit kind wilt verwijderen?');">
+                                        <i class="bi bi-trash-fill"></i> Verwijderen
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="succesModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Status</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Gegevens zijn succesvol opgeslagen!
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opslaan knop -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-save"></i> Opslaan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @* Zorg ervoor dat client-side validatie werkt *@
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            // Controleer of er een succesbericht is
+            if ('@TempData["SuccessMessage"]' && '@TempData["SuccessMessage"]' !== '') {
+                var myModal = new bootstrap.Modal(document.getElementById('succesModal'));
+                myModal.show();
+            }
+        });
+    </script>
+}

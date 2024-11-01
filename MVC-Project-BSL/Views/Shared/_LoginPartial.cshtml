@@ -5,10 +5,12 @@
 <ul class="navbar-nav bg-navbar">
     @if (SignInManager.IsSignedIn(User))
     {
+        // Haal de huidige gebruiker opnieuw op vanuit UserManager
+        var currentUser = await UserManager.GetUserAsync(User);
 
         <li class="nav-item">
             <a class="nav-link text-light" asp-controller="Dashboard" asp-action="Index" title="Manage">
-                Hello @User.Identity?.Name! <i class="bi bi-person"></i>
+                Hello @currentUser?.Voornaam! <i class="bi bi-person"></i>
             </a>
         </li>
         <li class="nav-item">

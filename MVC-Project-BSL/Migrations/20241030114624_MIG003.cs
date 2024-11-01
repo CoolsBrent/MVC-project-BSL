@@ -5,7 +5,7 @@
 namespace MVC_Project_BSL.Migrations
 {
     /// <inheritdoc />
-    public partial class DeelnemerNNA : Migration
+    public partial class MIG003 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
