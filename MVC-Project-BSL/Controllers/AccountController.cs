@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
@@ -25,6 +26,7 @@ namespace MVC_Project_BSL.Controllers
 
         // Afhandeling van de registratie
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -74,6 +76,7 @@ namespace MVC_Project_BSL.Controllers
 
         // Afhandeling van de login
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
@@ -116,6 +119,8 @@ namespace MVC_Project_BSL.Controllers
 
         // Afhandeling van de logout
         [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

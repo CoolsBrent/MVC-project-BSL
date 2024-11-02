@@ -1,9 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace MVC_Project_BSL.Data.Repository
 {
@@ -87,6 +83,7 @@ namespace MVC_Project_BSL.Data.Repository
         public void Update(TEntity entity)
         {
             _dbSet.Update(entity);
+            _context.Entry(entity).State = EntityState.Modified;
         }
 
         public void Delete(TEntity entity)
@@ -98,14 +95,14 @@ namespace MVC_Project_BSL.Data.Repository
         {
             _context.SaveChanges();
         }
-		public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
-		{
-			return await _dbSet.AnyAsync(predicate);
-		}
-		public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
-		{
-			return await _dbSet.FirstOrDefaultAsync(predicate);
-		}
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
+        public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.FirstOrDefaultAsync(predicate);
+        }
 
-	}
+    }
 }

@@ -56,9 +56,7 @@ main {
     transition: transform 0.3s; /* Smooth transition bij hover */
 }
 
-    .card:hover {
-        transform: scale(1.05); /* Vergroot de kaart bij hover */
-    }
+  
 
 /* Formulier styling */
 .form-row {
