@@ -18,27 +18,42 @@ namespace MVC_Project_BSL.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index(int? minLeeftijd, int? maxLeeftijd, DateTime? begindatum)
+        // GET: Home/Index met filters voor leeftijdscategorie, begindatum, en prijsbereik
+        public async Task<IActionResult> Index(string leeftijdscategorie, DateTime? begindatum, decimal? maxPrijs)
         {
             // Haal alle groepsreizen op inclusief bestemmingen en foto's
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
                 query => query.Include(g => g.Bestemming)
-                               .ThenInclude(b => b.Fotos));
+                              .ThenInclude(b => b.Fotos));
 
-            // Pas filters toe
-            if (minLeeftijd.HasValue)
+            // Haal unieke leeftijdscategorieën op uit de database
+            var leeftijdscategorieën = groepsreizen
+                .Select(g => new { Min = g.Bestemming.MinLeeftijd, Max = g.Bestemming.MaxLeeftijd })
+                .Distinct()
+                .ToList();
+
+            // Pas filters toe op basis van leeftijdscategorie
+            if (!string.IsNullOrEmpty(leeftijdscategorie))
             {
-                groepsreizen = groepsreizen.Where(g => g.Bestemming.MinLeeftijd >= minLeeftijd.Value);
+                // Splits de leeftijdscategorie op basis van het streepje, bijvoorbeeld "6-12"
+                var leeftijdsBereik = leeftijdscategorie.Split('-');
+                int minLeeftijd = int.Parse(leeftijdsBereik[0]);
+                int maxLeeftijd = int.Parse(leeftijdsBereik[1]);
+
+                // Filter de groepsreizen binnen het opgegeven leeftijdsbereik
+                groepsreizen = groepsreizen.Where(g => g.Bestemming.MinLeeftijd <= maxLeeftijd && g.Bestemming.MaxLeeftijd >= minLeeftijd);
             }
 
-            if (maxLeeftijd.HasValue)
-            {
-                groepsreizen = groepsreizen.Where(g => g.Bestemming.MaxLeeftijd <= maxLeeftijd.Value);
-            }
-
+            // Pas filter toe op basis van begindatum
             if (begindatum.HasValue)
             {
                 groepsreizen = groepsreizen.Where(g => g.Begindatum >= begindatum.Value);
+            }
+
+            // Pas filters toe op basis van prijsbereik
+            if (maxPrijs.HasValue)
+            {
+                groepsreizen = groepsreizen.Where(g => (decimal)g.Prijs <= maxPrijs.Value);
             }
 
             // Map de groepsreizen naar het ViewModel
@@ -55,8 +70,13 @@ namespace MVC_Project_BSL.Controllers
                 Prijs = (decimal)g.Prijs,
             }).ToList();
 
+            // Maak een ViewBag of een ander ViewModel om de leeftijdscategorieën naar de view te sturen
+            ViewBag.Leeftijdscategorieën = leeftijdscategorieën;
+
             return View(viewModel);
         }
+
+
 
         public IActionResult Privacy()
         {

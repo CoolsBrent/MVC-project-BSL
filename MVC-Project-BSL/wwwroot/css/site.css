@@ -144,3 +144,36 @@ footer {
         font-family: 'Playfair Display', serif;
     }
 
+
+/* Style voor het filter menu aan de linkerkant */
+.filter-menu {
+    height: 100%;
+    width: 300px; /* Zet de breedte van het filtermenu */
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: -300px; /* Begin met het menu buiten beeld (links) */
+    background-color: #f1f1f1;
+    overflow-x: hidden;
+    padding-top: 60px;
+    padding-left: 30px;
+    padding-right: 30px;
+    box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+    .filter-menu.open {
+        left: 0; /* Verplaats het menu in beeld wanneer het geopend is */
+    }
+
+    .filter-menu .closebtn {
+        position: absolute;
+        top: 20px;
+        right: 25px;
+        font-size: 36px;
+        text-decoration: none;
+        color: #000;
+    }
+
+#openFilterMenu {
+    cursor: pointer;
+}
