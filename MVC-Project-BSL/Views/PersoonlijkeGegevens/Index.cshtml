@@ -63,6 +63,11 @@
                                 <label asp-for="IsActief" class="form-check-label">Actief</label>
                             </div>
                         }
+                        else
+                        {
+                            <!-- Zorg ervoor dat de waarde van IsActief behouden blijft -->
+                            <input type="hidden" asp-for="IsActief" />
+                        }
                     </div>
                     <!-- Opslaan knop voor gebruiker -->
                     <div class="d-grid gap-2">

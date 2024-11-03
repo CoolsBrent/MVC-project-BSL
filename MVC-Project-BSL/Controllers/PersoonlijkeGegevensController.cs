@@ -118,7 +118,12 @@ namespace MVC_Project_BSL.Controllers
             user.Huisdokter = model.Huisdokter;
             user.TelefoonNummer = model.TelefoonNummer;
             user.RekeningNummer = model.RekeningNummer;
-            user.IsActief = model.IsActief;
+
+            // Alleen bijwerken van IsActief als de gebruiker een beheerder is
+            if (User.IsInRole("Beheerder"))
+            {
+                user.IsActief = model.IsActief;
+            }
 
             // Update gebruiker
             _unitOfWork.CustomUserRepository.Update(user);
