@@ -38,8 +38,6 @@
         </div>
     </form>
 
-
-
     @if (!Model.Any())
     {
         <div class="alert alert-warning">
@@ -52,18 +50,29 @@
             @foreach (var groepsreis in Model)
             {
                 <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img src="@Url.Content("~/images/" + groepsreis.FotoUrls.FirstOrDefault())" class="card-img-top" alt="@groepsreis.Bestemming" />
-                        <div class="card-body">
-                            <h5 class="card-title">@groepsreis.Bestemming</h5>
-                            <p class="card-text">@groepsreis.Beschrijving</p>
-                            <p class="card-text">Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
-                            <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-                            <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary">Meer Informatie</a>
+                    <!-- Maak de hele card klikbaar door een <a> om de hele card te plaatsen -->
+                    <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+                        <div class="card h-100">
+                            <img src="@Url.Content("~/images/" + groepsreis.FotoUrls.FirstOrDefault())" class="card-img-top" alt="@groepsreis.Bestemming" />
+                            <div class="card-body">
+                                <h5 class="card-title">@groepsreis.Bestemming</h5>
+                                <p class="card-text">@groepsreis.Beschrijving</p>
+                                <p class="card-text">Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
+                                <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>
     }
 </div>
+
+@section Scripts {
+    @* Zorg ervoor dat client-side validatie werkt, als er validatie nodig is *@
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        // Toevoegen van eventuele extra JavaScript functionaliteiten voor de filters
+    </script>
+}
