@@ -113,6 +113,10 @@ footer {
 
 
 .large-thumbnail {
+    /*height: 300px;
+    width: 100%;
+    object-fit: cover;
+    object-position: center; */
     width: 100%; /* Vult de breedte van de container */
     height: auto; /* Behoudt de aspect ratio */
     max-width: 600px; /* Limiteert de breedte tot maximaal 600px */

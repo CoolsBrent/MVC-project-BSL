@@ -1,25 +1,53 @@
 ﻿@model MVC_Project_BSL.ViewModels.RoleManagementViewModel
 
 <h2>Rollen Beheren</h2>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="userVoornaamInput" placeholder="Filter op voornaam...">
+    </div>
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="userAchternaamInput" placeholder="Filter op achternaam...">
+    </div>
+</div>
+
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-9">
         <h3>Gebruikers</h3>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Gebruikersnaam</th>
-                    <th>Email</th>
-                    <th>Huidige Rollen</th>
+                    <th>Naam</th>
+                    <th>Voornaam</th>
+                    <th>Leeftijd</th>
+                    <th>Actief</th>
+                    <th>Huidige Rol</th>
                     <th>Actie</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="userTableBody">
                 @foreach (var userRoles in Model.Users)
                 {
-                    <tr>
-                        <td>@userRoles.User.UserName</td>
-                        <td>@userRoles.User.Email</td>
+                    <tr class="user-row">
+                        <td class="user-lastname">@userRoles.User.Naam</td>
+                        <td class="user-firstname">@userRoles.User.Voornaam</td>
+                        <td>
+                        @if (userRoles.User.Geboortedatum != null)
+                        {
+                            var geboortedatum = userRoles.User.Geboortedatum;
+                            var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+
+                            if (DateTime.Now < geboortedatum.AddYears(leeftijd))
+                            {
+                                leeftijd--;
+                            }
+
+                            @leeftijd
+                        }
+                        </td>
+                        <td>
+                            @(userRoles.User.IsActief ? "Ja" : "Nee")
+                        </td>
                         <td>
                             @foreach (var role in userRoles.Roles)
                             {
@@ -29,8 +57,24 @@
                         <td>
                             <button class="btn btn-primary" data-toggle="modal" data-target="#assignRoleModal"
                                     data-userid="@userRoles.User.Id" data-username="@userRoles.User.UserName">
-                                Rol Toewijzen
+                                <i class="bi bi-plus-circle"></i> Rol
                             </button>
+                            <a asp-action="Edit" asp-route-id="@userRoles.User.Id" class="btn btn-secondary">
+                                <i class="bi bi-pencil-square"></i>
+                            </a>
+                            <form asp-action="DeactivateUser" method="post" style="display:inline;">
+                                <input type="hidden" name="userId" value="@userRoles.User.Id" />
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="bi bi-person-fill-slash"></i>
+                                </button>
+                            </form>
+                            <form asp-action="DeleteUser" method="post" style="display:inline;">
+                                <input type="hidden" name="userId" value="@userRoles.User.Id" />
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteModal" data-userid="@userRoles.User.Id">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+
+                            </form>
                         </td>
                     </tr>
                 }
@@ -38,7 +82,7 @@
         </table>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-3">
         <h3>Rollen</h3>
         <ul class="list-group">
             @foreach (var role in Model.Roles)
@@ -79,6 +123,31 @@
         </div>
     </div>
 </div>
+<!-- Bevestigingsmodal voor verwijderen -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Bevestig Verwijdering</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Weet je zeker dat je <strong id="deleteUserName"></strong> wilt verwijderen?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuleer</button>
+                <form id="confirmDeleteForm" asp-action="DeleteUser" method="post" style="display:inline;">
+                    <input type="hidden" name="userId" id="deleteUserId" />
+                    <button type="submit" class="btn btn-danger">Verwijder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 @section Scripts {
     <script>
@@ -87,6 +156,43 @@
             var userId = button.data('userid');
             var modal = $(this);
             modal.find('#selectedUserId').val(userId);
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Functie voor filtering
+            function filterUsers() {
+                var voornaamFilter = $('#userVoornaamInput').val().toLowerCase();
+                var achternaamFilter = $('#userAchternaamInput').val().toLowerCase();
+
+                $('.user-row').each(function () {
+                    var voornaam = $(this).find('.user-firstname').text().toLowerCase();
+                    var achternaam = $(this).find('.user-lastname').text().toLowerCase();
+
+                    if ((voornaam.includes(voornaamFilter) || !voornaamFilter) &&
+                        (achternaam.includes(achternaamFilter) || !achternaamFilter)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+
+            // Event listeners voor filtervelden
+            $('#userVoornaamInput, #userAchternaamInput').on('input', function () {
+                filterUsers();
+            });
+
+            // Functie voor het tonen van de bevestigingsmodal bij verwijdering
+            $('#confirmDeleteModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Knop die de modal opende
+                var userId = button.data('userid'); // Haal de gebruiker-ID op uit de data-attributen
+                var userName = button.closest('.user-row').find('.user-lastname').text() + " " + button.closest('.user-row').find('.user-firstname').text(); // Haal de naam op
+
+                var modal = $(this);
+                modal.find('#deleteUserId').val(userId); // Stel de verborgen input in het formulier in
+                modal.find('#deleteUserName').text(userName); // Stel de naam in de modal in
+            });
         });
     </script>
 }

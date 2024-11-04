@@ -1,0 +1,151 @@
+﻿@using System.Globalization
+@model MVC_Project_BSL.Models.Groepsreis
+
+<h1>De reis naar @Model.Bestemming?.BestemmingsNaam</h1>
+
+<!-- Foto en beschrijving naast elkaar -->
+<div class="row">
+	<!-- Linkerzijde: Foto's (50% breedte) -->
+	<div class="col-md-6">
+		@if (Model.Bestemming?.Fotos != null && Model.Bestemming.Fotos.Any())
+		{
+			<div class="row">
+				@foreach (var foto in Model.Bestemming.Fotos)
+				{
+					<div class="col-12 mb-3">
+						<!-- Volledige breedte in de 50% kolom, met wat marge -->
+						<img src="~/images/@foto.Naam" alt="Foto van @Model.Bestemming.BestemmingsNaam"
+							 class="large-thumbnail img-thumbnail img-fluid" />
+					</div>
+				}
+			</div>
+		}
+		else
+		{
+			<p>Geen foto's beschikbaar</p>
+		}
+	</div>
+
+	<!-- Rechterzijde: Beschrijving (50% breedte) -->
+	<div class="col-md-6 d-flex flex-column">
+		<h2>@Model.Bestemming?.BestemmingsNaam</h2>
+		<p>@Model.Bestemming?.Beschrijving</p>
+
+		<h5>Activiteiten</h5>
+		@if (Model.Programmas != null && Model.Programmas.Any())
+		{
+			<ul>
+				@foreach (var activiteit in Model.Programmas)
+				{
+					<li>
+						<strong>@activiteit.Activiteit.Naam</strong>: @activiteit.Activiteit.Beschrijving
+					</li>
+				}
+			</ul>
+		}
+		else
+		{
+			<p>Nog geen activiteiten beschikbaar voor deze reis.</p>
+		}
+	</div>
+
+</div>
+
+<hr />
+
+
+<!-- Details van de groepsreis -->
+<div>
+	<h4>Details</h4>
+	<dl class="row">
+		<dt class="col-sm-2">Begindatum</dt>
+		<dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
+
+		<dt class="col-sm-2">Einddatum</dt>
+		<dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
+
+		<dt class="col-sm-2">Prijs</dt>
+		<dd class="col-sm-10">@Model.Prijs.ToString("C", new CultureInfo("nl-BE"))</dd>
+
+		<dt class="col-sm-2">Leeftijdscategorie</dt>
+		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
+
+		<dt class="col-sm-2">Aantal Deelnemers</dt>
+		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
+	</dl>
+</div>
+@if (User.IsInRole("Beheerder"))
+{
+    <div class="row">
+        <!-- Ingeschreven Monitoren -->
+        <div class="col-md-6">
+            <h2>Ingeschreven Monitoren</h2>
+            @if (Model.Monitoren.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Naam</th>
+                            <th>Hoofdmonitor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var monitor in Model.Monitoren)
+                        {
+                            <tr>
+                                <td>@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
+                                <td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Geen monitoren geregistreerd voor deze groepsreis.
+                </div>
+            }
+        </div>
+
+        <!-- Ingeschreven Deelnemers -->
+        <div class="col-md-6">
+            <h2>Ingeschreven Deelnemers</h2>
+            @if (Model.Deelnemers.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Naam</th>
+                            <th>Leeftijd</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var deelnemer in Model.Deelnemers)
+                        {
+                            var geboortedatum = deelnemer.Kind.Geboortedatum;
+                            var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+                            if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+                            <tr>
+                                <td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
+                                <td>@leeftijd jaar</td> <!-- Toon leeftijd -->
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Geen deelnemers geregistreerd voor deze groepsreis.
+                </div>
+            }
+        </div>
+    </div>
+}
+
+
+<p>
+    <a href="javascript:history.back()" class="btn btn-primary">Terug</a>
+</p>
