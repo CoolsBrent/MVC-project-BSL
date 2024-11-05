@@ -341,7 +341,8 @@ namespace MVC_Project_BSL.Controllers
 		{
 
 			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
-				query => query.Include(m => m.Persoon));
+				query => query.Include(m => m.Persoon)
+					            .Where(m => m.Persoon.IsActief));
 
 			var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
 				query => query.Include(m => m.Persoon));
@@ -398,6 +399,34 @@ namespace MVC_Project_BSL.Controllers
 			_unitOfWork.SaveChanges();
 
 			return RedirectToAction(nameof(Index));
+		}
+        public async Task<IActionResult> ArchivedDetail(int id)
+        {
+			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
+
+			var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
+
+
+			// Haal alle groepsreizen op met de bijbehorende monitoren en hun personen
+			var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Monitoren)
+							   .ThenInclude(m => m.Monitor.Persoon) // Persoon van Monitoren ophalen
+							   .Include(g => g.Bestemming)
+							   .ThenInclude(b => b.Fotos)
+							   .Include(g => g.Deelnemers));
+			// Zoek de specifieke groepsreis met het gegeven id
+			var groepsreis = groepsreizen.FirstOrDefault(g => g.Id == id);
+
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
+
+
+			return View(groepsreis);
+
 		}
 
 		// POST: Groepsreis/Activate/5

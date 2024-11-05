@@ -1,25 +1,29 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 
 namespace MVC_Project_BSL.Controllers
 {
-    // [Authorize(Roles = "Beheerder")]
+    [Authorize(Roles = "Beheerder")]
     public class RoleManagementController : Controller
     {
         private readonly RoleManager<IdentityRole<int>> _roleManager;
         private readonly UserManager<CustomUser> _userManager;
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly MonitorService _monitorService;
+        private readonly SignInManager<CustomUser> _signInManager;
 
-		public RoleManagementController(MonitorService monitorService, RoleManager<IdentityRole<int>> roleManager, UserManager<CustomUser> userManager, IUnitOfWork unitOfWork)
+        public RoleManagementController(MonitorService monitorService, SignInManager<CustomUser> signInManager, RoleManager<IdentityRole<int>> roleManager, UserManager<CustomUser> userManager, IUnitOfWork unitOfWork)
         {
 			_monitorService = monitorService;
-			_roleManager = roleManager;
+            _signInManager = signInManager;
+            _roleManager = roleManager;
             _userManager = userManager;
 			_unitOfWork = unitOfWork;
 		}
@@ -45,7 +49,7 @@ namespace MVC_Project_BSL.Controllers
                 Users = userRolesViewModels
             };
 
-            return View(viewModel);
+                return View(viewModel);
         }
 
 		[HttpPost]
@@ -228,6 +232,92 @@ namespace MVC_Project_BSL.Controllers
 			var result = await _monitorService.MaakGewoneMonitor(groepsreisId, monitorId);
 			return result;
 		}
+        [HttpPost]
+        public async Task<IActionResult> DeactivateUser(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user != null)
+            {
+                user.IsActief = false;  // Stel de gebruiker inactief
+                await _userManager.UpdateAsync(user);
+                _unitOfWork.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
 
-	}
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user != null)
+            {
+                await _userManager.DeleteAsync(user);
+                _unitOfWork.SaveChanges();
+            }
+            return RedirectToAction("Index");
+        }
+        // Edit actie: Weergeven van het formulier om persoonlijke gegevens te bewerken
+        public async Task<IActionResult> Edit(int id)
+        {
+         
+            var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(id);
+
+            if (user == null)
+            {
+                return NotFound("Gebruiker niet gevonden.");
+            }
+
+            // Map naar ViewModel
+            var viewModel = new PersoonlijkeGegevensViewModel
+            {
+                Naam = user.Naam,
+                Voornaam = user.Voornaam,
+                Geboortedatum = user.Geboortedatum,
+                Huisdokter = user.Huisdokter,
+                TelefoonNummer = user.TelefoonNummer,
+                RekeningNummer = user.RekeningNummer,
+				IsActief = user.IsActief,
+            };
+
+            return View("EditGebruiker", viewModel);
+        }
+
+        // Edit POST actie: Verwerken van het bewerken van persoonlijke gegevens van de gebruiker
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditGebruiker(PersoonlijkeGegevensViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("EditGebruiker", model);
+            }
+
+            var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(model.Id);
+
+            if (user == null)
+            {
+                return NotFound("Gebruiker niet gevonden.");
+            }
+
+			// Update de gebruiker gegevens
+			user.Id = model.Id;
+            user.Naam = model.Naam;
+            user.Voornaam = model.Voornaam;
+            user.Geboortedatum = model.Geboortedatum;
+            user.Huisdokter = model.Huisdokter;
+            user.TelefoonNummer = model.TelefoonNummer;
+            user.RekeningNummer = model.RekeningNummer;
+			user.IsActief = model.IsActief;
+
+            // Update gebruiker
+            _unitOfWork.CustomUserRepository.Update(user);
+            _unitOfWork.SaveChanges();
+
+          
+            TempData["SuccessMessage"] = "Gebruiker gegevens zijn correct opgeslagen!";
+            return RedirectToAction(nameof(Index));
+        }
+
+
+    }
 }
