@@ -1,18 +1,27 @@
-﻿namespace MVC_Project_BSL.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MVC_Project_BSL.Models
 {
 	public class Kind
 	{
 		public int Id { get; set; } // Primary Key
 		public int PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
 
-		public string Naam { get; set; }
-		public string Voornaam { get; set; }
-		public DateTime Geboortedatum { get; set; }
-		public string Allergieën { get; set; }
-		public string Medicatie { get; set; }
+        [Required(ErrorMessage = "Naam is verplicht.")]
+        public string Naam { get; set; }
 
-		// Navigatie-eigenschappen
-		public CustomUser Persoon { get; set; }
+        [Required(ErrorMessage = "Voornaam is verplicht.")]
+        public string Voornaam { get; set; }
+
+        [Required(ErrorMessage = "Geboortedatum is verplicht.")]
+        public DateTime Geboortedatum { get; set; }
+        [Required(ErrorMessage = "Allergieën verplicht")]
+        public string Allergieën { get; set; }
+        [Required(ErrorMessage = "Medicatie verplicht")]
+        public string Medicatie { get; set; }
+
+        // Navigatie-eigenschappen
+        public CustomUser Persoon { get; set; }
 	}
 
 }

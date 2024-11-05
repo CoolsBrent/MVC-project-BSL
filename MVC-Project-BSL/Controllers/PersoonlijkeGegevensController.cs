@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
+using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -47,8 +48,8 @@ namespace MVC_Project_BSL.Controllers
                     Naam = k.Naam,
                     Voornaam = k.Voornaam,
                     Geboortedatum = k.Geboortedatum,
-                    Allergieën = k.Allergieën,
-                    Medicatie = k.Medicatie,
+                    Allergieën = string.IsNullOrEmpty(k.Allergieën) ? "Geen" : k.Allergieën,
+                    Medicatie = string.IsNullOrEmpty(k.Medicatie) ? "Geen" : k.Medicatie,
                     PersoonId = userId
                 }).ToList()
             };
@@ -143,7 +144,12 @@ namespace MVC_Project_BSL.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
+				var errors = ModelState.Values.SelectMany(v => v.Errors);
+				foreach (var error in errors)
+				{
+					Debug.WriteLine(error.ErrorMessage);
+				}
+				TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -166,11 +172,11 @@ namespace MVC_Project_BSL.Controllers
             kind.Naam = kindModel.Naam;
             kind.Voornaam = kindModel.Voornaam;
             kind.Geboortedatum = kindModel.Geboortedatum;
-            kind.Allergieën = kindModel.Allergieën;
-            kind.Medicatie = kindModel.Medicatie;
+			kind.Allergieën = string.IsNullOrEmpty(kindModel.Allergieën) ? "Geen" : kindModel.Allergieën;
+			kind.Medicatie = string.IsNullOrEmpty(kindModel.Medicatie) ? "Geen" : kindModel.Medicatie;
 
-            // Update het kind via UnitOfWork
-            _unitOfWork.KindRepository.Update(kind);
+			// Update het kind via UnitOfWork
+			_unitOfWork.KindRepository.Update(kind);
             _unitOfWork.SaveChanges();
 
             TempData["SuccessMessage"] = $"Gegevens van kind '{kind.Voornaam} {kind.Naam}' zijn correct opgeslagen!";

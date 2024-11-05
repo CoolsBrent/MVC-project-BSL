@@ -1,4 +1,6 @@
-﻿namespace MVC_Project_BSL.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MVC_Project_BSL.ViewModels
 {
     public class PersoonlijkeGegevensViewModel
     {
@@ -20,10 +22,17 @@
     public class KindGegevensViewModel
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "Naam is verplicht.")]
         public string Naam { get; set; }
+
+        [Required(ErrorMessage = "Voornaam is verplicht.")]
         public string Voornaam { get; set; }
+
+        [Required(ErrorMessage = "Geboortedatum is verplicht.")]
         public DateTime Geboortedatum { get; set; }
+        [Required(ErrorMessage ="Allergieën verplicht")]
         public string Allergieën { get; set; }
+        [Required(ErrorMessage = "Medicatie verplicht")]
         public string Medicatie { get; set; }
         public int PersoonId { get; set; }
     }
