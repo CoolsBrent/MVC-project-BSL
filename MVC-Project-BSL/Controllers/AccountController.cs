@@ -86,6 +86,11 @@ namespace MVC_Project_BSL.Controllers
 
                 if (user != null) // Zorg ervoor dat de gebruiker bestaat
                 {
+                    if (!user.IsActief)
+                    {
+                        ModelState.AddModelError(string.Empty, "Dit account is inactief en kan niet inloggen.");
+                        return View(model);
+                    }
                     // Gebruik de juiste overload van PasswordSignInAsync die een user-object accepteert
                     var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
 

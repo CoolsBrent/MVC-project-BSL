@@ -42,8 +42,8 @@ namespace MVC_Project_BSL.ViewModels
         public IEnumerable<Groepsreis> ActieveGroepsreizen { get; set; }
         public IEnumerable<Groepsreis> GearchiveerdeGroepsreizen { get; set; }
 
-
         public List<Monitor> Monitoren { get; set; } = new List<Monitor>();
+
         // Filteropties die vanuit de view worden gebruikt
         public int? MinLeeftijdFilter { get; set; }
         public int? MaxLeeftijdFilter { get; set; }
