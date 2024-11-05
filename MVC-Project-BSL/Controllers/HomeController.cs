@@ -24,7 +24,8 @@ namespace MVC_Project_BSL.Controllers
             // Haal alle groepsreizen op inclusief bestemmingen en foto's
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
                 query => query.Include(g => g.Bestemming)
-                              .ThenInclude(b => b.Fotos));
+                              .ThenInclude(b => b.Fotos)
+                              .Where(g => !g.IsArchived));
 
             // Haal unieke leeftijdscategorieën op uit de database
             var leeftijdscategorieën = groepsreizen

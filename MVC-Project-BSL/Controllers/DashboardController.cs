@@ -54,6 +54,15 @@ namespace MVC_Project_BSL.Controllers
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
 							.ThenInclude(b => b.Fotos)
+							.Where(g => !g.IsArchived) // Haal alleen niet-gearchiveerde groepsreizen op
+				);
+				var gerachriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+					query.Include(g => g.Deelnemers)
+							.ThenInclude(d => d.Kind)
+							.Include(g => g.Monitoren)
+							.Include(g => g.Bestemming)
+							.ThenInclude(b => b.Fotos)
+							.Where(g => g.IsArchived) // Haal alleen gearchiveerde groepsreizen op
 				);
 
 				// Filter op bestemming als deze is opgegeven
@@ -68,7 +77,8 @@ namespace MVC_Project_BSL.Controllers
 				model = new GroepsreisViewModel
 				{
 					AlleGroepsReizen = alleGroepsreizen.ToList(),
-					AlleBestemmingen = alleBestemmingen.ToList()
+					AlleBestemmingen = alleBestemmingen.ToList(),
+					GearchiveerdeGroepsreizen = gerachriveerdeGroepsreizen.ToList()
 				};
 			}
 			else if (isMonitor)
@@ -80,7 +90,7 @@ namespace MVC_Project_BSL.Controllers
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
 							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id)) // Alleen groepsreizen waarvoor de monitor is aangesteld
+							.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived) // Alleen groepsreizen waarvoor de monitor is aangesteld
 				);
 
 				// Haal toekomstige groepsreizen op waarvoor de gebruiker als monitor is aangesteld
@@ -90,7 +100,7 @@ namespace MVC_Project_BSL.Controllers
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
 							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Begindatum > DateTime.Now && g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id)) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
+							.Where(g => g.Begindatum > DateTime.Now && g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id && !g.IsArchived)) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
 				);
 
 				// Filter op bestemming als deze is opgegeven
@@ -130,7 +140,7 @@ namespace MVC_Project_BSL.Controllers
 								.Include(g => g.Monitoren)
 								.Include(g => g.Bestemming)
 								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Begindatum > DateTime.Now) // Haal alleen toekomstige reizen op
+								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Haal alleen toekomstige reizen op
 					);
 
 					// Filter op bestemming als deze is opgegeven
@@ -159,7 +169,7 @@ namespace MVC_Project_BSL.Controllers
 								.Include(g => g.Monitoren)
 								.Include(g => g.Bestemming)
 								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Deelnemers.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId)))
+								.Where(g => g.Deelnemers.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived))
 					);
 
 					// Haal de toekomstige groepsreizen op, inclusief filters
@@ -169,7 +179,7 @@ namespace MVC_Project_BSL.Controllers
 								.Include(g => g.Monitoren)
 								.Include(g => g.Bestemming)
 								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Begindatum > DateTime.Now)
+								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived)
 					);
 
 					// Filter op bestemming als deze is opgegeven

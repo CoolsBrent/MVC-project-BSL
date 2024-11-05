@@ -199,7 +199,13 @@
 						<tr>
 							<td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
 							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
-							zz
+								<td>
+									<form asp-action="DeleteDeelnemer" method="post">
+										<input type="hidden" name="groepsreisId" value="@Model.Id" />
+										<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
+										<button type="submit" class="btn btn-danger">Verwijderen</button>
+									</form>
+								</td>
 						</tr>
 
 
