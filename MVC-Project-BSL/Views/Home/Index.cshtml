@@ -18,28 +18,54 @@
 <div class="container mt-5" id="groepsreizen">
     <h2>Beschikbare Groepsreizen</h2>
 
-    <form method="get" asp-action="Index" class="mb-4">
-        <div class="form-row d-flex">
-            <div class="form-group col-md-3">
-                <label for="minLeeftijd">Min Leeftijd</label>
-                <input type="number" class="form-control" name="minLeeftijd" />
-            </div>
-            <div class="form-group col-md-3 mx-3">
-                <label for="maxLeeftijd">Max Leeftijd</label>
-                <input type="number" class="form-control" name="maxLeeftijd" />
-            </div>
-            <div class="form-group col-md-3">
-                <label for="begindatum">Begindatum</label>
-                <input type="date" class="form-control" name="begindatum" />
-            </div>
-            <div class="form-group col-md-3 mt-4 ms-2">
-                <button type="submit" class="btn btn-primary">Filter</button>
-            </div>
+    <!-- Filterknop die een zijpaneel opent -->
+    <button class="btn btn-primary mb-4" type="button" data-bs-toggle="offcanvas" data-bs-target="#filterMenu" aria-controls="filterMenu">
+        <i class="bi bi-funnel"></i> Filter
+    </button>
+
+    <!-- Zijpaneel voor filters -->
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="filterMenu" aria-labelledby="filterMenuLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="filterMenuLabel">Filter Groepsreizen</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
-    </form>
+        <div class="offcanvas-body">
+            <form method="get" asp-action="Index">
+                <!-- Leeftijdscategorie Dropdown -->
+                <div class="form-group mb-3">
+                    <label for="leeftijdscategorie" class="form-label">Leeftijdscategorie</label>
+                    <select class="form-control" name="leeftijdscategorie" id="leeftijdscategorie">
+                        <option value="">Selecteer Leeftijdscategorie</option>
+                        @foreach (var categorie in ViewBag.Leeftijdscategorieën)
+                        {
+                            <option value="@($"{categorie.Min}-{categorie.Max}")">@($"{categorie.Min} - {categorie.Max} jaar")</option>
+                        }
+                    </select>
+                </div>
 
 
+                <!-- Begindatum Datepicker -->
+                <div class="form-group mb-3">
+                    <label for="begindatum" class="form-label">Begindatum</label>
+                    <input type="date" class="form-control" name="begindatum" id="begindatum" />
+                </div>
 
+                <!-- Prijsbereik Schuifbalk -->
+                <div class="form-group mb-3">
+                    <label for="maxPrijs" class="form-label">Prijs Bereik (€)</label>
+                    <input type="range" class="form-range" min="0" max="2000" step="50" id="maxPrijs" name="maxPrijs" oninput="document.getElementById('prijsValue').textContent = this.value">
+                    <div>Kies maximum prijs: <span id="prijsValue">1000</span> €</div>
+                </div>
+
+                <!-- Filter Toepassen Knop -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Filter Toepassen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Groepsreizen -->
     @if (!Model.Any())
     {
         <div class="alert alert-warning">
@@ -52,18 +78,26 @@
             @foreach (var groepsreis in Model)
             {
                 <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img src="@Url.Content("~/images/" + groepsreis.FotoUrls.FirstOrDefault())" class="card-img-top" alt="@groepsreis.Bestemming" />
-                        <div class="card-body">
-                            <h5 class="card-title">@groepsreis.Bestemming</h5>
-                            <p class="card-text">@groepsreis.Beschrijving</p>
-                            <p class="card-text">Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
-                            <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-                            <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary">Meer Informatie</a>
+                    <!-- Maak de hele card klikbaar door een <a> om de hele card te plaatsen -->
+                    <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+                        <div class="card h-100">
+                            <img src="@Url.Content("~/images/" + groepsreis.FotoUrls.FirstOrDefault())" class="card-img-top" alt="@groepsreis.Bestemming" />
+                            <div class="card-body">
+                                <h5 class="card-title">@groepsreis.Bestemming</h5>
+                                <p class="card-text">@groepsreis.Beschrijving</p>
+                                <p class="card-text">Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
+                                <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
             }
         </div>
     }
 </div>
+
+@section Scripts {
+    @* Zorg ervoor dat client-side validatie werkt, als er validatie nodig is *@
+    <partial name="_ValidationScriptsPartial" />
+
+}
