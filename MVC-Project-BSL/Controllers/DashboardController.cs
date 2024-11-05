@@ -56,7 +56,7 @@ namespace MVC_Project_BSL.Controllers
 							.ThenInclude(b => b.Fotos)
 							.Where(g => !g.IsArchived) // Haal alleen niet-gearchiveerde groepsreizen op
 				);
-				var gerachriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+				var gearchriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
 					query.Include(g => g.Deelnemers)
 							.ThenInclude(d => d.Kind)
 							.Include(g => g.Monitoren)
@@ -69,6 +69,7 @@ namespace MVC_Project_BSL.Controllers
 				if (!string.IsNullOrEmpty(bestemming))
 				{
 					alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+					gearchriveerdeGroepsreizen = gearchriveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
 				}
 
 				alleGroepsreizen = alleGroepsreizen.OrderBy(g => g.Begindatum);
@@ -78,7 +79,7 @@ namespace MVC_Project_BSL.Controllers
 				{
 					AlleGroepsReizen = alleGroepsreizen.ToList(),
 					AlleBestemmingen = alleBestemmingen.ToList(),
-					GearchiveerdeGroepsreizen = gerachriveerdeGroepsreizen.ToList()
+					GearchiveerdeGroepsreizen = gearchriveerdeGroepsreizen.ToList()
 				};
 			}
 			else if (isMonitor)

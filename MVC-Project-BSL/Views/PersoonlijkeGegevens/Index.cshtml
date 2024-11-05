@@ -1,166 +1,166 @@
 ﻿@model MVC_Project_BSL.ViewModels.PersoonlijkeGegevensViewModel
 
 @{
-    ViewData["Title"] = "Persoonlijke Gegevens Beheren";
+	ViewData["Title"] = "Persoonlijke Gegevens Beheren";
 }
 
 <div class="container my-5">
-    <div class="row">
-        <div class="col-md-12">
-            <h2 class="text-center mb-4">Persoonlijke Gegevens Beheren</h2>
+	<div class="row">
+		<div class="col-md-12">
+			<h2 class="text-center mb-4">Persoonlijke Gegevens Beheren</h2>
 
-            <!-- Formulier voor persoonlijke gegevens van de gebruiker -->
-            <form asp-action="EditGebruiker" method="post">
-                @Html.AntiForgeryToken()
-                <div class="card mb-4 shadow-lg">
-                    <div class="card-header bg-navbar text-white">
-                        <h4 class="my-0">Persoonlijke Gegevens</h4>
-                    </div>
-                    <div class="card-body bg-light">
-                        <div class="form-row">
-                            <div class="form-group col-mb-3">
-                                <label asp-for="Naam" class="form-label">Naam</label>
-                                <input asp-for="Naam" class="form-control" />
-                                <span asp-validation-for="Naam" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-mb-3">
-                                <label asp-for="Voornaam" class="form-label">Voornaam</label>
-                                <input asp-for="Voornaam" class="form-control" />
-                                <span asp-validation-for="Voornaam" class="text-danger"></span>
-                            </div>
-                        </div>
+			<!-- Formulier voor persoonlijke gegevens van de gebruiker -->
+			<form asp-action="EditGebruiker" method="post">
+				@Html.AntiForgeryToken()
+				<div class="card mb-4 shadow-lg">
+					<div class="card-header bg-navbar text-white">
+						<h4 class="my-0">Persoonlijke Gegevens</h4>
+					</div>
+					<div class="card-body bg-light">
+						<div class="form-row">
+							<div class="form-group col-mb-3">
+								<label asp-for="Naam" class="form-label">Naam</label>
+								<input asp-for="Naam" class="form-control" />
+								<span asp-validation-for="Naam" class="text-danger"></span>
+							</div>
+							<div class="form-group col-mb-3">
+								<label asp-for="Voornaam" class="form-label">Voornaam</label>
+								<input asp-for="Voornaam" class="form-control" />
+								<span asp-validation-for="Voornaam" class="text-danger"></span>
+							</div>
+						</div>
 
-                        <div class="form-row">
-                            <div class="form-group col-mb-3">
-                                <label asp-for="Geboortedatum" class="form-label">Geboortedatum</label>
-                                <input asp-for="Geboortedatum" class="form-control" type="date" />
-                                <span asp-validation-for="Geboortedatum" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-mb-3">
-                                <label asp-for="Huisdokter" class="form-label">Huisdokter</label>
-                                <input asp-for="Huisdokter" class="form-control" />
-                                <span asp-validation-for="Huisdokter" class="text-danger"></span>
-                            </div>
-                        </div>
+						<div class="form-row">
+							<div class="form-group col-mb-3">
+								<label asp-for="Geboortedatum" class="form-label">Geboortedatum</label>
+								<input asp-for="Geboortedatum" class="form-control" type="date" />
+								<span asp-validation-for="Geboortedatum" class="text-danger"></span>
+							</div>
+							<div class="form-group col-mb-3">
+								<label asp-for="Huisdokter" class="form-label">Huisdokter</label>
+								<input asp-for="Huisdokter" class="form-control" />
+								<span asp-validation-for="Huisdokter" class="text-danger"></span>
+							</div>
+						</div>
 
-                        <div class="form-row">
-                            <div class="form-group col-mb-3">
-                                <label asp-for="TelefoonNummer" class="form-label">Telefoonnummer</label>
-                                <input asp-for="TelefoonNummer" class="form-control" />
-                                <span asp-validation-for="TelefoonNummer" class="text-danger"></span>
-                            </div>
-                            <div class="form-group col-mb-3">
-                                <label asp-for="RekeningNummer" class="form-label">Rekeningnummer</label>
-                                <input asp-for="RekeningNummer" class="form-control" />
-                                <span asp-validation-for="RekeningNummer" class="text-danger"></span>
-                            </div>
-                        </div>
+						<div class="form-row">
+							<div class="form-group col-mb-3">
+								<label asp-for="TelefoonNummer" class="form-label">Telefoonnummer</label>
+								<input asp-for="TelefoonNummer" class="form-control" />
+								<span asp-validation-for="TelefoonNummer" class="text-danger"></span>
+							</div>
+							<div class="form-group col-mb-3">
+								<label asp-for="RekeningNummer" class="form-label">Rekeningnummer</label>
+								<input asp-for="RekeningNummer" class="form-control" />
+								<span asp-validation-for="RekeningNummer" class="text-danger"></span>
+							</div>
+						</div>
 
-                        @if (User.IsInRole("Beheerder"))
-                        {
-                            <div class="form-check mb-3">
-                                <input asp-for="IsActief" class="form-check-input" type="checkbox" />
-                                <label asp-for="IsActief" class="form-check-label">Actief</label>
-                            </div>
-                        }
-                        else
-                        {
-                            <!-- Zorg ervoor dat de waarde van IsActief behouden blijft -->
-                            <input type="hidden" asp-for="IsActief" />
-                        }
-                    </div>
-                    <!-- Opslaan knop voor gebruiker -->
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            <i class="bi bi-save"></i> Opslaan Gebruiker
-                        </button>
-                    </div>
-                </div>
+						@if (User.IsInRole("Beheerder"))
+						{
+							<div class="form-check mb-3">
+								<input asp-for="IsActief" class="form-check-input" type="checkbox" />
+								<label asp-for="IsActief" class="form-check-label">Actief</label>
+							</div>
+						}
+						else
+						{
+							<!-- Zorg ervoor dat de waarde van IsActief behouden blijft -->
+							<input type="hidden" asp-for="IsActief" />
+						}
+					</div>
+					<!-- Opslaan knop voor gebruiker -->
+					<div class="d-grid gap-2">
+						<button type="submit" class="btn btn-primary btn-lg">
+							<i class="bi bi-save"></i> Opslaan Gebruiker
+						</button>
+					</div>
+				</div>
 
-                
-            </form>
 
-            <!-- Formulieren voor gegevens van kinderen -->
-            <div class="row">
-            @for (int i = 0; i < Model.Kinderen.Count; i++)
-            {
-                <div class="col-md-6 mb-4">
-                <form asp-action="EditKind" asp-controller="PersoonlijkeGegevens" method="post" class="mt-4">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="Id" value="@Model.Kinderen[i].Id" />
-                            <div class="card-header bg-navbar text-white">
-                                <h4 class="my-0">Kind @(i + 1)</h4>
-                            </div>
-                    <div class="card mb-3 shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="Naam-@i" class="form-label">Naam</label>
-                                    <input type="text" name="Naam" id="Naam-@i" class="form-control" value="@Model.Kinderen[i].Naam" />
-                                    <span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
-                                </div>
+			</form>
 
-                                <div class="form-group col-md-6">
-                                    <label for="Voornaam-@i" class="form-label">Voornaam</label>
-                                    <input type="text" name="Voornaam" id="Voornaam-@i" class="form-control" value="@Model.Kinderen[i].Voornaam" />
-                                    <span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
-                                </div>
-                            </div>
+			<!-- Formulieren voor gegevens van kinderen -->
+			<div class="row">
+				@for (int i = 0; i < Model.Kinderen.Count; i++)
+				{
+					<div class="col-md-6 mb-4">
+						<form asp-action="EditKind" asp-controller="PersoonlijkeGegevens" method="post" class="mt-4">
+							@Html.AntiForgeryToken()
+							<input type="hidden" name="Id" value="@Model.Kinderen[i].Id" />
+							<div class="card-header bg-navbar text-white">
+								<h4 class="my-0">Kind @(i + 1)</h4>
+							</div>
+							<div class="card mb-3 shadow-sm border-0">
+								<div class="card-body">
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="Naam-@i" class="form-label">Naam</label>
+											<input type="text" name="Naam" id="Naam-@i" class="form-control" value="@Model.Kinderen[i].Naam" />
+											<span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
+										</div>
 
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="Geboortedatum-@i" class="form-label">Geboortedatum</label>
-                                    <input type="date" name="Geboortedatum" id="Geboortedatum-@i" class="form-control" value="@Model.Kinderen[i].Geboortedatum.ToString("yyyy-MM-dd")" />
-                                    <span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
-                                </div>
+										<div class="form-group col-md-6">
+											<label for="Voornaam-@i" class="form-label">Voornaam</label>
+											<input type="text" name="Voornaam" id="Voornaam-@i" class="form-control" value="@Model.Kinderen[i].Voornaam" />
+											<span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
+										</div>
+									</div>
 
-                                <div class="form-group col-md-6">
-                                    <label for="Allergieën-@i" class="form-label">Allergieën</label>
-                                    <input type="text" name="Allergieën" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieën" />
-                                    <span asp-validation-for="Kinderen[i].Allergieën" class="text-danger"></span>
-                                </div>
-                            </div>
+									<div class="form-row">
+										<div class="form-group col-md-6">
+											<label for="Geboortedatum-@i" class="form-label">Geboortedatum</label>
+											<input asp-for="Kinderen[i].Geboortedatum" class="form-control" type="date" id="Geboortedatum-@i" />
+											<span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
+										</div>
 
-                            <div class="form-group col-md-6">
-                                <label for="Medicatie-@i" class="form-label">Medicatie</label>
-                                <input type="text" name="Medicatie" id="Medicatie-@i" class="form-control" value="@Model.Kinderen[i].Medicatie" />
-                                <span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
-                            </div>
+										<div class="form-group col-md-6">
+											<label for="Allergieën-@i" class="form-label">Allergieën</label>
+											<input type="text" name="Allergieën" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieën" />
+											<span asp-validation-for="Kinderen[i].Allergieën" class="text-danger"></span>
+										</div>
+									</div>
 
-                            <div class="d-flex mt-3">
-                                <!-- Opslaan knop voor kind -->
-                                <button type="submit" class="btn btn-primary me-3">
-                                    <i class="bi bi-save"></i> Opslaan Kind
-                                </button>
+									<div class="form-group col-md-6">
+										<label for="Medicatie-@i" class="form-label">Medicatie</label>
+										<input type="text" name="Medicatie" id="Medicatie-@i" class="form-control" value="@Model.Kinderen[i].Medicatie" />
+										<span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
+									</div>
 
-                                <!-- Verwijder knop voor kind -->
-                                <button type="submit" formaction="@Url.Action("DeleteChild", "PersoonlijkeGegevens", new { id = Model.Kinderen[i].Id })"
-                                        class="btn btn-danger"
-                                        onclick="return confirm('Weet je zeker dat je dit kind wilt verwijderen?');">
-                                    <i class="bi bi-trash-fill"></i> Verwijderen
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                </div>
-            }
-            </div>
-        </div>
-    </div>
+									<div class="d-flex mt-3">
+										<!-- Opslaan knop voor kind -->
+										<button type="submit" class="btn btn-primary me-3">
+											<i class="bi bi-save"></i> Opslaan Kind
+										</button>
+
+										<!-- Verwijder knop voor kind -->
+										<button type="submit" formaction="@Url.Action("DeleteChild", "PersoonlijkeGegevens", new { id = Model.Kinderen[i].Id })"
+												class="btn btn-danger"
+												onclick="return confirm('Weet je zeker dat je dit kind wilt verwijderen?');">
+											<i class="bi bi-trash-fill"></i> Verwijderen
+										</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    @* Zorg ervoor dat client-side validatie werkt *@
-    <partial name="_ValidationScriptsPartial" />
+	@* Zorg ervoor dat client-side validatie werkt *@
+	<partial name="_ValidationScriptsPartial" />
 
-    <script type="text/javascript">
-        document.addEventListener("DOMContentLoaded", function () {
-            // Controleer of er een succesbericht is
-            if ('@TempData["SuccessMessage"]' && '@TempData["SuccessMessage"]' !== '') {
-                var myModal = new bootstrap.Modal(document.getElementById('succesModal'));
-                myModal.show();
-            }
-        });
-    </script>
+	<script type="text/javascript">
+		document.addEventListener("DOMContentLoaded", function () {
+			// Controleer of er een succesbericht is
+			if ('@TempData["SuccessMessage"]' && '@TempData["SuccessMessage"]' !== '') {
+				var myModal = new bootstrap.Modal(document.getElementById('succesModal'));
+				myModal.show();
+			}
+		});
+	</script>
 }

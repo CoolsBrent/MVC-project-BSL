@@ -603,8 +603,7 @@ namespace MVC_Project_BSL.Controllers
             }
 
             // Voeg de monitor toe aan de groepsreis
-            if (!groepsreis.Monitoren.Any(m => m.Monitor.Id == monitor.Id))
-            {
+            
                 var groepsreisMonitor = new GroepsreisMonitor
                 {
                     GroepsreisId = groepsreis.Id,
@@ -616,7 +615,7 @@ namespace MVC_Project_BSL.Controllers
 
                 // Sla de wijzigingen op
                 _unitOfWork.SaveChanges();
-            }
+            
 
             return RedirectToAction("Detail", new { id = groepsreisId });
         }
