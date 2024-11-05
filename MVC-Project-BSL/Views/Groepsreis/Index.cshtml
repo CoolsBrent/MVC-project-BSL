@@ -76,31 +76,9 @@ else
                             </form>
 
                             <!-- Verwijderknop -->
-                            <button type="button" class="btn btn-danger" data-bs-target="#deleteModal-@groepsreis.Id" data-bs-toggle="tooltip" title="Verwijderen">
+                            <a asp-action="Delete" asp-route-id="@groepsreis.Id" class="btn btn-danger" data-bs-toggle="tooltip" title="Verwijderen">
                                 <i class="bi bi-trash h5"></i>
-                            </button>
-
-                            <!-- Bootstrap modal voor verwijderbevestiging -->
-                            <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@groepsreis.Id" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteModalLabel-@groepsreis.Id">Bevestig Verwijderen</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Weet je zeker dat je de groepsreis naar <strong>@groepsreis.Bestemming?.BestemmingsNaam</strong> wilt verwijderen?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
-                                            <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="submit" value="Verwijderen" class="btn btn-danger" />
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </a>
                         </td>
                     </tr>
                 }
@@ -153,31 +131,9 @@ else
                             </form>
 
                             <!-- Verwijderknop -->
-                            <button type="button" class="btn btn-danger" data-bs-target="#deleteModal-@groepsreis.Id" data-bs-toggle="tooltip" title="Verwijderen">
+                            <a asp-action="Delete" asp-route-id="@groepsreis.Id" class="btn btn-danger" data-bs-toggle="tooltip" title="Verwijderen">
                                 <i class="bi bi-trash h5"></i>
-                            </button>
-
-                            <!-- Bootstrap modal voor verwijderbevestiging -->
-                            <div class="modal fade" id="deleteModal-@groepsreis.Id" tabindex="-1" aria-labelledby="deleteModalLabel-@groepsreis.Id" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="deleteModalLabel-@groepsreis.Id">Bevestig Verwijderen</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            Weet je zeker dat je de groepsreis naar <strong>@groepsreis.Bestemming?.BestemmingsNaam</strong> wilt verwijderen?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
-                                            <form asp-action="Delete" asp-route-id="@groepsreis.Id" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <input type="submit" value="Verwijderen" class="btn btn-danger" />
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            </a>
                         </td>
                     </tr>
                 }
