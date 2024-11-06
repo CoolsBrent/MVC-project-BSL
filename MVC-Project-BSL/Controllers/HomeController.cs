@@ -27,8 +27,8 @@ namespace MVC_Project_BSL.Controllers
                               .ThenInclude(b => b.Fotos)
                               .Where(g => !g.IsArchived));
 
-            // Haal unieke leeftijdscategorieën op uit de database
-            var leeftijdscategorieën = groepsreizen
+            // Haal unieke leeftijdscategorieÃ«n op uit de database
+            var leeftijdscategorieÃ«n = groepsreizen
                 .Select(g => new { Min = g.Bestemming.MinLeeftijd, Max = g.Bestemming.MaxLeeftijd })
                 .Distinct()
                 .ToList();
@@ -71,8 +71,8 @@ namespace MVC_Project_BSL.Controllers
                 Prijs = (decimal)g.Prijs,
             }).ToList();
 
-            // Maak een ViewBag of een ander ViewModel om de leeftijdscategorieën naar de view te sturen
-            ViewBag.Leeftijdscategorieën = leeftijdscategorieën;
+            // Maak een ViewBag of een ander ViewModel om de leeftijdscategorieÃ«n naar de view te sturen
+            ViewBag.leeftijdscategorieÃ«n = leeftijdscategorieÃ«n;
 
             return View(viewModel);
         }
