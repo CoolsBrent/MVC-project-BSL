@@ -61,126 +61,144 @@
 
 @if (User.IsInRole("Beheerder"))
 {
-	<div class="row mb-4">
-		<h3 class="p-3">Niet gearchiveerde Groepsreizen</h3>
-		@if (!Model.AlleGroepsReizen.Any())
-		{
-			<div class="alert alert-warning">
-				Geen groepsreizen gevonden.
-			</div>
-		}
-		else
-		{
-			
-			@foreach (var groepsreis in Model.AlleGroepsReizen)
-			{
-				<div class="col-md-4 mb-4">
-					<div class="card h-100">
-						<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-						@{
-							// Haal de eerste foto op, als deze beschikbaar is
-							var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-						}
-							<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
-    object-position: center;" />
-						<div class="card-body">
-							<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-							<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-							<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-							<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-							<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-						</div>
-					</a>
+	<ul class="nav nav-tabs">
+		<li class="nav-item">
+			<a class="nav-link active" data-bs-toggle="tab" href="#tab1">Actieve Groepsreizen</a>
+		</li>
+		<li class="nav-item">
+			<a class="nav-link" data-bs-toggle="tab" href="#tab2">Gearchiveerde Groepsreizen</a>
+		</li>
+	</ul>
+
+	<div class="tab-content">
+		<div id="tab1" class="tab-pane fade show active">
+
+			<div class="row mb-4 mt-4">
+
+				@if (!Model.AlleGroepsReizen.Any())
+				{
+					<div class="alert alert-warning">
+						Geen groepsreizen gevonden.
 					</div>
-				</div>
-			}
-		}
-	</div>
-	<div class="row mb-4">
-		<h3 class="p-3">Gearchiveerde Groepsreizen</h3>
-		@if (!Model.GearchiveerdeGroepsreizen.Any())
-		{
-			<div class="alert alert-warning">
-				Geen gearchiveerde groepsreizen gevonden.
-			</div>
-			
-		}
-		else
-		{
-			
-			@foreach (var groepsreis in Model.GearchiveerdeGroepsreizen)
-			{
-				<div class="col-md-4 mb-4">
-					<div class="card h-100">
-						<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-						@{
-							// Haal de eerste foto op, als deze beschikbaar is
-							var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-						}
-							<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
+				}
+				else
+				{
+
+					@foreach (var groepsreis in Model.AlleGroepsReizen)
+					{
+						<div class="col-md-4 mb-4">
+							<div class="card h-100">
+								<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+									@{
+										// Haal de eerste foto op, als deze beschikbaar is
+										var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+									}
+									<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
     object-position: center;" />
-						<div class="card-body">
-							<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-							<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-							<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-							<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-							<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+									<div class="card-body">
+										<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+										<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+										<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+										<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+										<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+									</div>
+								</a>
+							</div>
 						</div>
-					</a>
+					}
+				}
+			</div>
+		</div>
+		<div id="tab2" class="tab-pane fade">
+
+			<div class="row mb-4 mt-4">
+				@if (!Model.GearchiveerdeGroepsreizen.Any())
+				{
+					<div class="alert alert-warning">
+						Geen gearchiveerde groepsreizen gevonden.
 					</div>
-				</div>
-			}
-		}
+
+				}
+				else
+				{
+
+					@foreach (var groepsreis in Model.GearchiveerdeGroepsreizen)
+					{
+						<div class="col-md-4 mb-4">
+							<div class="card h-100">
+								<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+									@{
+										// Haal de eerste foto op, als deze beschikbaar is
+										var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+									}
+									<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
+    object-position: center;" />
+									<div class="card-body">
+										<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+										<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+										<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+										<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+										<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+									</div>
+								</a>
+							</div>
+						</div>
+					}
+				}
+			</div>
+		</div>
 	</div>
+
+
 }
 
 
 @if (!User.IsInRole("Beheerder"))
 {
 	<div class="row mb-4">
-	@if (!Model.GeboekteGroepsReizen.Any())
-	{
+		@if (!Model.GeboekteGroepsReizen.Any())
+		{
 			<div class="alert alert-warning">
 				Geen ingeschreven groepsreizen gevonden.
 			</div>
-		
-	}
-	else
-	{
-		<h3 class="p-3">Ingeschreven Groepsreizen</h3>
-		@foreach (var groepsreis in Model.GeboekteGroepsReizen)
+
+		}
+		else
 		{
-			<div class="col-md-4 mb-4">
+			<h3 class="p-3">Ingeschreven Groepsreizen</h3>
+			@foreach (var groepsreis in Model.GeboekteGroepsReizen)
+			{
+				<div class="col-md-4 mb-4">
 					<div class="card h-100">
 						<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-					@{
-						// Haal de eerste foto op, als deze beschikbaar is
-						var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-					}
+							@{
+								// Haal de eerste foto op, als deze beschikbaar is
+								var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+							}
 							<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
-    object-position: center;"/>
-					<div class="card-body">
-						<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-						<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-							<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-							<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-						<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+    object-position: center;" />
+							<div class="card-body">
+								<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+								<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+								<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+								<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+								<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+							</div>
+						</a>
 					</div>
-				</a>
 				</div>
-			</div>
+			}
 		}
-	}
 	</div>
 	<div class="row mb-4">
-	@if (!Model.ToekomstigeGroepsReizen.Any())
-	{
+		@if (!Model.ToekomstigeGroepsReizen.Any())
+		{
 			<div class="alert alert-warning">
 				Geen toekomstige groepsreizen gevonden.
 			</div>
-	}
-	else
-	{
+		}
+		else
+		{
 			<h3 class="p-3">Toekomstige Groepsreizen</h3>
 			<div class="row">
 				@foreach (var groepsreis in Model.ToekomstigeGroepsReizen)
@@ -206,7 +224,7 @@
 					</div>
 				}
 			</div>
-	}
+		}
 	</div>
 }
 
