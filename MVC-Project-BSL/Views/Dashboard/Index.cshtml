@@ -141,13 +141,13 @@
 	@if (!Model.GeboekteGroepsReizen.Any())
 	{
 			<div class="alert alert-warning">
-				Geen ingeschreven groepsreizen gevonden.
+				Geen groepsreizen gevonden.
 			</div>
 		
 	}
 	else
 	{
-		<h3 class="p-3">Ingeschreven Groepsreizen</h3>
+		<h3 class="p-3">Mijn Reizen</h3>
 		@foreach (var groepsreis in Model.GeboekteGroepsReizen)
 		{
 			<div class="col-md-4 mb-4">
@@ -176,12 +176,12 @@
 	@if (!Model.ToekomstigeGroepsReizen.Any())
 	{
 			<div class="alert alert-warning">
-				Geen toekomstige groepsreizen gevonden.
+				Geen groepsreizen gevonden.
 			</div>
 	}
 	else
 	{
-			<h3 class="p-3">Toekomstige Groepsreizen</h3>
+			<h3 class="p-3">Te Ontdekken Reizen</h3>
 			<div class="row">
 				@foreach (var groepsreis in Model.ToekomstigeGroepsReizen)
 				{
