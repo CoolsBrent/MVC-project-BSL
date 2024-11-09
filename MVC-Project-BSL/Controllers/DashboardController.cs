@@ -101,7 +101,7 @@ namespace MVC_Project_BSL.Controllers
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
 							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Begindatum > DateTime.Now && g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id && !g.IsArchived)) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
+							.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
 				);
 
 				// Filter op bestemming als deze is opgegeven
