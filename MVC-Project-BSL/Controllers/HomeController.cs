@@ -19,13 +19,13 @@ namespace MVC_Project_BSL.Controllers
         }
 
         // GET: Home/Index met filters voor leeftijdscategorie, begindatum, en prijsbereik
-        public async Task<IActionResult> Index(string leeftijdscategorie, DateTime? begindatum, decimal? maxPrijs)
+        public async Task<IActionResult> Index(string leeftijdscategorie, DateTime? begindatum, decimal? minPrijs, decimal? maxPrijs)
         {
             // Haal alle groepsreizen op inclusief bestemmingen en foto's
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
                 query => query.Include(g => g.Bestemming)
                               .ThenInclude(b => b.Fotos)
-                              .Where(g => !g.IsArchived));
+                              .Where(g => !g.IsArchived)); // Filter de niet-gearchiveerde reizen
 
             // Haal unieke leeftijdscategorieën op uit de database
             var leeftijdscategorieën = groepsreizen
@@ -52,8 +52,15 @@ namespace MVC_Project_BSL.Controllers
             }
 
             // Pas filters toe op basis van prijsbereik
+            if (minPrijs.HasValue)
+            {
+                // Filter de groepsreizen met een prijs die groter dan of gelijk is aan de minimumprijs
+                groepsreizen = groepsreizen.Where(g => (decimal)g.Prijs >= minPrijs.Value);
+            }
+
             if (maxPrijs.HasValue)
             {
+                // Filter de groepsreizen met een prijs die kleiner dan of gelijk is aan de maximumprijs
                 groepsreizen = groepsreizen.Where(g => (decimal)g.Prijs <= maxPrijs.Value);
             }
 
@@ -74,8 +81,10 @@ namespace MVC_Project_BSL.Controllers
             // Maak een ViewBag of een ander ViewModel om de leeftijdscategorieën naar de view te sturen
             ViewBag.leeftijdscategorieën = leeftijdscategorieën;
 
+            // Geef het ViewModel terug aan de view
             return View(viewModel);
         }
+
 
 
 

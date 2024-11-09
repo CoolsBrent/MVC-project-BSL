@@ -43,19 +43,28 @@
                     </select>
                 </div>
 
-
                 <!-- Begindatum Datepicker -->
                 <div class="form-group mb-3">
                     <label for="begindatum" class="form-label">Begindatum</label>
                     <input type="date" class="form-control" name="begindatum" id="begindatum" />
                 </div>
 
-                <!-- Prijsbereik Schuifbalk -->
+                <!-- Prijsbereik Slider -->
                 <div class="form-group mb-3">
-                    <label for="maxPrijs" class="form-label">Prijs Bereik (€)</label>
-                    <input type="range" class="form-range" min="0" max="2000" step="50" id="maxPrijs" name="maxPrijs" oninput="document.getElementById('prijsValue').textContent = this.value">
-                    <div>Kies maximum prijs: <span id="prijsValue">1000</span> €</div>
+                    <label for="prijsRange" class="form-label">Prijs Bereik (€)</label>
+
+                    <!-- Slider voor Prijs -->
+                    <div id="prijsSlider"></div>
+
+                    <div>
+                        Kies prijsscope:
+                        <span id="minPrijsValue">0</span> € -
+                        <span id="maxPrijsValue">2000</span> €
+                    </div>
                 </div>
+                <!-- Verborgen velden voor minPrijs en maxPrijs -->
+                <input type="hidden" id="minPrijs" name="minPrijs" value="0" />
+                <input type="hidden" id="maxPrijs" name="maxPrijs" value="2000" />
 
                 <!-- Filter Toepassen Knop -->
                 <div class="d-grid">
@@ -101,4 +110,41 @@
     @* Zorg ervoor dat client-side validatie werkt, als er validatie nodig is *@
     <partial name="_ValidationScriptsPartial" />
 
+    <script>
+        // Initieer de noUiSlider voor een bereik met twee bolletjes
+        var slider = document.getElementById('prijsSlider');
+
+        noUiSlider.create(slider, {
+            start: [0, 2000],  // Startwaarden voor minimum en maximum prijs
+            connect: true,  // Verbind de twee bolletjes
+            range: {
+                'min': 0,
+                'max': 2000
+            },
+            step: 50,
+            format: {
+                to: function (value) {
+                    return Math.round(value);  // Ronde waarde voor de prijs
+                },
+                from: function (value) {
+                    return value;
+                }
+            }
+        });
+
+        // Functie om de waarden bij te werken als de slider beweegt
+        slider.noUiSlider.on('update', function (values, handle) {
+            // Haal de waarden van de twee bolletjes op
+            var minPrijs = values[0];
+            var maxPrijs = values[1];
+
+            // Update de weergegeven waarden in de UI
+            document.getElementById("minPrijsValue").textContent = minPrijs;
+            document.getElementById("maxPrijsValue").textContent = maxPrijs;
+
+            // Zet de formwaarden zodat ze mee worden verzonden naar de server
+            document.getElementById("minPrijs").value = minPrijs;
+            document.getElementById("maxPrijs").value = maxPrijs;
+        });
+    </script>
 }
