@@ -1,4 +1,5 @@
-﻿@model MVC_Project_BSL.Models.Groepsreis
+﻿@using System.Globalization
+@model MVC_Project_BSL.Models.Groepsreis
 
 @{
     ViewBag.Title = "Bewerk Groepsreis";
@@ -128,7 +129,7 @@
     <button type="button" class="btn btn-primary" id="btnAddOnkost">Voeg onkost toe</button>
 
     <!-- Totaal onkosten -->
-    <p><strong>Totaal Onkosten:</strong> @(Model.Onkosten?.Sum(o => o.Bedrag) ?? 0)</p>
+    <p><strong>Totaal Onkosten:</strong> @(Model.Onkosten?.Sum(o => o.Bedrag).ToString("C", new CultureInfo("nl-BE")) ?? "€ 0,00")</p>
 
     <div class="form-group mt-2">
         <input type="submit" value="Opslaan" class="btn btn-primary" />

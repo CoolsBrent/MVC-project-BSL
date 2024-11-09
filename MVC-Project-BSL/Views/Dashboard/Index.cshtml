@@ -159,15 +159,14 @@
 		@if (!Model.GeboekteGroepsReizen.Any())
 		{
 			<div class="alert alert-warning">
-				Geen ingeschreven groepsreizen gevonden.
+				Geen groepsreizen gevonden.
 			</div>
-
-		}
-		else
-		{
-			<h3 class="p-3">Ingeschreven Groepsreizen</h3>
-			@foreach (var groepsreis in Model.GeboekteGroepsReizen)
-			{
+	  }
+	else
+	{
+		<h3 class="p-3">Mijn Reizen</h3>
+		@foreach (var groepsreis in Model.GeboekteGroepsReizen)
+    {
 				<div class="col-md-4 mb-4">
 					<div class="card h-100">
 						<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
@@ -194,12 +193,12 @@
 		@if (!Model.ToekomstigeGroepsReizen.Any())
 		{
 			<div class="alert alert-warning">
-				Geen toekomstige groepsreizen gevonden.
+				Geen groepsreizen gevonden.
 			</div>
-		}
-		else
-		{
-			<h3 class="p-3">Toekomstige Groepsreizen</h3>
+	}
+	else
+	{
+			<h3 class="p-3">Te Ontdekken Reizen</h3>
 			<div class="row">
 				@foreach (var groepsreis in Model.ToekomstigeGroepsReizen)
 				{
