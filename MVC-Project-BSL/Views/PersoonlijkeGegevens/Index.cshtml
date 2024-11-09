@@ -134,11 +134,12 @@
                                 </button>
 
                                 <!-- Verwijder knop voor kind -->
-                                <button type="submit" formaction="@Url.Action("DeleteChild", "PersoonlijkeGegevens", new { id = Model.Kinderen[i].Id })"
-                                        class="btn btn-danger"
-                                        onclick="return confirm('Weet je zeker dat je dit kind wilt verwijderen?');">
-                                    <i class="bi bi-trash-fill"></i> Verwijderen
-                                </button>
+                                        <!-- Verwijder knop voor kind -->
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteChildModal"
+                                                data-childid="@Model.Kinderen[i].Id" data-childname="@Model.Kinderen[i].Voornaam @Model.Kinderen[i].Naam">
+                                            <i class="bi bi-trash-fill"></i> Verwijderen
+                                        </button>
+
                             </div>
                         </div>
                     </div>
@@ -149,6 +150,30 @@
         </div>
     </div>
 </div>
+<!-- Bevestigingsmodal voor het verwijderen van een kind -->
+<div class="modal fade" id="confirmDeleteChildModal" tabindex="-1" aria-labelledby="confirmDeleteChildModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteChildModalLabel">Bevestig Verwijdering</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Weet je zeker dat je <strong id="deleteChildName"></strong> wilt verwijderen?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuleer</button>
+                <form id="confirmDeleteChildForm" method="post">
+                    <input type="hidden" name="childId" id="deleteChildId" />
+                    <button type="submit" class="btn btn-danger">Verwijder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     @* Zorg ervoor dat client-side validatie werkt *@
@@ -161,6 +186,20 @@
                 var myModal = new bootstrap.Modal(document.getElementById('succesModal'));
                 myModal.show();
             }
+        });
+
+        // Script voor het openen van de bevestigingsmodal voor het verwijderen van een kind
+        $('#confirmDeleteChildModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Knop die de modal opende
+            var childId = button.data('childid'); // Haal de kind-ID op
+            var childName = button.data('childname'); // Haal de kind-naam op
+
+            var modal = $(this);
+            modal.find('#deleteChildId').val(childId); // Stel de ID in de verborgen input in
+            modal.find('#deleteChildName').text(childName); // Toon de naam in de modal
+
+            // Stel de formulieractie in voor het juiste kind-ID
+            modal.find('#confirmDeleteChildForm').attr('action', '@Url.Action("DeleteChild", "PersoonlijkeGegevens")' + '?id=' + childId);
         });
     </script>
 }
