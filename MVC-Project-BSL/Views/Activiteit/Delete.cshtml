@@ -1,0 +1,69 @@
+﻿@model MVC_Project_BSL.ViewModels.ActiviteitViewModel
+
+<!-- Container for the page content -->
+<div class="container mt-4">
+    <!-- Header -->
+    <h1 class="text-center text-danger mb-4">Activiteit Verwijderen</h1>
+
+    <!-- Warning card -->
+    <div class="card border-warning shadow-sm">
+        <div class="card-body">
+            <div class="alert alert-warning text-center">
+                <p class="mb-0"><strong>Weet je zeker dat je deze activiteit wilt verwijderen?</strong></p>
+            </div>
+
+            <!-- Activity details -->
+            <dl class="row mt-3">
+                <dt class="col-sm-3 fw-bold">Naam:</dt>
+                <dd class="col-sm-9">@Model.Naam</dd>
+
+                <dt class="col-sm-3 fw-bold">Beschrijving:</dt>
+                <dd class="col-sm-9">
+                    <div class="bg-light p-2 rounded" style="max-height: 100px; overflow-y: auto;">
+                        @Model.Beschrijving
+                    </div>
+                </dd>
+
+                <dt class="col-sm-3 fw-bold">Gekoppelde Groepsreizen:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Programmas.Any())
+                    {
+                        <ul class="list-unstyled mb-0">
+                            @foreach (var programma in Model.Programmas)
+                            {
+                                <li class="badge btn-primary text-wrap m-1">@programma.GroepsreisNaam</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>Geen gekoppelde groepsreizen</p>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <!-- Confirmation buttons -->
+    <div class="mt-4 text-center">
+        <form asp-action="DeleteConfirmed" method="post" style="display: inline;">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger me-2">
+                <i class="bi bi-trash"></i> Verwijderen
+            </button>
+        </form>
+        <a asp-action="Index" class="btn btn-outline-secondary">Annuleren</a>
+    </div>
+</div>
+
+<!-- Bootstrap JS for tooltips -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeo0AEKN0dVPr5QK3qtCbhX5cZ1mJJ0k/tVxMn56X50lYqFm" crossorigin="anonymous"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+    });
+</script>

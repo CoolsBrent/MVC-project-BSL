@@ -45,7 +45,14 @@ main {
     border-color: #d4592b; /* Accentkleur rand knoppen */
 }
 
+    .btn-primary:active {
+        background-color: #ff7043;
+        box-shadow: 0 4px #d4592b;
+        transform: translateY(2px);
+    }
+
     .btn-primary:hover {
+        transform: scale(1.02);
         background-color: #3C3C3C; /* Donkere accentkleur bij hover */
         border-color: #3C3C3C; /* Donkere accentkleur bij hover */
     }
