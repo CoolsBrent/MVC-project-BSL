@@ -2,10 +2,10 @@
 
 namespace MVC_Project_BSL.Models
 {
-	public class Kind
-	{
-		public int Id { get; set; } // Primary Key
-		public int PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
+    public class Kind
+    {
+        public int Id { get; set; } // Primary Key
+        public int PersoonId { get; set; } // Foreign Key naar Persoon (via CustomUser)
 
         [Required(ErrorMessage = "Naam is verplicht.")]
         public string Naam { get; set; }
@@ -15,13 +15,13 @@ namespace MVC_Project_BSL.Models
 
         [Required(ErrorMessage = "Geboortedatum is verplicht.")]
         public DateTime Geboortedatum { get; set; }
-        [Required(ErrorMessage = "Allergieën verplicht")]
-        public string Allergieën { get; set; }
-        [Required(ErrorMessage = "Medicatie verplicht")]
-        public string Medicatie { get; set; }
+
+        public string? Allergieen { get; set; }
+
+        public string? Medicatie { get; set; }
 
         // Navigatie-eigenschappen
         public CustomUser Persoon { get; set; }
-	}
+    }
 
 }

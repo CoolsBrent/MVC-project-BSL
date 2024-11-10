@@ -3,33 +3,40 @@ using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MVC_Project_BSL.Controllers
 {
+    /// <summary>
+    /// Een controller voor het beheren van bestemmingen binnen de applicatie.
+    /// Ondersteunt het weergeven, toevoegen, bewerken en verwijderen van bestemmingen, inclusief het beheren van foto-uploadfunctionaliteit.
+    /// Gebruikt een Unit of Work-patroon voor database-interacties en biedt methoden voor het verwerken van bijbehorende foto's.
+    /// </summary>
     public class BestemmingController : Controller
     {
+        #region Private Fields
         private readonly IUnitOfWork _unitOfWork;
+        #endregion
 
+        #region Constructor
         public BestemmingController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+        #endregion
 
+        #region Index
         // GET: Bestemming
         public async Task<IActionResult> Index()
         {
             var bestemmingen = await _unitOfWork.BestemmingRepository.GetQueryable(
-            query => query.Include(b => b.Fotos))
+                query => query.Include(b => b.Fotos))
                 .ToListAsync();
 
             return View(bestemmingen);
         }
+        #endregion
 
+        #region Details
         // GET: Bestemming/Details/5
         public async Task<IActionResult> Details(int id)
         {
@@ -43,7 +50,9 @@ namespace MVC_Project_BSL.Controllers
             }
             return View(bestemming);
         }
+        #endregion
 
+        #region Create
         // GET: Bestemming/Create
         public IActionResult Create()
         {
@@ -55,7 +64,6 @@ namespace MVC_Project_BSL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BestemmingViewModel model)
         {
-
             if (ModelState.IsValid)
             {
                 System.Diagnostics.Debug.WriteLine("CREATE actie called ");
@@ -69,7 +77,6 @@ namespace MVC_Project_BSL.Controllers
                     Fotos = new List<Foto>()
                 };
 
-                // Verwerk de foto-upload
                 if (model.FotoBestanden != null && model.FotoBestanden.Count > 0)
                 {
                     foreach (var bestand in model.FotoBestanden)
@@ -82,7 +89,6 @@ namespace MVC_Project_BSL.Controllers
                                 var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
                                 var filePath = Path.Combine(uploads, fileName);
 
-                                // Controleer of de map bestaat, zo niet, maak deze aan
                                 if (!Directory.Exists(uploads))
                                 {
                                     Directory.CreateDirectory(uploads);
@@ -101,9 +107,8 @@ namespace MVC_Project_BSL.Controllers
                             }
                             catch (Exception ex)
                             {
-                                // Log de fout en voeg een ModelState error toe
-                                System.Diagnostics.Debug.WriteLine("FotoBestanden", $"Er is een fout opgetreden bij het uploaden van de foto {bestand.FileName}: {ex.Message}");
-                                ModelState.AddModelError("FotoBestanden", $"Er is een fout opgetreden bij het uploaden van de foto {bestand.FileName}: {ex.Message}");
+                                System.Diagnostics.Debug.WriteLine("FotoBestanden", $"Error uploading photo {bestand.FileName}: {ex.Message}");
+                                ModelState.AddModelError("FotoBestanden", $"Error uploading photo {bestand.FileName}: {ex.Message}");
                                 return View(model);
                             }
                         }
@@ -111,10 +116,8 @@ namespace MVC_Project_BSL.Controllers
                 }
                 else
                 {
-                    // Voeg een ModelState error toe als er geen foto's zijn geüpload
-                        System.Diagnostics.Debug.WriteLine("FotoBestanden", "Selecteer minstens één foto.");
-                        ModelState.AddModelError("FotoBestanden", "Selecteer minstens één foto.");
-                        System.Diagnostics.Debug.WriteLine($"Aantal FotoBestanden: {model.FotoBestanden?.Count ?? 0}");
+                    System.Diagnostics.Debug.WriteLine("FotoBestanden", "Select at least one photo.");
+                    ModelState.AddModelError("FotoBestanden", "Select at least one photo.");
                     return View(model);
                 }
 
@@ -123,20 +126,11 @@ namespace MVC_Project_BSL.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Voeg deze code toe om de validatiefouten te loggen
-            foreach (var key in ModelState.Keys)
-            {
-                var errors = ModelState[key].Errors;
-                foreach (var error in errors)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Key: {key}, Error: {error.ErrorMessage}");
-                }
-            }
-            System.Diagnostics.Debug.WriteLine($"Aantal FotoBestanden: {model.FotoBestanden?.Count ?? 0}");
-            System.Diagnostics.Debug.WriteLine("Modelstate invalid en returned naar view");
             return View(model);
         }
+        #endregion
 
+        #region Edit
         // GET: Bestemming/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
@@ -163,35 +157,22 @@ namespace MVC_Project_BSL.Controllers
             return View(model);
         }
 
-
-        private async Task LaadBestaandeFotos(BestemmingViewModel model, int id)
-        {
-            var bestemming = await _unitOfWork.BestemmingRepository.GetQueryable(
-                query => query.Include(b => b.Fotos).Where(b => b.Id == id))
-                .FirstOrDefaultAsync();
-
-            model.BestaandeFotos = bestemming?.Fotos.ToList() ?? new List<Foto>();
-        }
-
-    
         // POST: Bestemming/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BestemmingViewModel model)
         {
-            System.Diagnostics.Debug.WriteLine("Edit actie called");
+            System.Diagnostics.Debug.WriteLine("Edit action called");
 
             if (id != model.Id)
             {
                 return NotFound();
             }
 
-            // Controleer of het model geldig is
             if (!ModelState.IsValid)
             {
                 System.Diagnostics.Debug.WriteLine("ModelState is not valid");
 
-                // Log de ModelState-fouten
                 foreach (var key in ModelState.Keys)
                 {
                     var errors = ModelState[key].Errors;
@@ -201,12 +182,10 @@ namespace MVC_Project_BSL.Controllers
                     }
                 }
 
-                // Laad de bestaande foto's opnieuw
                 await LaadBestaandeFotos(model, id);
                 return View(model);
             }
 
-            // Haal de bestemming op inclusief de foto's
             var bestemming = await _unitOfWork.BestemmingRepository.GetQueryable(
                 query => query.Include(b => b.Fotos))
                 .FirstOrDefaultAsync(b => b.Id == id);
@@ -216,53 +195,36 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound();
             }
 
-            // Controleer of de foto's correct zijn geladen
-            var aantalFotos = bestemming.Fotos.Count; // Voor debugging
-            System.Diagnostics.Debug.WriteLine("Aantal foto's:" + aantalFotos);
-
-            // Update de bestemmingsgegevens
             bestemming.Code = model.Code;
             bestemming.BestemmingsNaam = model.BestemmingsNaam;
             bestemming.Beschrijving = model.Beschrijving;
             bestemming.MinLeeftijd = model.MinLeeftijd;
             bestemming.MaxLeeftijd = model.MaxLeeftijd;
 
-            // Verwijder geselecteerde foto's
             if (model.VerwijderFotosIds != null && model.VerwijderFotosIds.Any())
             {
                 var fotosTeVerwijderen = bestemming.Fotos.Where(f => model.VerwijderFotosIds.Contains(f.Id)).ToList();
 
                 foreach (var foto in fotosTeVerwijderen)
                 {
-                    // Verwijder het bestand van de schijf
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", foto.Naam);
                     if (System.IO.File.Exists(filePath))
                     {
                         System.IO.File.Delete(filePath);
                     }
-                    // Verwijder de foto uit de collectie en de database
                     bestemming.Fotos.Remove(foto);
                     _unitOfWork.FotoRepository.Delete(foto);
                 }
             }
 
-            // Controleer of er na het verwijderen nog bestaande foto's over zijn
-            var heeftNogFotos = bestemming.Fotos.Any();
-
-            // Controleer of er nieuwe foto's zijn geüpload
-            var nieuweFotosGeupload = model.FotoBestanden != null && model.FotoBestanden.Count > 0;
-
-            // Als er geen bestaande foto's zijn en er zijn geen nieuwe foto's geüpload, voeg een ModelState-fout toe
-            if (!heeftNogFotos && !nieuweFotosGeupload)
+            if (!bestemming.Fotos.Any() && (model.FotoBestanden == null || model.FotoBestanden.Count == 0))
             {
                 ModelState.AddModelError("FotoBestanden", "Selecteer minstens één foto.");
-                // Laad de bestaande foto's opnieuw
                 await LaadBestaandeFotos(model, id);
                 return View(model);
             }
 
-            // Verwerk de nieuwe foto-upload
-            if (nieuweFotosGeupload)
+            if (model.FotoBestanden != null)
             {
                 foreach (var bestand in model.FotoBestanden)
                 {
@@ -276,7 +238,6 @@ namespace MVC_Project_BSL.Controllers
                             var uploads = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images");
                             var filePath = Path.Combine(uploads, uniqueFileName);
 
-                            // Controleer of de map bestaat, zo niet, maak deze aan
                             if (!Directory.Exists(uploads))
                             {
                                 Directory.CreateDirectory(uploads);
@@ -295,9 +256,7 @@ namespace MVC_Project_BSL.Controllers
                         }
                         catch (Exception ex)
                         {
-                            // Log de fout en voeg een ModelState-fout toe
-                            ModelState.AddModelError("FotoBestanden", $"Er is een fout opgetreden bij het uploaden van de foto {bestand.FileName}: {ex.Message}");
-                            // Laad de bestaande foto's opnieuw
+                            ModelState.AddModelError("FotoBestanden", $"Error uploading photo {bestand.FileName}: {ex.Message}");
                             await LaadBestaandeFotos(model, id);
                             return View(model);
                         }
@@ -305,19 +264,27 @@ namespace MVC_Project_BSL.Controllers
                 }
             }
 
-            // Update de bestemming in de database
             _unitOfWork.BestemmingRepository.Update(bestemming);
             _unitOfWork.SaveChanges();
 
-            // Redirect naar de Index-pagina
             return RedirectToAction(nameof(Index));
         }
 
+        private async Task LaadBestaandeFotos(BestemmingViewModel model, int id)
+        {
+            var bestemming = await _unitOfWork.BestemmingRepository.GetQueryable(
+                query => query.Include(b => b.Fotos).Where(b => b.Id == id))
+                .FirstOrDefaultAsync();
 
+            model.BestaandeFotos = bestemming?.Fotos.ToList() ?? new List<Foto>();
+        }
+        #endregion
+
+        #region Delete
         // GET: Bestemming/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            System.Diagnostics.Debug.WriteLine("Delete actie called");
+            System.Diagnostics.Debug.WriteLine("Delete action called");
 
             var bestemming = await _unitOfWork.BestemmingRepository.GetByIdAsync(id);
             if (bestemming == null)
@@ -335,7 +302,6 @@ namespace MVC_Project_BSL.Controllers
             var bestemming = await _unitOfWork.BestemmingRepository.GetByIdAsync(id);
             if (bestemming != null)
             {
-                // Verwijder de foto's van de schijf
                 var fotos = await _unitOfWork.FotoRepository.GetAllAsync(f => f.Where(foto => foto.BestemmingId == id));
                 foreach (var foto in fotos)
                 {
@@ -346,18 +312,19 @@ namespace MVC_Project_BSL.Controllers
                     }
                 }
 
-                // Verwijder de bestemming
                 _unitOfWork.BestemmingRepository.Delete(bestemming);
                 _unitOfWork.SaveChanges();
             }
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
-
+        #region Helper Methods
         private async Task<bool> BestemmingExists(int id)
         {
             var bestemming = await _unitOfWork.BestemmingRepository.GetByIdAsync(id);
             return bestemming != null;
         }
+        #endregion
     }
 }

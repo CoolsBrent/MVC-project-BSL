@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
+using MVC_Project_BSL.Services;
 
 public partial class Program
 {

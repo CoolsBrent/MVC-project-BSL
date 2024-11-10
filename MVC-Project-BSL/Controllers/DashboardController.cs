@@ -9,208 +9,207 @@ using System.Security.Claims;
 
 namespace MVC_Project_BSL.Controllers
 {
+    /// <summary>
+    /// Een controller voor het beheren en weergeven van het dashboard, aangepast aan de rol van de ingelogde gebruiker.
+    /// Voor beheerders, monitoren en deelnemers worden relevante groepsreizen en bestemmingen weergegeven, 
+    /// waarbij verschillende filters en archiveringsstatussen worden toegepast.
+    /// </summary>
+    [Authorize]
+    public class DashboardController : Controller
+    {
+        #region Private Fields
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<CustomUser> _userManager;
+        #endregion
 
-	[Authorize]
-	public class DashboardController : Controller
-	{
-		private readonly IUnitOfWork _unitOfWork;
-		private readonly UserManager<CustomUser> _userManager;
+        #region Constructor
+        public DashboardController(IUnitOfWork unitOfWork, UserManager<CustomUser> userManager)
+        {
+            _unitOfWork = unitOfWork;
+            _userManager = userManager;
+        }
+        #endregion
 
-		public DashboardController(IUnitOfWork unitOfWork, UserManager<CustomUser> userManager)
-		{
+        #region Index
+        // GET: Groepsreis
+        public async Task<IActionResult> Index(string bestemming)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-			_unitOfWork = unitOfWork;
-			_userManager = userManager;
-		}
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
 
-		// GET: Groepsreis
-		public async Task<IActionResult> Index(string bestemming)
-		{
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var gebruiker = await _userManager.FindByIdAsync(userId);
+            if (gebruiker == null)
+            {
+                return NotFound("Gebruiker niet gevonden.");
+            }
 
-			if (string.IsNullOrEmpty(userId))
-			{
-				return Unauthorized(); // Als het gebruikers-ID niet beschikbaar is
-			}
+            bool isBeheerder = await _userManager.IsInRoleAsync(gebruiker, "Beheerder");
+            bool isMonitor = await _userManager.IsInRoleAsync(gebruiker, "Monitor");
 
-			var gebruiker = await _userManager.FindByIdAsync(userId);
-			if (gebruiker == null)
-			{
-				return NotFound("Gebruiker niet gevonden."); // Als de gebruiker niet gevonden wordt
-			}
+            GroepsreisViewModel model;
 
-			// Controleer of de gebruiker een beheerder is
-			bool isBeheerder = await _userManager.IsInRoleAsync(gebruiker, "Beheerder");
-			bool isMonitor = await _userManager.IsInRoleAsync(gebruiker, "Monitor");
+            if (isBeheerder)
+            {
+                model = await LoadGroepsreizenForBeheerder(bestemming);
+            }
+            else if (isMonitor)
+            {
+                model = await LoadGroepsreizenForMonitor(gebruiker.Id, bestemming);
+            }
+            else
+            {
+                model = await LoadGroepsreizenForUser(gebruiker.Id, bestemming);
+            }
 
-			GroepsreisViewModel model;
+            return View(model);
+        }
+        #endregion
 
-			if (isBeheerder)
-			{
-				// Haal alle groepsreizen op voor beheerders, inclusief filters
-				var alleGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
-							.ThenInclude(d => d.Kind)
-							.Include(g => g.Monitoren)
-							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
-							.Where(g => !g.IsArchived) // Haal alleen niet-gearchiveerde groepsreizen op
-				);
-				var gearchriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
-							.ThenInclude(d => d.Kind)
-							.Include(g => g.Monitoren)
-							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
-							.Where(g => g.IsArchived) // Haal alleen gearchiveerde groepsreizen op
-				);
+        #region Private Methods
 
-				// Filter op bestemming als deze is opgegeven
-				if (!string.IsNullOrEmpty(bestemming))
-				{
-					alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-					gearchriveerdeGroepsreizen = gearchriveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-				}
+        private async Task<GroepsreisViewModel> LoadGroepsreizenForBeheerder(string bestemming)
+        {
+            var alleGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                query.Include(g => g.Deelnemers)
+                     .ThenInclude(d => d.Kind)
+                     .Include(g => g.Monitoren)
+                     .Include(g => g.Bestemming)
+                     .ThenInclude(b => b.Fotos)
+                     .Where(g => !g.IsArchived));
 
-				alleGroepsreizen = alleGroepsreizen.OrderBy(g => g.Begindatum);
-				var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
+            var gearchriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                query.Include(g => g.Deelnemers)
+                     .ThenInclude(d => d.Kind)
+                     .Include(g => g.Monitoren)
+                     .Include(g => g.Bestemming)
+                     .ThenInclude(b => b.Fotos)
+                     .Where(g => g.IsArchived));
 
-				model = new GroepsreisViewModel
-				{
-					AlleGroepsReizen = alleGroepsreizen.ToList(),
-					AlleBestemmingen = alleBestemmingen.ToList(),
-					GearchiveerdeGroepsreizen = gearchriveerdeGroepsreizen.ToList()
-				};
-			}
-			else if (isMonitor)
-			{
-				// Haal alle ingeschreven groepsreizen op waarvoor de gebruiker als monitor is aangesteld
-				var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
-							.ThenInclude(d => d.Kind)
-							.Include(g => g.Monitoren)
-							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived) // Alleen groepsreizen waarvoor de monitor is aangesteld
-				);
+            if (!string.IsNullOrEmpty(bestemming))
+            {
+                alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                gearchriveerdeGroepsreizen = gearchriveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+            }
 
-				// Haal toekomstige groepsreizen op waarvoor de gebruiker als monitor is aangesteld
-				var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
-							.ThenInclude(d => d.Kind)
-							.Include(g => g.Monitoren)
-							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
-				);
+            alleGroepsreizen = alleGroepsreizen.OrderBy(g => g.Begindatum);
+            var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
 
-				// Filter op bestemming als deze is opgegeven
-				if (!string.IsNullOrEmpty(bestemming))
-				{
-					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
-					toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
-				}
+            return new GroepsreisViewModel
+            {
+                AlleGroepsReizen = alleGroepsreizen.ToList(),
+                AlleBestemmingen = alleBestemmingen.ToList(),
+                GearchiveerdeGroepsreizen = gearchriveerdeGroepsreizen.ToList()
+            };
+        }
 
-				// Sorteren op Begindatum
-				geboekteGroepsreizen = geboekteGroepsreizen.OrderBy(g => g.Begindatum).ToList();
-				toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum).ToList();
+        private async Task<GroepsreisViewModel> LoadGroepsreizenForMonitor(int userId, string bestemming)
+        {
+            var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                query.Include(g => g.Deelnemers)
+                     .ThenInclude(d => d.Kind)
+                     .Include(g => g.Monitoren)
+                     .Include(g => g.Bestemming)
+                     .ThenInclude(b => b.Fotos)
+                     .Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == userId) && !g.IsArchived));
 
-				var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
+            var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                query.Include(g => g.Deelnemers)
+                     .ThenInclude(d => d.Kind)
+                     .Include(g => g.Monitoren)
+                     .Include(g => g.Bestemming)
+                     .ThenInclude(b => b.Fotos)
+                     .Where(g => g.Begindatum > DateTime.Now && !g.IsArchived));
 
-				model = new GroepsreisViewModel
-				{
-					GeboekteGroepsReizen = geboekteGroepsreizen.ToList(),
-					ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
-					AlleBestemmingen = alleBestemmingen.ToList()
-				};
-			}
+            if (!string.IsNullOrEmpty(bestemming))
+            {
+                geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
+                toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
+            }
 
+            geboekteGroepsreizen = geboekteGroepsreizen.OrderBy(g => g.Begindatum).ToList();
+            toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum).ToList();
 
-			else
-			{
-				// Haal alle kinderen op die aan de ingelogde gebruiker zijn gekoppeld
-				var kinderen = await _unitOfWork.KindRepository.GetAllAsync();
-				var gebruikersKinderen = kinderen.Where(k => k.PersoonId == gebruiker.Id).ToList();
+            var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
 
-				if (!gebruikersKinderen.Any())
-				{
-					// Geen kinderen gevonden, dus we halen de toekomstige groepsreizen op
-					var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-						query.Include(g => g.Deelnemers)
-								.ThenInclude(d => d.Kind)
-								.Include(g => g.Monitoren)
-								.Include(g => g.Bestemming)
-								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Haal alleen toekomstige reizen op
-					);
+            return new GroepsreisViewModel
+            {
+                GeboekteGroepsReizen = geboekteGroepsreizen.ToList(),
+                ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
+                AlleBestemmingen = alleBestemmingen.ToList()
+            };
+        }
 
-					// Filter op bestemming als deze is opgegeven
-					if (!string.IsNullOrEmpty(bestemming))
-					{
-						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-					}
+        private async Task<GroepsreisViewModel> LoadGroepsreizenForUser(int userId, string bestemming)
+        {
+            var kinderen = await _unitOfWork.KindRepository.GetAllAsync();
+            var gebruikersKinderen = kinderen.Where(k => k.PersoonId == userId).ToList();
 
-					// Sorteren op Begindatum
-					toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum);
+            if (!gebruikersKinderen.Any())
+            {
+                var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                    query.Include(g => g.Deelnemers)
+                         .ThenInclude(d => d.Kind)
+                         .Include(g => g.Monitoren)
+                         .Include(g => g.Bestemming)
+                         .ThenInclude(b => b.Fotos)
+                         .Where(g => g.Begindatum > DateTime.Now && !g.IsArchived));
 
-					var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
+                if (!string.IsNullOrEmpty(bestemming))
+                {
+                    toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                }
 
-					model = new GroepsreisViewModel
-					{
-						ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
-						AlleBestemmingen = alleBestemmingen.ToList()
-					};
-				}
-				else
-				{
-					// Haal de groepsreizen op waarin de kinderen zijn ingeschreven, inclusief filters
-					var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-						query.Include(g => g.Deelnemers)
-								.ThenInclude(d => d.Kind)
-								.Include(g => g.Monitoren)
-								.Include(g => g.Bestemming)
-								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Deelnemers.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived))
-					);
+                toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum);
 
-					// Haal de toekomstige groepsreizen op, inclusief filters
-					var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-						query.Include(g => g.Deelnemers)
-								.ThenInclude(d => d.Kind)
-								.Include(g => g.Monitoren)
-								.Include(g => g.Bestemming)
-								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived)
-					);
+                var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
 
-					// Filter op bestemming als deze is opgegeven
-					if (!string.IsNullOrEmpty(bestemming))
-					{
-						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                return new GroepsreisViewModel
+                {
+                    ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
+                    AlleBestemmingen = alleBestemmingen.ToList()
+                };
+            }
+            else
+            {
+                var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                    query.Include(g => g.Deelnemers)
+                         .ThenInclude(d => d.Kind)
+                         .Include(g => g.Monitoren)
+                         .Include(g => g.Bestemming)
+                         .ThenInclude(b => b.Fotos)
+                         .Where(g => g.Deelnemers.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived)));
 
-					}
+                var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+                    query.Include(g => g.Deelnemers)
+                         .ThenInclude(d => d.Kind)
+                         .Include(g => g.Monitoren)
+                         .Include(g => g.Bestemming)
+                         .ThenInclude(b => b.Fotos)
+                         .Where(g => g.Begindatum > DateTime.Now && !g.IsArchived));
 
-					// Sorteren op Begindatum
-					geboekteGroepsreizen = geboekteGroepsreizen.OrderBy(g => g.Begindatum);
-					toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum);
+                if (!string.IsNullOrEmpty(bestemming))
+                {
+                    geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                    toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                }
 
-					var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
+                geboekteGroepsreizen = geboekteGroepsreizen.OrderBy(g => g.Begindatum);
+                toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum);
 
-					model = new GroepsreisViewModel
-					{
-						GeboekteGroepsReizen = geboekteGroepsreizen.ToList(),
-						ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
-						AlleBestemmingen = alleBestemmingen.ToList()
-					};
-				}
-			}
+                var alleBestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
 
-			return View(model);
-		}
-
-
-	}
-
+                return new GroepsreisViewModel
+                {
+                    GeboekteGroepsReizen = geboekteGroepsreizen.ToList(),
+                    ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
+                    AlleBestemmingen = alleBestemmingen.ToList()
+                };
+            }
+        }
+        #endregion
+    }
 }
-
