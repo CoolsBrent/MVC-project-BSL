@@ -5,31 +5,71 @@ using MVC_Project_BSL.Models;
 
 namespace MVC_Project_BSL.Data
 {
+    /// <summary>
+    /// ApplicationDbContext representeert de databasecontext voor de applicatie en beheert
+    /// de entiteiten, hun relaties en het Identity-systeem voor gebruikersbeheer.
+    /// </summary>
     public class ApplicationDbContext : IdentityDbContext<CustomUser, IdentityRole<int>, int>
     {
+        #region Constructor
+        /// <summary>
+        /// Initialisatie van de ApplicationDbContext met configuratieopties.
+        /// </summary>
+        /// <param name="options">Opties voor de configuratie van de databasecontext.</param>
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+        #endregion
 
+        #region DbSets
+        /// <summary> Activiteiten in de applicatie. </summary>
         public DbSet<Activiteit> Activiteiten { get; set; }
-        public DbSet<Onkosten> Onkosten { get; set; }
-        public DbSet<Opleiding> Opleidingen { get; set; }
-        public DbSet<OpleidingPersoon> OpleidingPersonen { get; set; }
-        public DbSet<Programma> Programmas { get; set; }
-        public DbSet<Bestemming> Bestemmingen { get; set; }
-        public DbSet<Groepsreis> Groepsreizen { get; set; }
-        public DbSet<Monitor> Monitoren { get; set; }
-        public DbSet<Kind> Kinderen { get; set; }
-        public DbSet<Foto> Fotos { get; set; }
-        public DbSet<Deelnemer> Deelnemers { get; set; }
-        public DbSet<CustomUser> CustomUsers { get; set; }
 
+        /// <summary> Onkosten records gelinkt aan groepsreizen. </summary>
+        public DbSet<Onkosten> Onkosten { get; set; }
+
+        /// <summary> Opleidingen die gebruikers kunnen volgen. </summary>
+        public DbSet<Opleiding> Opleidingen { get; set; }
+
+        /// <summary> Koppeltabellen voor gebruikers en opleidingen. </summary>
+        public DbSet<OpleidingPersoon> OpleidingPersonen { get; set; }
+
+        /// <summary> Programma's die activiteiten en groepsreizen verbinden. </summary>
+        public DbSet<Programma> Programmas { get; set; }
+
+        /// <summary> Bestemmingen voor groepsreizen. </summary>
+        public DbSet<Bestemming> Bestemmingen { get; set; }
+
+        /// <summary> Groepsreizen in de applicatie. </summary>
+        public DbSet<Groepsreis> Groepsreizen { get; set; }
+
+        /// <summary> Monitoren die groepsreizen begeleiden. </summary>
+        public DbSet<Monitor> Monitoren { get; set; }
+
+        /// <summary> Kinderen die deelnemen aan groepsreizen. </summary>
+        public DbSet<Kind> Kinderen { get; set; }
+
+        /// <summary> Foto's gekoppeld aan bestemmingen. </summary>
+        public DbSet<Foto> Fotos { get; set; }
+
+        /// <summary> Deelnemers aan groepsreizen. </summary>
+        public DbSet<Deelnemer> Deelnemers { get; set; }
+
+        /// <summary> Custom gebruikers in de applicatie. </summary>
+        public DbSet<CustomUser> CustomUsers { get; set; }
+        #endregion
+
+        #region OnModelCreating
+        /// <summary>
+        /// Configuratie van de database-entiteiten, sleutels en relaties tussen de modellen.
+        /// </summary>
+        /// <param name="modelBuilder">De ModelBuilder om de modellen in te configureren.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            //customuser auto ID
+            // Auto-increment ID for CustomUser
             modelBuilder.Entity<CustomUser>()
                 .Property(u => u.Id)
                 .ValueGeneratedOnAdd();
@@ -74,19 +114,17 @@ namespace MVC_Project_BSL.Data
                 .WithMany(g => g.Deelnemers)
                 .HasForeignKey(d => d.GroepsreisDetailId);
 
+            // R7: Groepsreis - Monitor (many-to-many via GroepsreisMonitor)
             modelBuilder.Entity<GroepsreisMonitor>()
-       .HasKey(gm => new { gm.GroepsreisId, gm.MonitorId });
-
+                .HasKey(gm => new { gm.GroepsreisId, gm.MonitorId });
             modelBuilder.Entity<GroepsreisMonitor>()
                 .HasOne(gm => gm.Groepsreis)
                 .WithMany(g => g.Monitoren)
                 .HasForeignKey(gm => gm.GroepsreisId);
-
             modelBuilder.Entity<GroepsreisMonitor>()
                 .HasOne(gm => gm.Monitor)
                 .WithMany(m => m.Groepsreizen)
                 .HasForeignKey(gm => gm.MonitorId);
-
 
             // R9: Opleiding - Opleiding (self-referencing)
             modelBuilder.Entity<Opleiding>()
@@ -113,5 +151,6 @@ namespace MVC_Project_BSL.Data
                 .WithMany(u => u.Opleidingen)
                 .HasForeignKey(op => op.PersoonId);
         }
+        #endregion
     }
 }

@@ -3,105 +3,122 @@ using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 
-public class MonitorService
+namespace MVC_Project_BSL.Services
 {
-	private readonly UserManager<CustomUser> _userManager;
-	private readonly IUnitOfWork _unitOfWork;
+    public class MonitorService
+    {
+        #region Private Fields
+        private readonly UserManager<CustomUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        #endregion
 
-	public MonitorService(UserManager<CustomUser> userManager, IUnitOfWork unitOfWork)
-	{
-		_userManager = userManager;
-		_unitOfWork = unitOfWork;
-	}
+        #region Constructor
+        /// <summary>
+        /// Initialiseert een nieuwe instantie van de MonitorService met gebruikersbeheer en unit of work.
+        /// </summary>
+        /// <param name="userManager">De UserManager voor gebruikersbeheer.</param>
+        /// <param name="unitOfWork">De UnitOfWork voor toegang tot repository's.</param>
+        public MonitorService(UserManager<CustomUser> userManager, IUnitOfWork unitOfWork)
+        {
+            _userManager = userManager;
+            _unitOfWork = unitOfWork;
+        }
+        #endregion
 
-	public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, int monitorId)
-	{
-		var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+        #region Public Methods
 
-		if (groepsreis == null)
-		{
-			return new NotFoundObjectResult("Groepsreis niet gevonden");
-		}
+        /// <summary>
+        /// Wijzigt de opgegeven monitor naar hoofdmonitor binnen de groepsreis en past de gebruikerstoegang aan.
+        /// </summary>
+        /// <param name="groepsreisId">De ID van de groepsreis.</param>
+        /// <param name="monitorId">De ID van de monitor.</param>
+        /// <returns>Een IActionResult dat de wijziging bevestigt.</returns>
+        public async Task<IActionResult> MaakHoofdmonitor(int groepsreisId, int monitorId)
+        {
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
 
-		// Zet alle monitoren terug naar niet-hoofdmonitor
-		foreach (var gm in groepsreis.Monitoren)
-		{
-			if (gm.Monitor != null)
-			{
-				gm.Monitor.IsHoofdMonitor = false;
-			}
-		}
+            if (groepsreis == null)
+            {
+                return new NotFoundObjectResult("Groepsreis niet gevonden");
+            }
 
-		var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByIdAsync(monitorId);
-		if (geselecteerdeMonitor == null)
-		{
-			return new NotFoundObjectResult("Monitor niet gevonden");
-		}
+            foreach (var gm in groepsreis.Monitoren)
+            {
+                if (gm.Monitor != null)
+                {
+                    gm.Monitor.IsHoofdMonitor = false;
+                }
+            }
 
-		// Zet de geselecteerde monitor als hoofdmonitor
-		geselecteerdeMonitor.IsHoofdMonitor = true;
+            var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByIdAsync(monitorId);
+            if (geselecteerdeMonitor == null)
+            {
+                return new NotFoundObjectResult("Monitor niet gevonden");
+            }
 
-		// Opslaan van wijzigingen
-		_unitOfWork.MonitorRepository.Update(geselecteerdeMonitor);
-		_unitOfWork.SaveChanges();
+            geselecteerdeMonitor.IsHoofdMonitor = true;
 
-		// Update de rol van de gebruiker
-		var user = await _userManager.FindByIdAsync(geselecteerdeMonitor.PersoonId.ToString());
-		if (user != null)
-		{
-			// Verwijder de rol "Monitor" als deze al is toegewezen
-			if (await _userManager.IsInRoleAsync(user, "Monitor"))
-			{
-				await _userManager.RemoveFromRoleAsync(user, "Monitor");
-			}
+            _unitOfWork.MonitorRepository.Update(geselecteerdeMonitor);
+            _unitOfWork.SaveChanges();
 
-			// Voeg de rol "Hoofdmonitor" toe
-			if (!await _userManager.IsInRoleAsync(user, "Hoofdmonitor"))
-			{
-				await _userManager.AddToRoleAsync(user, "Hoofdmonitor");
-			}
-		}
+            var user = await _userManager.FindByIdAsync(geselecteerdeMonitor.PersoonId.ToString());
+            if (user != null)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Monitor"))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, "Monitor");
+                }
 
-		return new RedirectToActionResult("Detail", "Groepsreis", new { id = groepsreisId });
-	}
+                if (!await _userManager.IsInRoleAsync(user, "Hoofdmonitor"))
+                {
+                    await _userManager.AddToRoleAsync(user, "Hoofdmonitor");
+                }
+            }
 
-	public async Task<IActionResult> MaakGewoneMonitor(int groepsreisId, int monitorId)
-	{
-		var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
+            return new RedirectToActionResult("Detail", "Groepsreis", new { id = groepsreisId });
+        }
 
-		if (groepsreis == null)
-		{
-			return new NotFoundObjectResult("Groepsreis niet gevonden");
-		}
+        /// <summary>
+        /// Wijzigt de opgegeven hoofdmonitor naar gewone monitor binnen de groepsreis en past de gebruikerstoegang aan.
+        /// </summary>
+        /// <param name="groepsreisId">De ID van de groepsreis.</param>
+        /// <param name="monitorId">De ID van de monitor.</param>
+        /// <returns>Een IActionResult dat de wijziging bevestigt.</returns>
+        public async Task<IActionResult> MaakGewoneMonitor(int groepsreisId, int monitorId)
+        {
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdWithIncludesAsync(groepsreisId, g => g.Monitoren);
 
-		var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByIdAsync(monitorId);
-		if (geselecteerdeMonitor == null)
-		{
-			return new NotFoundObjectResult("Monitor niet gevonden");
-		}
+            if (groepsreis == null)
+            {
+                return new NotFoundObjectResult("Groepsreis niet gevonden");
+            }
 
-		// Update de monitor-status naar "niet hoofdmonitor"
-		geselecteerdeMonitor.IsHoofdMonitor = false;
-		_unitOfWork.MonitorRepository.Update(geselecteerdeMonitor);
-		_unitOfWork.SaveChanges();
+            var geselecteerdeMonitor = await _unitOfWork.MonitorRepository.GetByIdAsync(monitorId);
+            if (geselecteerdeMonitor == null)
+            {
+                return new NotFoundObjectResult("Monitor niet gevonden");
+            }
 
-		// Update de rol van de gebruiker
-		var user = await _userManager.FindByIdAsync(geselecteerdeMonitor.PersoonId.ToString());
-		if (user != null)
-		{
-			// Verwijder de rol "Hoofdmonitor" als deze al is toegewezen
-			if (await _userManager.IsInRoleAsync(user, "Hoofdmonitor"))
-			{
-				await _userManager.RemoveFromRoleAsync(user, "Hoofdmonitor");
-			}
+            geselecteerdeMonitor.IsHoofdMonitor = false;
+            _unitOfWork.MonitorRepository.Update(geselecteerdeMonitor);
+            _unitOfWork.SaveChanges();
 
-			// Voeg de rol "Monitor" toe als de gebruiker deze nog niet heeft
-			if (!await _userManager.IsInRoleAsync(user, "Monitor"))
-			{
-				await _userManager.AddToRoleAsync(user, "Monitor");
-			}
-		}
+            var user = await _userManager.FindByIdAsync(geselecteerdeMonitor.PersoonId.ToString());
+            if (user != null)
+            {
+                if (await _userManager.IsInRoleAsync(user, "Hoofdmonitor"))
+                {
+                    await _userManager.RemoveFromRoleAsync(user, "Hoofdmonitor");
+                }
 
-		return new RedirectToActionResult("Detail", "Groepsreis", new { id = groepsreisId });
-	}
+                if (!await _userManager.IsInRoleAsync(user, "Monitor"))
+                {
+                    await _userManager.AddToRoleAsync(user, "Monitor");
+                }
+            }
+
+            return new RedirectToActionResult("Detail", "Groepsreis", new { id = groepsreisId });
+        }
+        #endregion
+    }
 }

@@ -7,8 +7,13 @@ using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
+    /// <summary>
+    /// De HomeController beheert de hoofdpagina en toont een lijst van groepsreizen
+    /// met optionele filters op leeftijdscategorie, begindatum, en prijs.
+    /// </summary>
     public class HomeController : Controller
     {
+        #region Fields and Constructor
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<HomeController> _logger;
 
@@ -17,6 +22,9 @@ namespace MVC_Project_BSL.Controllers
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
+        #endregion
+
+        #region Index Action
 
         // GET: Home/Index met filters voor leeftijdscategorie, begindatum, en prijsbereik
         public async Task<IActionResult> Index(string leeftijdscategorie, DateTime? begindatum, decimal? minPrijs, decimal? maxPrijs)
@@ -54,13 +62,11 @@ namespace MVC_Project_BSL.Controllers
             // Pas filters toe op basis van prijsbereik
             if (minPrijs.HasValue)
             {
-                // Filter de groepsreizen met een prijs die groter dan of gelijk is aan de minimumprijs
                 groepsreizen = groepsreizen.Where(g => (decimal)g.Prijs >= minPrijs.Value);
             }
 
             if (maxPrijs.HasValue)
             {
-                // Filter de groepsreizen met een prijs die kleiner dan of gelijk is aan de maximumprijs
                 groepsreizen = groepsreizen.Where(g => (decimal)g.Prijs <= maxPrijs.Value);
             }
 
@@ -85,8 +91,9 @@ namespace MVC_Project_BSL.Controllers
             return View(viewModel);
         }
 
+        #endregion
 
-
+        #region Privacy and Error Actions
 
         public IActionResult Privacy()
         {
@@ -98,5 +105,7 @@ namespace MVC_Project_BSL.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        #endregion
     }
 }

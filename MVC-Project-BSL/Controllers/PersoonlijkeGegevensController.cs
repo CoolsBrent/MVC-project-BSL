@@ -3,27 +3,35 @@ using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
-using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
+    /// <summary>
+    /// De PersoonlijkeGegevensController biedt functionaliteit voor gebruikers om hun persoonlijke gegevens en die van hun kinderen te beheren.
+    /// Gebruikers kunnen hun naam, geboortedatum, en contactinformatie bewerken en kinderen toevoegen, bewerken of verwijderen.
+    /// Alle acties binnen deze controller vereisen dat de gebruiker is ingelogd.
+    /// </summary>
     public class PersoonlijkeGegevensController : Controller
     {
+        #region Private Fields
         private readonly UserManager<CustomUser> _userManager;
         private readonly SignInManager<CustomUser> _signInManager;
         private readonly IUnitOfWork _unitOfWork;
+        #endregion
 
+        #region Constructor
         public PersoonlijkeGegevensController(UserManager<CustomUser> userManager, SignInManager<CustomUser> signInManager, IUnitOfWork unitOfWork)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _unitOfWork = unitOfWork;
         }
+        #endregion
 
+        #region Index Action
         // Index actie: Weergeven van persoonlijke gegevens van de gebruiker
         public async Task<IActionResult> Index()
         {
-            // Haal de ingelogde gebruiker op
             var userId = int.Parse(_userManager.GetUserId(User));
             var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
 
@@ -32,7 +40,6 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound("Gebruiker niet gevonden.");
             }
 
-            // Map naar ViewModel
             var viewModel = new PersoonlijkeGegevensViewModel
             {
                 Naam = user.Naam,
@@ -48,7 +55,7 @@ namespace MVC_Project_BSL.Controllers
                     Naam = k.Naam,
                     Voornaam = k.Voornaam,
                     Geboortedatum = k.Geboortedatum,
-                    Allergieën = string.IsNullOrEmpty(k.Allergieën) ? "Geen" : k.Allergieën,
+                    Allergieen = string.IsNullOrEmpty(k.Allergieen) ? "Geen" : k.Allergieen,
                     Medicatie = string.IsNullOrEmpty(k.Medicatie) ? "Geen" : k.Medicatie,
                     PersoonId = userId
                 }).ToList()
@@ -56,11 +63,12 @@ namespace MVC_Project_BSL.Controllers
 
             return View(viewModel);
         }
+        #endregion
 
-        // Edit actie: Weergeven van het formulier om persoonlijke gegevens te bewerken
+        #region Edit Gebruiker Actions
+        // GET: Edit actie: Weergeven van het formulier om persoonlijke gegevens te bewerken
         public async Task<IActionResult> Edit()
         {
-            // Haal de ingelogde gebruiker op
             var userId = int.Parse(_userManager.GetUserId(User));
             var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
 
@@ -69,7 +77,6 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound("Gebruiker niet gevonden.");
             }
 
-            // Map naar ViewModel
             var viewModel = new PersoonlijkeGegevensViewModel
             {
                 Naam = user.Naam,
@@ -85,7 +92,7 @@ namespace MVC_Project_BSL.Controllers
                     Naam = k.Naam,
                     Voornaam = k.Voornaam,
                     Geboortedatum = k.Geboortedatum,
-                    Allergieën = k.Allergieën,
+                    Allergieen = k.Allergieen,
                     Medicatie = k.Medicatie,
                     PersoonId = userId
                 }).ToList()
@@ -94,7 +101,7 @@ namespace MVC_Project_BSL.Controllers
             return View(viewModel);
         }
 
-        // Edit POST actie: Verwerken van het bewerken van persoonlijke gegevens van de gebruiker
+        // POST: Edit Gebruiker actie
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditGebruiker(PersoonlijkeGegevensViewModel model)
@@ -112,7 +119,6 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound("Gebruiker niet gevonden.");
             }
 
-            // Update de gebruiker gegevens
             user.Naam = model.Naam;
             user.Voornaam = model.Voornaam;
             user.Geboortedatum = model.Geboortedatum;
@@ -120,36 +126,30 @@ namespace MVC_Project_BSL.Controllers
             user.TelefoonNummer = model.TelefoonNummer;
             user.RekeningNummer = model.RekeningNummer;
 
-            // Alleen bijwerken van IsActief als de gebruiker een beheerder is
             if (User.IsInRole("Beheerder"))
             {
                 user.IsActief = model.IsActief;
             }
 
-            // Update gebruiker
             _unitOfWork.CustomUserRepository.Update(user);
             _unitOfWork.SaveChanges();
 
-            // Vernieuw de gebruiker in de sessie
             await _signInManager.RefreshSignInAsync(user);
 
             TempData["SuccessMessage"] = "Gebruiker gegevens zijn correct opgeslagen!";
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
-        // Edit POST actie: Verwerken van het bewerken van gegevens van kinderen
+        #region Add Kind Action
+        // POST: Create actie om een kind toe te voegen
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditKind(KindGegevensViewModel kindModel)
+        public async Task<IActionResult> AddKind(KindGegevensViewModel kindModel)
         {
             if (!ModelState.IsValid)
             {
-				var errors = ModelState.Values.SelectMany(v => v.Errors);
-				foreach (var error in errors)
-				{
-					Debug.WriteLine(error.ErrorMessage);
-				}
-				TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
+                TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -161,32 +161,66 @@ namespace MVC_Project_BSL.Controllers
                 return NotFound("Gebruiker niet gevonden.");
             }
 
-            // Zoek het kind in de database
+            var kind = new Kind
+            {
+                Naam = kindModel.Naam,
+                Voornaam = kindModel.Voornaam,
+                Geboortedatum = kindModel.Geboortedatum,
+                Allergieen = string.IsNullOrWhiteSpace(kindModel.Allergieen) ? "Geen" : kindModel.Allergieen,
+                Medicatie = string.IsNullOrWhiteSpace(kindModel.Medicatie) ? "Geen" : kindModel.Medicatie,
+                PersoonId = userId
+            };
+
+            await _unitOfWork.KindRepository.AddAsync(kind);
+            _unitOfWork.SaveChanges();
+
+            TempData["SuccessMessage"] = $"Kind '{kind.Voornaam} {kind.Naam}' is succesvol toegevoegd!";
+            return RedirectToAction(nameof(Index));
+        }
+        #endregion
+
+        #region Edit Kind Action
+        // POST: Edit Kind actie
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditKind(KindGegevensViewModel kindModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var userId = int.Parse(_userManager.GetUserId(User));
+            var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
+
+            if (user == null)
+            {
+                return NotFound("Gebruiker niet gevonden.");
+            }
+
             var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindModel.Id);
             if (kind == null || kind.PersoonId != userId)
             {
                 return NotFound("Kind niet gevonden of behoort niet tot de gebruiker.");
             }
 
-            // Update de kind gegevens
             kind.Naam = kindModel.Naam;
             kind.Voornaam = kindModel.Voornaam;
             kind.Geboortedatum = kindModel.Geboortedatum;
-			kind.Allergieën = string.IsNullOrEmpty(kindModel.Allergieën) ? "Geen" : kindModel.Allergieën;
-			kind.Medicatie = string.IsNullOrEmpty(kindModel.Medicatie) ? "Geen" : kindModel.Medicatie;
+            kind.Allergieen = string.IsNullOrEmpty(kindModel.Allergieen) ? "Geen" : kindModel.Allergieen;
+            kind.Medicatie = string.IsNullOrEmpty(kindModel.Medicatie) ? "Geen" : kindModel.Medicatie;
 
-			// Update het kind via UnitOfWork
-			_unitOfWork.KindRepository.Update(kind);
+            _unitOfWork.KindRepository.Update(kind);
             _unitOfWork.SaveChanges();
 
             TempData["SuccessMessage"] = $"Gegevens van kind '{kind.Voornaam} {kind.Naam}' zijn correct opgeslagen!";
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
-
-
-
-        // Delete actie: Verwijder een kind van de gebruiker
+        #region Delete Kind Action
+        // POST: Delete Kind actie
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteChild(int id)
@@ -203,7 +237,7 @@ namespace MVC_Project_BSL.Controllers
             if (kind != null)
             {
                 user.Kinderen.Remove(kind);
-                _unitOfWork.KindRepository.Delete(kind); // Verwijder uit de KindRepository als Kinderen een aparte tabel is.
+                _unitOfWork.KindRepository.Delete(kind);
                 _unitOfWork.SaveChanges();
                 TempData["SuccessMessage"] = $"Kind '{kind.Voornaam} {kind.Naam}' is succesvol verwijderd.";
             }
@@ -214,6 +248,6 @@ namespace MVC_Project_BSL.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        #endregion
     }
 }

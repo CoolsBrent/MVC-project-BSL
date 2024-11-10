@@ -7,17 +7,26 @@ using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
+    /// <summary>
+    /// Een controllerklasse voor het beheren van accountgerelateerde acties, waaronder gebruikersregistratie, inloggen en uitloggen.
+    /// Verantwoordelijk voor authenticatie en initiële roltoewijzing van gebruikers.
+    /// </summary>
     public class AccountController : Controller
     {
+        #region Private Fields
         private readonly SignInManager<CustomUser> _signInManager;
         private readonly UserManager<CustomUser> _userManager;
+        #endregion
 
+        #region Constructor
         public AccountController(SignInManager<CustomUser> signInManager, UserManager<CustomUser> userManager)
         {
             _signInManager = signInManager;
             _userManager = userManager;
         }
+        #endregion
 
+        #region Registration Actions
         // Registratie View
         public IActionResult Register()
         {
@@ -48,13 +57,10 @@ namespace MVC_Project_BSL.Controllers
                     IsActief = true
                 };
 
-
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // Voeg gebruiker toe aan de rol 'Deelnemer'
                     await _userManager.AddToRoleAsync(user, "Deelnemer");
-
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("Index", "Dashboard");
                 }
@@ -67,7 +73,9 @@ namespace MVC_Project_BSL.Controllers
 
             return View(model);
         }
+        #endregion
 
+        #region Login Actions
         // Login View
         public IActionResult Login()
         {
@@ -81,20 +89,18 @@ namespace MVC_Project_BSL.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Probeer de gebruiker op te halen op basis van het e-mailadres
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
-                if (user != null) // Zorg ervoor dat de gebruiker bestaat
+                if (user != null)
                 {
                     if (!user.IsActief)
                     {
                         ModelState.AddModelError(string.Empty, "Dit account is inactief en kan niet inloggen.");
                         return View(model);
                     }
-                    // Gebruik de juiste overload van PasswordSignInAsync die een user-object accepteert
+
                     var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
 
-                    // Log het resultaat voor debugging
                     Debug.WriteLine($"SignIn result: {result.Succeeded}, User: {user.Email}");
 
                     if (result.Succeeded)
@@ -112,16 +118,15 @@ namespace MVC_Project_BSL.Controllers
                 }
                 else
                 {
-                    // Optioneel: Geef een generieke foutmelding om te voorkomen dat je aangeeft dat de gebruiker niet bestaat
                     ModelState.AddModelError(string.Empty, "Ongeldige inlogpoging.");
                 }
             }
 
-            // Als we hier komen, is er een probleem met de invoer
             return View(model);
         }
+        #endregion
 
-
+        #region Logout Action
         // Afhandeling van de logout
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -131,6 +136,6 @@ namespace MVC_Project_BSL.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "Home");
         }
-
+        #endregion
     }
 }

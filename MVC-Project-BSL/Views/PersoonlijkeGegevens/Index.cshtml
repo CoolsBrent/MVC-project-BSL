@@ -33,7 +33,7 @@
                         <div class="form-row">
                             <div class="form-group col-mb-3">
                                 <label asp-for="Geboortedatum" class="form-label">Geboortedatum</label>
-                                <input asp-for="Geboortedatum" class="form-control" type="date" />
+                                <input asp-for="Geboortedatum" class="form-control" type="date" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
                                 <span asp-validation-for="Geboortedatum" class="text-danger"></span>
                             </div>
                             <div class="form-group col-mb-3">
@@ -76,80 +76,129 @@
                         </button>
                     </div>
                 </div>
-
-                
             </form>
+
+            <!-- Sectie voor gezin leden met plus icoon voor toevoegen van kind -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Gezinsleden</h3>
+                <button type="button" class="btn btn-primary d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#addChildModal" data-bs-toggle="tooltip" title="Nieuw kind toevoegen">
+                    <i class="bi bi-plus-circle me-2"></i> Voeg Gezinslid Toe
+                </button>
+            </div>
+
 
             <!-- Formulieren voor gegevens van kinderen -->
             <div class="row">
-            @for (int i = 0; i < Model.Kinderen.Count; i++)
-            {
-                <div class="col-md-6 mb-4">
-                <form asp-action="EditKind" asp-controller="PersoonlijkeGegevens" method="post" class="mt-4">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="Id" value="@Model.Kinderen[i].Id" />
+                @for (int i = 0; i < Model.Kinderen.Count; i++)
+                {
+                    <div class="col-md-6 mb-4">
+                        <form asp-action="EditKind" asp-controller="PersoonlijkeGegevens" method="post" class="mt-4">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="Id" value="@Model.Kinderen[i].Id" />
                             <div class="card-header bg-navbar text-white">
                                 <h4 class="my-0">Kind @(i + 1)</h4>
                             </div>
-                    <div class="card mb-3 shadow-sm border-0">
-                        <div class="card-body">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="Naam-@i" class="form-label">Naam</label>
-                                    <input type="text" name="Naam" id="Naam-@i" class="form-control" value="@Model.Kinderen[i].Naam" />
-                                    <span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
-                                </div>
+                            <div class="card mb-3 shadow-sm border-0">
+                                <div class="card-body">
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="Naam-@i" class="form-label">Naam</label>
+                                            <input type="text" name="Naam" id="Naam-@i" class="form-control" value="@Model.Kinderen[i].Naam" />
+                                            <span asp-validation-for="Kinderen[i].Naam" class="text-danger"></span>
+                                        </div>
 
-                                <div class="form-group col-md-6">
-                                    <label for="Voornaam-@i" class="form-label">Voornaam</label>
-                                    <input type="text" name="Voornaam" id="Voornaam-@i" class="form-control" value="@Model.Kinderen[i].Voornaam" />
-                                    <span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
-                                </div>
-                            </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="Voornaam-@i" class="form-label">Voornaam</label>
+                                            <input type="text" name="Voornaam" id="Voornaam-@i" class="form-control" value="@Model.Kinderen[i].Voornaam" />
+                                            <span asp-validation-for="Kinderen[i].Voornaam" class="text-danger"></span>
+                                        </div>
+                                    </div>
 
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="Geboortedatum-@i" class="form-label">Geboortedatum</label>
-                                    <input type="date" name="Geboortedatum" id="Geboortedatum-@i" class="form-control" value="@Model.Kinderen[i].Geboortedatum.ToString("yyyy-MM-dd")" />
-                                    <span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
-                                </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="Geboortedatum-@i" class="form-label">Geboortedatum</label>
+                                            <input type="date" name="Geboortedatum" id="Geboortedatum-@i" class="form-control" value="@Model.Kinderen[i].Geboortedatum.ToString("yyyy-MM-dd")" max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                            <span asp-validation-for="Kinderen[i].Geboortedatum" class="text-danger"></span>
+                                        </div>
 
-                                <div class="form-group col-md-6">
-                                    <label for="Allergieën-@i" class="form-label">Allergieën</label>
-                                    <input type="text" name="Allergieën" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieën" />
-                                    <span asp-validation-for="Kinderen[i].Allergieën" class="text-danger"></span>
-                                </div>
-                            </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="Allergieën-@i" class="form-label">Allergieën</label>
+                                            <input type="text" name="Allergieën" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieen" />
+                                            <span asp-validation-for="Kinderen[i].Allergieen" class="text-danger"></span>
+                                        </div>
+                                    </div>
 
-                            <div class="form-group col-md-6">
-                                <label for="Medicatie-@i" class="form-label">Medicatie</label>
-                                <input type="text" name="Medicatie" id="Medicatie-@i" class="form-control" value="@Model.Kinderen[i].Medicatie" />
-                                <span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
-                            </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="Medicatie-@i" class="form-label">Medicatie</label>
+                                        <input type="text" name="Medicatie" id="Medicatie-@i" class="form-control" value="@Model.Kinderen[i].Medicatie" />
+                                        <span asp-validation-for="Kinderen[i].Medicatie" class="text-danger"></span>
+                                    </div>
 
-                            <div class="d-flex mt-3">
-                                <!-- Opslaan knop voor kind -->
-                                <button type="submit" class="btn btn-primary me-3">
-                                    <i class="bi bi-save"></i> Opslaan Kind
-                                </button>
+                                    <div class="d-flex mt-3">
+                                        <!-- Opslaan knop voor kind -->
+                                        <button type="submit" class="btn btn-primary me-3">
+                                            <i class="bi bi-save"></i> Opslaan Kind
+                                        </button>
 
-                                <!-- Verwijder knop voor kind -->
+                                        <!-- Verwijder knop voor kind -->
                                         <!-- Verwijder knop voor kind -->
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteChildModal"
                                                 data-childid="@Model.Kinderen[i].Id" data-childname="@Model.Kinderen[i].Voornaam @Model.Kinderen[i].Naam">
                                             <i class="bi bi-trash-fill"></i> Verwijderen
                                         </button>
 
+                                    </div>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
-                </form>
-                </div>
-            }
+                }
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modaal voor toevoegen van nieuw kind -->
+<div class="modal fade" id="addChildModal" tabindex="-1" aria-labelledby="addChildModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addChildModalLabel">Voeg een nieuw kind toe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="AddKind" method="post" id="addChildForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Voornaam</label>
+                        <input type="text" name="Voornaam" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Naam</label>
+                        <input type="text" name="Naam" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Geboortedatum</label>
+                        <input type="date" name="Geboortedatum" class="form-control" required max="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Allergieen</label>
+                        <input type="text" name="Allergieen" class="form-control" placeholder="Geen" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Medicatie</label>
+                        <input type="text" name="Medicatie" class="form-control" placeholder="Geen" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <button type="submit" class="btn btn-primary">Toevoegen</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Bevestigingsmodal voor het verwijderen van een kind -->
 <div class="modal fade" id="confirmDeleteChildModal" tabindex="-1" aria-labelledby="confirmDeleteChildModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -200,6 +249,39 @@
 
             // Stel de formulieractie in voor het juiste kind-ID
             modal.find('#confirmDeleteChildForm').attr('action', '@Url.Action("DeleteChild", "PersoonlijkeGegevens")' + '?id=' + childId);
+        });
+
+        // Script voor de tooltip
+        document.addEventListener("DOMContentLoaded", function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+
+        // Script voor de standaardwaarde op "Geen" voor Allergieën en Medicatie
+        document.addEventListener("DOMContentLoaded", function () {
+            // Valideer formulier bij verzenden
+            document.getElementById("addChildForm").addEventListener("submit", function (event) {
+                // Controleer of allergieen of medicatie leeg zijn
+                let allergieen = document.querySelector("input[name='Allergieen']");
+                let medicatie = document.querySelector("input[name='Medicatie']");
+
+                // Zet standaardwaarden als de velden leeg zijn
+                if (allergieen.value.trim() === "") {
+                    allergieen.value = "Geen";
+                }
+                if (medicatie.value.trim() === "") {
+                    medicatie.value = "Geen";
+                }
+
+                // Voer native HTML-validatie uit
+                if (!this.checkValidity()) {
+                    event.preventDefault(); // Voorkom formulierverzending
+                    event.stopPropagation();
+                    alert("Vul alle verplichte velden in.");
+                }
+            });
         });
     </script>
 }
