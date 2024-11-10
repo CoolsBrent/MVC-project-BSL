@@ -1,0 +1,57 @@
+﻿@model MVC_Project_BSL.ViewModels.ActiviteitViewModel
+
+<!-- Container -->
+<div class="container mt-5">
+    <!-- Page Title -->
+    <h1 class="text-center mb-4">Nieuwe Activiteit Toevoegen</h1>
+
+    <!-- Form Card -->
+    <div class="card shadow-sm" style="border: 1px solid #d4592b;">
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+
+                <!-- Naam Input -->
+                <div class="form-row mb-3">
+                    <label asp-for="Naam" class="form-label font-weight-bold text-secondary">Naam van de Activiteit</label>
+                    <input asp-for="Naam" class="form-control" placeholder="Bijv. Yoga Sessies" />
+                    <span asp-validation-for="Naam" class="text-danger small"></span>
+                </div>
+
+                <!-- Beschrijving Textarea -->
+                <div class="form-row mb-3">
+                    <label asp-for="Beschrijving" class="form-label font-weight-bold text-secondary">Beschrijving</label>
+                    <textarea asp-for="Beschrijving" class="form-control" rows="4" placeholder="Voeg een korte beschrijving toe..."></textarea>
+                    <span asp-validation-for="Beschrijving" class="text-danger small"></span>
+                </div>
+
+                <!-- Groepsreizen Checkbox Group -->
+                <div class="form-row mb-3">
+                    <label class="form-label font-weight-bold text-secondary">Koppel aan Groepsreizen</label>
+                    <div class="d-flex flex-wrap p-3 border rounded bg-light">
+                        @foreach (var groepsreisOption in Model.GroepsreisOptions)
+                        {
+                            <div class="form-check me-3">
+                                <input class="form-check-input" type="checkbox" value="@groepsreisOption.Value"
+                                       name="SelectedGroepsreisIds"
+                                @(Model.SelectedGroepsreisIds.Contains(int.Parse(groepsreisOption.Value)) ? "checked" : "") />
+                                <label class="form-check-label text-muted">@groepsreisOption.Text</label>
+                            </div>
+                        }
+                    </div>
+                    <span asp-validation-for="SelectedGroepsreisIds" class="text-danger small"></span>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="text-end mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save2"></i> Opslaan
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary ms-2">Annuleren</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS for tooltips -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeo0AEKN0dVPr5QK3qtCbhX5cZ1mJJ0k/tVxMn56X50lYqFm" crossorigin="anonymous"></script>

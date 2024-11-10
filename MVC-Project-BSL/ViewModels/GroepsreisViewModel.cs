@@ -36,7 +36,8 @@ namespace MVC_Project_BSL.ViewModels
 
 
 
-        public List<Activiteit> Activiteiten { get; set; } = new List<Activiteit>();
+        // Lijst van programma's die bij de groepsreis horen
+        public List<ProgrammaViewModel> Programmas { get; set; } = new List<ProgrammaViewModel>();
 
 
         public IEnumerable<Groepsreis> ActieveGroepsreizen { get; set; }
