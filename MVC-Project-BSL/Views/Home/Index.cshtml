@@ -95,7 +95,8 @@
                             <div class="card-body">
                                 <h5 class="card-title">@groepsreis.Bestemming</h5>
                                 <p class="card-text">@groepsreis.Beschrijving</p>
-                                <p class="card-text">Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
+                                <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+                                <p class="card-text"><i class="bi bi-cake"></i> Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
                                 <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
                             </div>
                         </div>

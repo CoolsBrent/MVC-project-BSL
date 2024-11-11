@@ -49,7 +49,7 @@
                             }
                         </td>
                         <td>
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#roleWarningModal"
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#assignRoleModal"
                                     data-userid="@userRoles.User.Id" data-username="@userRoles.User.UserName">
                                 <i class="bi bi-plus-circle"></i> Rol
                             </button>
@@ -90,7 +90,70 @@
         </select>
     </div>
 
+
+    <!-- Modal voor het toewijzen van rollen -->
+    <div class="modal fade" id="assignRoleModal" tabindex="-1" role="dialog" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignRoleModalLabel">Rol Toewijzen</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="AssignRole" method="post">
+                        <input type="hidden" id="selectedUserId" name="SelectedUserId" />
+
+                        <div class="form-group">
+                            <label for="SelectedRole">Kies een rol:</label>
+                            <select class="form-control" id="SelectedRole" name="SelectedRole">
+                                @foreach (var role in Model.Roles)
+                                {
+                                    <option value="@role.Name">@role.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Rol Toewijzen</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bevestigingsmodal voor verwijderen -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Bevestig Verwijdering</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Weet je zeker dat je <strong id="deleteUserName"></strong> wilt verwijderen?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuleer</button>
+                    <form id="confirmDeleteForm" asp-action="DeleteUser" method="post" style="display:inline;">
+                        <input type="hidden" name="userId" id="deleteUserId" />
+                        <button type="submit" class="btn btn-danger">Verwijder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @section Scripts {
+        <script>
+            $('#assignRoleModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var userId = button.data('userid');
+                var modal = $(this);
+                modal.find('#selectedUserId').val(userId);
+            });
+        </script>
     <script>
         $(document).ready(function () {
             // Functie voor filtering
@@ -126,17 +189,6 @@
 
             // Event listeners voor filtervelden
             $('#userVoornaamInput, #userAchternaamInput, #roleFilterSelect').on('input', filterUsers);
-
-            // Setup voor overige modals
-            $('#roleWarningModal').on('show.bs.modal', function (event) {
-                var button = $(event.relatedTarget);
-                var userId = button.data('userid');
-                var userName = button.data('username');
-                var modal = $(this);
-
-                modal.find('#selectedUsername').text(userName);
-                modal.find('#selectedUserId').val(userId);
-            });
 
             $('#confirmDeleteModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
