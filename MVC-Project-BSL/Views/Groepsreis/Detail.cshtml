@@ -176,7 +176,7 @@
 @{
 	var gebruikerIsHoofdmonitor = User.IsInRole("Hoofdmonitor");
 	var gebruikerId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
-	var gebruikerIsIngeschreven = Model.IngeschrevenMonitoren.Any(d => d.Monitor.Id == gebruikerId);
+	var gebruikerIsIngeschreven = Model.Monitoren.Any(d => d.Monitor.PersoonId == gebruikerId);
 }
 <div class="row">
 @if (User.IsInRole("Beheerder") || (gebruikerIsHoofdmonitor && gebruikerIsIngeschreven))
@@ -192,7 +192,13 @@
 					<tr>
 						<th>Naam</th>
 						<th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
-						<th>Actie</th>
+						<th>Telefoonnummer</th>
+						<th>Ouder/Voogd</th>
+							@if (User.IsInRole("Beheerder"))
+							{
+								<th>Actie</th>
+							}
+						
 					</tr>
 				</thead>
 				<tbody>
@@ -205,13 +211,19 @@
 						<tr>
 							<td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
 							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
-								<td>
-									<form asp-action="DeleteDeelnemer" method="post">
-										<input type="hidden" name="groepsreisId" value="@Model.Id" />
-										<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
-										<button type="submit" class="btn btn-danger">Verwijderen</button>
-									</form>
-								</td>
+							<td>@deelnemer.Kind.Persoon.TelefoonNummer</td>
+							<td>@deelnemer.Kind.Persoon.Voornaam @deelnemer.Kind.Persoon.Naam</td>
+								@if (User.IsInRole("Beheerder"))
+								{
+									<td>
+										<form asp-action="DeleteDeelnemer" method="post">
+											<input type="hidden" name="groepsreisId" value="@Model.Id" />
+											<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
+											<button type="submit" class="btn btn-danger">Verwijderen</button>
+										</form>
+									</td>
+								}
+							
 						</tr>
 
 
