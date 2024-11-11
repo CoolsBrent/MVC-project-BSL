@@ -30,6 +30,8 @@ namespace MVC_Project_BSL.Models
 		[NotMapped]
 		public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
 		[NotMapped]
+		public ICollection<GroepsreisMonitor> IngeschrevenMonitoren { get; set; } = new List<GroepsreisMonitor>();
+		[NotMapped]
 		public ICollection<Kind> BeschikbareDeelnemers { get; set; } = new List<Kind>();
 
 	}

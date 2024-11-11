@@ -173,9 +173,15 @@
 	</div>
 </div>
 }
-@if (User.IsInRole("Beheerder"))
+@{
+	var gebruikerIsHoofdmonitor = User.IsInRole("Hoofdmonitor");
+	var gebruikerId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+	var gebruikerIsIngeschreven = Model.IngeschrevenMonitoren.Any(d => d.Monitor.Id == gebruikerId);
+}
+<div class="row">
+@if (User.IsInRole("Beheerder") || (gebruikerIsHoofdmonitor && gebruikerIsIngeschreven))
 {
-	<div class="row">
+	
 	<!-- Ingeschreven Deelnemers -->
 	<div class="col-md-6">
 		<h2>Ingeschreven Deelnemers</h2>
@@ -220,7 +226,10 @@
 			</div>
 		}
 	</div>
-
+	
+}
+@if (User.IsInRole("Beheerder"))
+{
 	<!-- Beschikbare Deelnemers -->
 	<div class="col-md-6">
 		<h2>Beschikbare Deelnemers</h2>
@@ -269,9 +278,8 @@
 		}
 
 	</div>
-	</div>
 }
-
+</div>
 		
 <p>
 	<a href="javascript:history.back()" class="btn btn-primary">Terug</a>
