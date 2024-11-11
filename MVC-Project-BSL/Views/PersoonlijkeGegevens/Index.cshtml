@@ -123,7 +123,7 @@
 
                                         <div class="form-group col-md-6">
                                             <label for="Allergieën-@i" class="form-label">Allergieën</label>
-                                            <input type="text" name="Allergieën" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieen" />
+                                            <input type="text" name="Allergieen" id="Allergieën-@i" class="form-control" value="@Model.Kinderen[i].Allergieen" />
                                             <span asp-validation-for="Kinderen[i].Allergieen" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -140,7 +140,6 @@
                                             <i class="bi bi-save"></i> Opslaan Kind
                                         </button>
 
-                                        <!-- Verwijder knop voor kind -->
                                         <!-- Verwijder knop voor kind -->
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#confirmDeleteChildModal"
                                                 data-childid="@Model.Kinderen[i].Id" data-childname="@Model.Kinderen[i].Voornaam @Model.Kinderen[i].Naam">

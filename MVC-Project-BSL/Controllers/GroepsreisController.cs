@@ -86,7 +86,7 @@ namespace MVC_Project_BSL.Controllers
 
         #endregion
 
-        #region Create and Edit Actions
+        #region Create, Edit and Delete Actions
 
         public IActionResult Create()
         {
@@ -146,6 +146,33 @@ namespace MVC_Project_BSL.Controllers
             await UpdateGroepsreis(id, groepsreis);
             return RedirectToAction(nameof(Index));
         }
+        // GET: Groepsreis/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable(
+                query => query.Include(g => g.Bestemming))
+                .FirstOrDefaultAsync(g => g.Id == id);
+            if (groepsreis == null)
+            {
+                return NotFound();
+            }
+            return View(groepsreis);
+        }
+
+        // POST: Groepsreis/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(id);
+            if (groepsreis != null)
+            {
+                _unitOfWork.GroepsreisRepository.Delete(groepsreis);
+                _unitOfWork.SaveChanges();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
 
         #endregion
 
