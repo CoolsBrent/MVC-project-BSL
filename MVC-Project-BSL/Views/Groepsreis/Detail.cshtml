@@ -128,7 +128,7 @@
 			<div class="modal-body">
 				<div class="row mb-3">
 					<div class="col">
-						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+						<input type="text" class="form-control user-filter-input" id="filterIngeschrevenMonitoren" placeholder="Filter op volledige naam...">
 					</div>
 				</div>
 				@if (Model.Monitoren.Any())
@@ -213,7 +213,7 @@
 			<div class="modal-body">
 				<div class="row mb-3">
 					<div class="col">
-						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+						<input type="text" class="form-control user-filter-input" id="filterBeschikbareMonitoren" placeholder="Filter op volledige naam...">
 					</div>
 				</div>
 				@if (Model.BeschikbareMonitoren.Any())
@@ -270,7 +270,7 @@
 			<div class="modal-body">
 				<div class="row mb-3">
 					<div class="col">
-						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+						<input type="text" class="form-control user-filter-input" id="filterIngeschrevenDeelnemers" placeholder="Filter op volledige naam...">
 					</div>
 				</div>
 				@if (Model.Deelnemers.Any())
@@ -342,7 +342,7 @@
 			<div class="modal-body">
 				<div class="row mb-3">
 					<div class="col">
-						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+						<input type="text" class="form-control user-filter-input" id="filterBeschikbareDeelnemers" placeholder="Filter op volledige naam...">
 					</div>
 				</div>
 				@if (Model.BeschikbareDeelnemers.Any())
@@ -402,36 +402,43 @@
 	<script>
 		$(document).ready(function () {
 			// Functie voor filtering
-			function filterUsers() {
-				var volledigeNaamFilter = $('#userVolledigeNaamInput').val().toLowerCase();
+			function filterUsers(modalId) {
+				var volledigeNaamFilter = $(modalId).find('.user-filter-input').val().toLowerCase();
 				var hasVisibleUsers = false;
 
 				// Loop door alle rijen en controleer de voornaam
-				$('.user-row').each(function () {
+				$(modalId).find('.user-row').each(function () {
 					var volledigeNaam = $(this).find('.user-fullname').text().toLowerCase();
-
-					// Als de voornaam de filterterm bevat, toon dan de rij, anders verberg deze
 					var matches = volledigeNaam.includes(volledigeNaamFilter) || !volledigeNaamFilter;
-
 					$(this).toggle(matches);
 
-					// Bijhouden of er zichtbare deelnemers zijn
 					if (matches) {
 						hasVisibleUsers = true;
 					}
 				});
 
 				// Toon of verberg het 'Geen deelnemers gevonden' bericht
-				if (hasVisibleUsers) {
-					$('#noUsersMessage').hide();
-				} else {
-					$('#noUsersMessage').show();
-				}
+				$(modalId).find('#noUsersMessage').toggle(!hasVisibleUsers);
 			}
 
-			// Event listener voor filterveld
-			$('#userVolledigeNaamInput').on('input', filterUsers);
+			// Event listeners voor elk filter in de modals
+			$('#filterIngeschrevenMonitoren').on('input', function () {
+				filterUsers('#ingeschrevenMonitorenModal');
+			});
+
+			$('#filterBeschikbareMonitoren').on('input', function () {
+				filterUsers('#beschikbareMonitorenModal');
+			});
+			$('#filterBeschikbareDeelnemers').on('input', function () {
+				filterUsers('#beschikbareDeelnemersnModal');
+			});
+			$('#filterIngeschrevenDeelnemers').on('input', function () {
+				filterUsers('#ingeschrevenDeelnemersModal');
+			});
+
+			// Voeg vergelijkbare logica toe voor de andere modals indien nodig
 		});
+
 	</script>
 }
 
