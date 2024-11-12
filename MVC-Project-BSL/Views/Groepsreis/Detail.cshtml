@@ -15,7 +15,7 @@
 					<div class="col-12 mb-3">
 						<!-- Volledige breedte in de 50% kolom, met wat marge -->
 						<img src="~/images/@foto.Naam" alt="Foto van @Model.Bestemming.BestemmingsNaam"
-							 class="large-thumbnail img-thumbnail img-fluid"/>
+							 class="large-thumbnail img-thumbnail img-fluid" />
 					</div>
 				}
 			</div>
@@ -74,205 +74,371 @@
 		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
 	</dl>
 </div>
-@if (User.IsInRole("Beheerder"))
-{
-<div class="row">
-	<!-- Ingeschreven Monitoren -->
-	<div class="col-md-6">
-		<h2>Ingeschreven Monitoren</h2>
-		@if (Model.Monitoren.Any())
-		{
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Naam</th>
-						<th>Hoofdmonitor</th>
-						<th class ="text-center">Acties</th><!-- Kolom voor hoofdmonitor -->
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var monitor in Model.Monitoren)
-					{
-						<tr>
-							<td>@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
-							<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
-							<td class="text-center align-middle">
-								@if (!monitor.Monitor.IsHoofdMonitor)
-								{
-									<!-- Knop om hoofdmonitor te maken -->
-									<form asp-action="MaakHoofdmonitor" method="post" style="display:inline;">
-										<input type="hidden" name="groepsreisId" value="@Model.Id" />
-										<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
-										<button type="submit" class="btn btn-success btn-sm me-1">Maak Hoofdmonitor</button>
-									</form>
-								}
-								else
-								{
-									<form asp-action="MaakGewoneMonitor" method="post" style="display:inline;">
-										<input type="hidden" name="groepsreisId" value="@Model.Id" />
-										<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
-										<button type="submit" class="btn btn-success btn-sm me-1">Maak monitor</button>
-									</form>
-								}
-								<form asp-action="DeleteMonitor" method="post" style="display:inline;">
-									<input type="hidden" name="groepsreisId" value="@Model.Id" />
-									<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
-									<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
-								</form>
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		}
-		else
-		{
-			<div class="alert alert-warning">
-				Geen monitoren geregistreerd voor deze groepsreis.
+@{
+	var gebruikerId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value);
+	var gebruikerIsIngeschreven = Model.Monitoren.Any(d => d.Monitor.PersoonId == gebruikerId);
+}
+<!-- Knoppen om de modals te openen -->
+<div class="row mb-4">
+	@if (User.IsInRole("Beheerder") || (User.IsInRole("Monitor") && gebruikerIsIngeschreven) || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven))
+	{
+		<div class="col-md-6">
+			<div>
+				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenMonitorenModal">
+					Bekijk Ingeschreven Monitoren
+				</button>
 			</div>
-		}
-	</div>
+			@if (User.IsInRole("Beheerder") || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven))
+			{
+				<div>
+					<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenDeelnemersModal">
+						Bekijk Ingeschreven Deelnemers
+					</button>
+				</div>
+			}
+		</div>
+	}
 
-	<!-- Beschikbare Monitoren -->
-	<div class="col-md-6">
-		<h2>Beschikbare Monitoren</h2>
-		@if (Model.BeschikbareMonitoren.Any())
-		{
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Naam</th>
-					<th>Hoofdmonitor</th>
-					<th>Actie</th><!-- Kolom voor hoofdmonitor -->
-				</tr>
-			</thead>
-			<tbody>
-				@foreach (var monitor in Model.BeschikbareMonitoren)
-				{
-					<tr>
-						<td>@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td> <!-- Toon naam van beschikbare monitor -->
-						<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
-						<td>
-							<form asp-action="AddMonitor" method="post" style="display:inline;">
-								<input type="hidden" name="groepsreisId" value="@Model.Id" />
-								<input type="hidden" name="monitorId" value="@monitor.Id" />
-								<button type="submit" class="btn btn-primary btn-sm">Voeg Toe</button>
-							</form>
-						</td>
-					</tr>
-				}
-			</tbody>
-		</table>
-		}
-		else
-		{
-			<div class="alert alert-warning">
-				Geen monitoren beschikbaar.
+	@if (User.IsInRole("Beheerder"))
+	{
+		<div class="col-md-6">
+			<div>
+			<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareMonitorenModal">
+				Bekijk Beschikbare Monitoren
+			</button>
 			</div>
-		}
+			<div>
+			<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#beschikbareDeelnemersModal">
+				Bekijk Beschikbare Deelnemers
+			</button>
+			</div>
+		</div>
+	}
+</div>
+
+
+<!-- Modal voor Ingeschreven Monitoren -->
+<div class="modal fade" id="ingeschrevenMonitorenModal" tabindex="-1" aria-labelledby="ingeschrevenMonitorenModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="ingeschrevenMonitorenModalLabel">Ingeschreven Monitoren</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control user-filter-input" id="filterIngeschrevenMonitoren" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
+				@if (Model.Monitoren.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Naam</th>
+								<th>Hoofdmonitor</th>
+								<th>Telefoonnummer</th>
+								<th>Emailadres</th>
+								@if (User.IsInRole("Beheerder"))
+								{
+									<th class="text-center">Acties</th>
+								}
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var monitor in Model.Monitoren)
+							{
+								<tr class="user-row">
+									<td class="user-fullname">@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td>
+									<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
+									<td>@monitor.Monitor.Persoon.TelefoonNummer</td>
+									<td>@monitor.Monitor.Persoon.Email</td>
+									@if (User.IsInRole("Beheerder"))
+									{
+										<td class="text-center align-middle">
+											@if (!monitor.Monitor.IsHoofdMonitor)
+											{
+												<!-- Knop om hoofdmonitor te maken -->
+												<form asp-action="MaakHoofdmonitor" method="post" style="display:inline;">
+													<input type="hidden" name="groepsreisId" value="@Model.Id" />
+													<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
+													<button type="submit" class="btn btn-success btn-sm me-1">Maak Hoofdmonitor</button>
+												</form>
+											}
+											else
+											{
+												<form asp-action="MaakGewoneMonitor" method="post" style="display:inline;">
+													<input type="hidden" name="groepsreisId" value="@Model.Id" />
+													<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
+													<button type="submit" class="btn btn-success btn-sm me-1">Maak monitor</button>
+												</form>
+											}
+											<form asp-action="DeleteMonitor" method="post" style="display:inline;">
+												<input type="hidden" name="groepsreisId" value="@Model.Id" />
+												<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
+												<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
+											</form>
+										</td>
+									}
+								</tr>
+							}
+						</tbody>
+					</table>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+
+				}
+				else
+				{
+					<div class="alert alert-warning">
+						Geen monitoren geregistreerd voor deze groepsreis.
+					</div>
+				}
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+			</div>
+		</div>
 	</div>
 </div>
-}
-@if (User.IsInRole("Beheerder"))
-{
-	<div class="row">
-	<!-- Ingeschreven Deelnemers -->
-	<div class="col-md-6">
-		<h2>Ingeschreven Deelnemers</h2>
-		@if (Model.Deelnemers.Any())
-		{
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Naam</th>
-						<th>Leeftijd</th> <!-- Voeg leeftijd kolom toe -->
-						<th>Actie</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var deelnemer in Model.Deelnemers)
-					{
-						var geboortedatum = deelnemer.Kind.Geboortedatum;
-						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
-						<tr>
-							<td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
-							<td>@leeftijd jaar</td> <!-- Toon leeftijd -->
-								<td>
-									<form asp-action="DeleteDeelnemer" method="post">
-										<input type="hidden" name="groepsreisId" value="@Model.Id" />
-										<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
-										<button type="submit" class="btn btn-danger">Verwijderen</button>
-									</form>
-								</td>
-						</tr>
-
-
-					}
-				</tbody>
-			</table>
-		}
-		else
-		{
-			<div class="alert alert-warning">
-				Geen deelnemers geregistreerd voor deze groepsreis.
+<!-- Modal voor Beschikbare Monitoren -->
+<div class="modal fade" id="beschikbareMonitorenModal" tabindex="-1" aria-labelledby="beschikbareMonitorenModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="beschikbareMonitorenModalLabel">Beschikbare Monitoren</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
-		}
-	</div>
+			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control user-filter-input" id="filterBeschikbareMonitoren" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
+				@if (Model.BeschikbareMonitoren.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Naam</th>
+								<th>Hoofdmonitor</th>
+								<th>Actie</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var monitor in Model.BeschikbareMonitoren)
+							{
+								<tr class= "user-row">
+									<td class="user-fullname">@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td>
+									<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
+									<td>
+										<form asp-action="AddMonitor" method="post" style="display:inline;">
+											<input type="hidden" name="groepsreisId" value="@Model.Id" />
+											<input type="hidden" name="monitorId" value="@monitor.Id" />
+											<button type="submit" class="btn btn-primary btn-sm">Voeg Toe</button>
+										</form>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+										<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
 
-	<!-- Beschikbare Deelnemers -->
-	<div class="col-md-6">
-		<h2>Beschikbare Deelnemers</h2>
-		<!-- Controleer of er beschikbare deelnemers zijn -->
-		@if (!Model.BeschikbareDeelnemers.Any())
-		{
-			<div class="alert alert-warning">
-				Geen deelnemers beschikbaar.
+				}
+				else
+				{
+					<div class="alert alert-warning">
+						Geen monitoren beschikbaar.
+					</div>
+				}
 			</div>
-		}
-		else
-		{
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Naam</th>
-						<th>Leeftijd</th>
-						<th>Actie</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var kind in Model.BeschikbareDeelnemers)
-					{
-						// Controleer of het kind al een deelnemer is
-						bool isDeelnemer = Model.Deelnemers.Any(d => d.KindId == kind.Id);
-						if (isDeelnemer) continue; // Sla dit kind over als het al een deelnemer is
-
-						var geboortedatum = kind.Geboortedatum;
-						var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-						if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
-
-						<tr>
-							<td>@kind.Voornaam @kind.Naam</td>
-							<td>@leeftijd jaar</td>
-							<td>
-								<form asp-action="VoegDeelnemerToe" method="post">
-									<input type="hidden" name="groepsreisId" value="@Model.Id" />
-									<input type="hidden" name="kindId" value="@kind.Id" />
-									<button type="submit" class="btn btn-success">Toevoegen</button>
-								</form>
-							</td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		}
-
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+			</div>
+		</div>
 	</div>
-	</div>
-}
+</div>
+<!-- Modal voor Ingeschreven Deelnemers -->
+<div class="modal fade" id="ingeschrevenDeelnemersModal" tabindex="-1" aria-labelledby="ingeschrevenDeelnemersModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="ingeschrevenDeelnemersModalLabel">Ingeschreven Deelnemers</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control user-filter-input" id="filterIngeschrevenDeelnemers" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
+				@if (Model.Deelnemers.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Naam</th>
+								<th>Leeftijd</th>
+								<th>Telefoonnummer</th>
+								<th>Ouder/Voogd</th>
+								@if (User.IsInRole("Beheerder"))
+								{
+									<th>Actie</th>
+								}
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var deelnemer in Model.Deelnemers)
+							{
+								var geboortedatum = deelnemer.Kind.Geboortedatum;
+								var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+								if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
-		
+								<tr class="user-row">
+									<td class="user-fullname">@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
+									<td>@leeftijd jaar</td>
+									<td>@deelnemer.Kind.Persoon.TelefoonNummer</td>
+									<td>@deelnemer.Kind.Persoon.Voornaam @deelnemer.Kind.Persoon.Naam</td>
+									@if (User.IsInRole("Beheerder"))
+									{
+										<td>
+											<form asp-action="DeleteDeelnemer" method="post">
+												<input type="hidden" name="groepsreisId" value="@Model.Id" />
+												<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
+												<button type="submit" class="btn btn-danger">Verwijderen</button>
+											</form>
+										</td>
+									}
+								</tr>
+							}
+						</tbody>
+					</table>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+
+				}
+				else
+				{
+					<div class="alert alert-warning">
+						Geen deelnemers geregistreerd voor deze groepsreis.
+					</div>
+				}
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal voor Beschikbare Deelnemers -->
+<div class="modal fade" id="beschikbareDeelnemersModal" tabindex="-1" aria-labelledby="beschikbareDeelnemersModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="beschikbareDeelnemersModalLabel">Beschikbare Deelnemers</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control user-filter-input" id="filterBeschikbareDeelnemers" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
+				@if (Model.BeschikbareDeelnemers.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Naam</th>
+								<th>Leeftijd</th>
+								<th>Actie</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var kind in Model.BeschikbareDeelnemers)
+							{
+								bool isDeelnemer = Model.Deelnemers.Any(d => d.KindId == kind.Id);
+								if (isDeelnemer) continue;
+
+								var geboortedatum = kind.Geboortedatum;
+								var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+								if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+								<tr class="user-row">
+									<td class="user-fullname">@kind.Voornaam @kind.Naam</td>
+									<td>@leeftijd jaar</td>
+									<td>
+										<form asp-action="VoegDeelnemerToe" method="post">
+											<input type="hidden" name="groepsreisId" value="@Model.Id" />
+											<input type="hidden" name="kindId" value="@kind.Id" />
+											<button type="submit" class="btn btn-success">Toevoegen</button>
+										</form>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+				}
+				else
+				{
+					<div class="alert alert-warning">
+						Geen deelnemers beschikbaar.
+					</div>
+				}
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+			</div>
+		</div>
+	</div>
+</div>
 <p>
 	<a href="javascript:history.back()" class="btn btn-primary">Terug</a>
 </p>
+@section Scripts {
+
+	<script>
+		$(document).ready(function () {
+			// Functie voor filtering
+			function filterUsers(modalId) {
+				var volledigeNaamFilter = $(modalId).find('.user-filter-input').val().toLowerCase();
+				var hasVisibleUsers = false;
+
+				// Loop door alle rijen en controleer de voornaam
+				$(modalId).find('.user-row').each(function () {
+					var volledigeNaam = $(this).find('.user-fullname').text().toLowerCase();
+					var matches = volledigeNaam.includes(volledigeNaamFilter) || !volledigeNaamFilter;
+					$(this).toggle(matches);
+
+					if (matches) {
+						hasVisibleUsers = true;
+					}
+				});
+
+				// Toon of verberg het 'Geen deelnemers gevonden' bericht
+				$(modalId).find('#noUsersMessage').toggle(!hasVisibleUsers);
+			}
+
+			// Event listeners voor elk filter in de modals
+			$('#filterIngeschrevenMonitoren').on('input', function () {
+				filterUsers('#ingeschrevenMonitorenModal');
+			});
+
+			$('#filterBeschikbareMonitoren').on('input', function () {
+				filterUsers('#beschikbareMonitorenModal');
+			});
+			$('#filterBeschikbareDeelnemers').on('input', function () {
+				filterUsers('#beschikbareDeelnemersnModal');
+			});
+			$('#filterIngeschrevenDeelnemers').on('input', function () {
+				filterUsers('#ingeschrevenDeelnemersModal');
+			});
+
+			// Voeg vergelijkbare logica toe voor de andere modals indien nodig
+		});
+
+	</script>
+}
+
