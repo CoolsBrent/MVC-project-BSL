@@ -126,6 +126,11 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
 				@if (Model.Monitoren.Any())
 				{
 					<table class="table">
@@ -144,8 +149,8 @@
 						<tbody>
 							@foreach (var monitor in Model.Monitoren)
 							{
-								<tr>
-									<td>@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td>
+								<tr class="user-row">
+									<td class="user-fullname">@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td>
 									<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
 									<td>@monitor.Monitor.Persoon.TelefoonNummer</td>
 									<td>@monitor.Monitor.Persoon.Email</td>
@@ -180,6 +185,8 @@
 							}
 						</tbody>
 					</table>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+
 				}
 				else
 				{
@@ -204,6 +211,11 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
 				@if (Model.BeschikbareMonitoren.Any())
 				{
 					<table class="table">
@@ -217,8 +229,8 @@
 						<tbody>
 							@foreach (var monitor in Model.BeschikbareMonitoren)
 							{
-								<tr>
-									<td>@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td>
+								<tr class= "user-row">
+									<td class="user-fullname">@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td>
 									<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
 									<td>
 										<form asp-action="AddMonitor" method="post" style="display:inline;">
@@ -231,6 +243,8 @@
 							}
 						</tbody>
 					</table>
+										<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+
 				}
 				else
 				{
@@ -254,6 +268,11 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
 				@if (Model.Deelnemers.Any())
 				{
 					<table class="table">
@@ -276,8 +295,8 @@
 								var leeftijd = DateTime.Now.Year - geboortedatum.Year;
 								if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
-								<tr>
-									<td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
+								<tr class="user-row">
+									<td class="user-fullname">@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
 									<td>@leeftijd jaar</td>
 									<td>@deelnemer.Kind.Persoon.TelefoonNummer</td>
 									<td>@deelnemer.Kind.Persoon.Voornaam @deelnemer.Kind.Persoon.Naam</td>
@@ -295,6 +314,8 @@
 							}
 						</tbody>
 					</table>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+
 				}
 				else
 				{
@@ -319,6 +340,11 @@
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
+				<div class="row mb-3">
+					<div class="col">
+						<input type="text" class="form-control" id="userVolledigeNaamInput" placeholder="Filter op volledige naam...">
+					</div>
+				</div>
 				@if (Model.BeschikbareDeelnemers.Any())
 				{
 					<table class="table">
@@ -339,8 +365,8 @@
 								var leeftijd = DateTime.Now.Year - geboortedatum.Year;
 								if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
 
-								<tr>
-									<td>@kind.Voornaam @kind.Naam</td>
+								<tr class="user-row">
+									<td class="user-fullname">@kind.Voornaam @kind.Naam</td>
 									<td>@leeftijd jaar</td>
 									<td>
 										<form asp-action="VoegDeelnemerToe" method="post">
@@ -353,6 +379,7 @@
 							}
 						</tbody>
 					</table>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
 				}
 				else
 				{
@@ -370,3 +397,41 @@
 <p>
 	<a href="javascript:history.back()" class="btn btn-primary">Terug</a>
 </p>
+@section Scripts {
+
+	<script>
+		$(document).ready(function () {
+			// Functie voor filtering
+			function filterUsers() {
+				var volledigeNaamFilter = $('#userVolledigeNaamInput').val().toLowerCase();
+				var hasVisibleUsers = false;
+
+				// Loop door alle rijen en controleer de voornaam
+				$('.user-row').each(function () {
+					var volledigeNaam = $(this).find('.user-fullname').text().toLowerCase();
+
+					// Als de voornaam de filterterm bevat, toon dan de rij, anders verberg deze
+					var matches = volledigeNaam.includes(volledigeNaamFilter) || !volledigeNaamFilter;
+
+					$(this).toggle(matches);
+
+					// Bijhouden of er zichtbare deelnemers zijn
+					if (matches) {
+						hasVisibleUsers = true;
+					}
+				});
+
+				// Toon of verberg het 'Geen deelnemers gevonden' bericht
+				if (hasVisibleUsers) {
+					$('#noUsersMessage').hide();
+				} else {
+					$('#noUsersMessage').show();
+				}
+			}
+
+			// Event listener voor filterveld
+			$('#userVolledigeNaamInput').on('input', filterUsers);
+		});
+	</script>
+}
+
