@@ -31,6 +31,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
             KindRepository = new GenericRepository<Kind>(_context);
             ProgrammaRepository = new GenericRepository<Programma>(_context);
             FotoRepository = new GenericRepository<Foto>(_context);
+            OpleidingRepository = new GenericRepository<Opleiding>(_context);
         }
 
         #endregion
@@ -81,6 +82,11 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         /// Repository voor het beheren van foto's.
         /// </summary>
         public IGenericRepository<Foto> FotoRepository { get; }
+
+        /// <summary>
+        /// Repository voor het beheren van opleidingen.
+        /// </summary>
+        public IGenericRepository<Opleiding> OpleidingRepository { get; private set; }
 
         #endregion
 
