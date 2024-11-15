@@ -22,7 +22,7 @@
 }
 else
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Foto</th>
@@ -43,7 +43,7 @@ else
                         {
                             var eersteFoto = bestemming.Fotos.FirstOrDefault();
                             <div class="image-container">
-                                <img src="~/images/@eersteFoto.Naam" alt="Foto van @bestemming.BestemmingsNaam" class="img-thumbnail" />
+                                <img src="~/images/@eersteFoto?.Naam" alt="Foto van @bestemming.BestemmingsNaam" class="img-thumbnail" />
                             </div>
                         }
                         else
@@ -53,7 +53,11 @@ else
                     </td>
                     <td>@bestemming.Code</td>
                     <td>@bestemming.BestemmingsNaam</td>
-                    <td>@bestemming.Beschrijving</td>
+                    <td style="width: 35%">
+                        <div style="max-height: 100px; overflow-y: auto;">
+                            @bestemming.Beschrijving
+                        </div>
+                    </td>
                     <td>@bestemming.MinLeeftijd</td>
                     <td>@bestemming.MaxLeeftijd</td>
                     <td>

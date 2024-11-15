@@ -61,8 +61,8 @@ else
                         <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
                         <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
                         <td>
-                            <!-- Bekijken knop -->
-                            <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Bekijken">
+                            <!-- Details knop -->
+                            <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Details">
                                 <i class="bi bi-eye h5 text-white"></i>
                             </a>
 
