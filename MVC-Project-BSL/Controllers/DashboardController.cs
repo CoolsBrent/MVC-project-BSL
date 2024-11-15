@@ -32,7 +32,7 @@ namespace MVC_Project_BSL.Controllers
 
 		#region Index
 		// GET: Groepsreis
-		public async Task<IActionResult> Index(string bestemming)
+		public async Task<IActionResult> Index(string bestemming, string filterType)
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -65,7 +65,7 @@ namespace MVC_Project_BSL.Controllers
 							.ThenInclude(b => b.Fotos)
 							.Where(g => !g.IsArchived) // Haal alleen niet-gearchiveerde groepsreizen op
 				);
-				var gearchriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
+				var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
 					query.Include(g => g.Deelnemers)
 							.ThenInclude(d => d.Kind)
 							.Include(g => g.Monitoren)
@@ -73,12 +73,22 @@ namespace MVC_Project_BSL.Controllers
 							.ThenInclude(b => b.Fotos)
 							.Where(g => g.IsArchived) // Haal alleen gearchiveerde groepsreizen op
 				);
-
+				var alleOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
+				query.Include(o => o.OpleidingPersonen));
+				// Filter op basis van 'filterType'
+				if (filterType == "active")
+				{
+					alleGroepsreizen = alleGroepsreizen.Where(g => !g.IsArchived);
+				}
+				else if (filterType == "archived")
+				{
+					gearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen.Where(g => g.IsArchived);
+				}
 				// Filter op bestemming als deze is opgegeven
 				if (!string.IsNullOrEmpty(bestemming))
 				{
 					alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-					gearchriveerdeGroepsreizen = gearchriveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+					gearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
 				}
 
 				alleGroepsreizen = alleGroepsreizen.OrderBy(g => g.Begindatum);
@@ -88,7 +98,8 @@ namespace MVC_Project_BSL.Controllers
 				{
 					AlleGroepsReizen = alleGroepsreizen.ToList(),
 					AlleBestemmingen = alleBestemmingen.ToList(),
-					GearchiveerdeGroepsreizen = gearchriveerdeGroepsreizen.ToList()
+					GearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen.ToList(),
+					AlleOpleidingen = alleOpleidingen.ToList()
 				};
 			}
 			else if (isMonitor || isHoofdmonitor)
@@ -110,9 +121,22 @@ namespace MVC_Project_BSL.Controllers
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
 							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Begindatum > DateTime.Now && g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id && !g.IsArchived)) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
+							.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
 				);
-
+				var toekomstigeOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
+					query.Include(o => o.OpleidingPersonen)
+							.Where(o => o.Begindatum > DateTime.Now));
+				var ingeschrevenOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
+					query.Include(o => o.OpleidingPersonen)
+							.Where(o => o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
+				if (filterType == "mijnReizen")
+				{
+					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
+				}
+				else if (filterType == "teOntdekkenReizen")
+				{
+					toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Begindatum > DateTime.Now);
+				}
 				// Filter op bestemming als deze is opgegeven
 				if (!string.IsNullOrEmpty(bestemming))
 				{
@@ -130,7 +154,9 @@ namespace MVC_Project_BSL.Controllers
 				{
 					GeboekteGroepsReizen = geboekteGroepsreizen.ToList(),
 					ToekomstigeGroepsReizen = toekomstigeGroepsreizen.ToList(),
-					AlleBestemmingen = alleBestemmingen.ToList()
+					AlleBestemmingen = alleBestemmingen.ToList(),
+					IngeschrevenOpleidingen = ingeschrevenOpleidingen.ToList(),
+					ToekomstigeOpleidingen = toekomstigeOpleidingen.ToList()
 				};
 			}
 
@@ -152,7 +178,11 @@ namespace MVC_Project_BSL.Controllers
 								.ThenInclude(b => b.Fotos)
 								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Haal alleen toekomstige reizen op
 					);
-
+					
+					if (filterType == "teOntdekkenReizen")
+					{
+						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Begindatum > DateTime.Now);
+					}
 					// Filter op bestemming als deze is opgegeven
 					if (!string.IsNullOrEmpty(bestemming))
 					{
@@ -191,7 +221,14 @@ namespace MVC_Project_BSL.Controllers
 								.ThenInclude(b => b.Fotos)
 								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived)
 					);
-
+					if (filterType == "mijnReizen")
+					{
+						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
+					}
+					else if (filterType == "teOntdekkenReizen")
+					{
+						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Begindatum > DateTime.Now);
+					}
 					// Filter op bestemming als deze is opgegeven
 					if (!string.IsNullOrEmpty(bestemming))
 					{

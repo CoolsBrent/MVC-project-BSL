@@ -188,3 +188,6 @@ footer {
 #openFilterMenu {
     cursor: pointer;
 }
+.nav-link:not(.active) {
+    color: #D4592B;
+}
