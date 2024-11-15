@@ -55,15 +55,19 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         /// Repository voor het beheren van foto's.
         /// </summary>
         IGenericRepository<Foto> FotoRepository { get; }
+		/// <summary>
+		/// Repository voor het beheren van opleidingen.
+		/// </summary>
+		IGenericRepository<Opleiding> OpleidingRepository { get; }
 
-        #endregion
+		#endregion
 
-        #region Save Changes
+		#region Save Changes
 
-        /// <summary>
-        /// Slaat alle wijzigingen in de context op naar de database.
-        /// </summary>
-        void SaveChanges();
+		/// <summary>
+		/// Slaat alle wijzigingen in de context op naar de database.
+		/// </summary>
+		void SaveChanges();
 
         #endregion
     }
