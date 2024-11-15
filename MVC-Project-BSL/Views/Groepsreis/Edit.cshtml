@@ -79,6 +79,7 @@
                             <span asp-validation-for="Onkosten[@i].Omschrijving" class="text-danger"></span>
                         </td>
                         <td>
+                            <span class="input-group-text">€</span>
                             @Html.TextBoxFor(m => m.Onkosten[i].Bedrag, new { @class = "form-control", type = "number", step = "0.01" })
                             <span asp-validation-for="Onkosten[@i].Bedrag" class="text-danger"></span>
                         </td>

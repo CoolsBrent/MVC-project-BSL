@@ -60,6 +60,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
 		/// </summary>
 		IGenericRepository<Opleiding> OpleidingRepository { get; }
 
+
 		#endregion
 
 		#region Save Changes
