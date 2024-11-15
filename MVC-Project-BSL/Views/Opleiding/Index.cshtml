@@ -37,7 +37,11 @@ else
             {
                 <tr>
                     <td>@opleiding.Naam</td>
-                    <td style="max-width: 200px; word-wrap: break-word; word-break: break-word; white-space: normal;">@opleiding.Beschrijving</td>
+                    <td style="max-width: 200px; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal;">
+                        <div style="max-height: 100px; overflow-y: auto;">
+                            @opleiding.Beschrijving
+                        </div>
+                    </td>
                     <td>@opleiding.Begindatum.ToShortDateString()</td>
                     <td>@opleiding.Einddatum.ToShortDateString()</td>
                     <td>@opleiding.AantalPlaatsen</td>
