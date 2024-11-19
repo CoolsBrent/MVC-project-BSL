@@ -71,9 +71,11 @@
                 {
                     <tr>
                         <td>
-                            @Html.TextBoxFor(m => m.Onkosten[i].Titel, new { @class = "form-control" })
+                            @Html.TextBoxFor(m => m.Onkosten[i].Titel, new { @class = "form-control autocomplete", data_index = i })
                             <span asp-validation-for="Onkosten[@i].Titel" class="text-danger"></span>
                         </td>
+
+
                         <td>
                             @Html.TextBoxFor(m => m.Onkosten[i].Omschrijving, new { @class = "form-control" })
                             <span asp-validation-for="Onkosten[@i].Omschrijving" class="text-danger"></span>
@@ -139,7 +141,13 @@
 </form>
 
 @section Scripts {
-    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+
+
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
     <script>
@@ -147,7 +155,6 @@
             // Voeg de custom validator toe
             $.validator.addMethod("requiredifnofoto", function (value, element, parameters) {
                 var foto = $(element).data("foto");
-                // Als Foto leeg is, is FotoFile verplicht
                 if (!foto) {
                     return value && value.length > 0;
                 }
@@ -165,7 +172,7 @@
             $('#btnAddOnkost').click(function () {
                 var index = onkostenCounter++;
                 var newRow = '<tr>' +
-                    '<td><input class="form-control" name="Onkosten[' + index + '].Titel" />' +
+                    '<td><input class="form-control autocomplete" name="Onkosten[' + index + '].Titel" />' +
                     '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Titel" data-valmsg-replace="true"></span></td>' +
                     '<td><input class="form-control" name="Onkosten[' + index + '].Omschrijving" />' +
                     '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Omschrijving" data-valmsg-replace="true"></span></td>' +
@@ -182,12 +189,55 @@
 
                 // Re-initialiseer de validatie voor de nieuw toegevoegde elementen
                 $.validator.unobtrusive.parse('#onkostenTable');
+
+                // Initialiseer autocomplete voor de nieuwe titelvelden
+                initializeAutocomplete();
             });
 
             // Verwijder onkost
             $(document).on('click', '.remove-onkost', function () {
                 $(this).closest('tr').remove();
             });
+
+            // Functie voor autocomplete
+            function initializeAutocomplete() {
+                $('.autocomplete').autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '@Url.Action("GetOnkosten", "Groepsreis")', // De actie in je controller
+                            dataType: "json",
+                            data: {
+                                term: request.term // De zoekterm die je invoert
+                            },
+                            success: function (data) {
+                                response(data); // Geef de zoekresultaten terug
+                            },
+                            error: function () {
+                                response([]); // Lege lijst teruggeven bij fout
+                            }
+                        });
+                    },
+                    minLength: 0, // Start zoekopdracht zonder minimaal aantal tekens
+                    select: function (event, ui) {
+                        $(this).val(ui.item.value); // Vul het tekstveld met de geselecteerde waarde
+                        return false; // Voorkom dat het automatisch invult bij hover
+                    },
+                    open: function () {
+                        // Eventueel kun je hier extra logica toevoegen, bijvoorbeeld styling voor de lijst
+                    }
+                });
+
+                // Trigger autocomplete direct als je op het tekstvak klikt (zonder zoekterm)
+                $(document).on('focus', '.autocomplete', function () {
+                    $(this).autocomplete("search", ""); // Start de zoekfunctie met een lege zoekterm
+                });
+            }
+
+            // Initialiseer autocomplete voor al bestaande velden
+            initializeAutocomplete();
         });
-    </script>
+
+
+    </script> 
+
 }

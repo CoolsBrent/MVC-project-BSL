@@ -31,7 +31,8 @@ namespace MVC_Project_BSL.Data.UnitOfWork
             KindRepository = new GenericRepository<Kind>(_context);
             ProgrammaRepository = new GenericRepository<Programma>(_context);
             FotoRepository = new GenericRepository<Foto>(_context);
-        }
+            OnkostenRepository = new GenericRepository<Onkosten>(_context);
+		}
 
         #endregion
 
@@ -82,14 +83,19 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         /// </summary>
         public IGenericRepository<Foto> FotoRepository { get; }
 
-        #endregion
+		/// <summary>
+		/// Repository voor het beheren van onkosten.
+		/// </summary>
+		public IGenericRepository<Onkosten> OnkostenRepository { get; }
 
-        #region Save Changes
+		#endregion
 
-        /// <summary>
-        /// Slaat alle wijzigingen op in de database.
-        /// </summary>
-        public void SaveChanges()
+		#region Save Changes
+
+		/// <summary>
+		/// Slaat alle wijzigingen op in de database.
+		/// </summary>
+		public void SaveChanges()
         {
             _context.SaveChanges();
         }
