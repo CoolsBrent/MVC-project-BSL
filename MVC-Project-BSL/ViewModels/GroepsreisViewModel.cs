@@ -54,10 +54,9 @@ namespace MVC_Project_BSL.ViewModels
         public List<Groepsreis> ToekomstigeGroepsReizen { get; set; } = new List<Groepsreis> { };
         public List<Groepsreis> AlleGroepsReizen { get; set; } = new List<Groepsreis> { };
         public List<Bestemming> AlleBestemmingen { get; set; } = new List<Bestemming> { };
+		    public List<Onkosten> Onkosten { get; set; } = new List<Onkosten> { };
         public List<Opleiding> AlleOpleidingen { get; set; } = new List<Opleiding> { };
-		public List<Opleiding> ToekomstigeOpleidingen { get; set; } = new List<Opleiding> { };
-		public List<Opleiding> IngeschrevenOpleidingen { get; set; } = new List<Opleiding> { };
-
-
+		    public List<Opleiding> ToekomstigeOpleidingen { get; set; } = new List<Opleiding> { };
+		    public List<Opleiding> IngeschrevenOpleidingen { get; set; } = new List<Opleiding> { };
 	}
 }

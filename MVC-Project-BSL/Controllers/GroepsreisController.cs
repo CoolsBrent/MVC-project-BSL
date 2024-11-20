@@ -641,6 +641,38 @@ namespace MVC_Project_BSL.Controllers
             }
         }
 
-        #endregion
+        public async Task<JsonResult> GetOnkosten(string term)
+        {
+            // Haal alle onkosten op
+            var onkosten = await _unitOfWork.OnkostenRepository.GetAllAsync();
+
+            // Als er een zoekterm is, filter dan op de term
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                onkosten = onkosten
+                    .Where(o => o.Titel.Contains(term, StringComparison.OrdinalIgnoreCase)) // Filteren op de term
+                    .Take(10) // Maximaal 10 resultaten
+                    .ToList();
+            }
+            else
+            {
+                // Als er geen zoekterm is, geef dan de populairste onkosten terug (je kunt dit aanpassen zoals je wilt)
+                onkosten = onkosten
+                    .Take(10)
+                    .ToList();
+            }
+
+            // Haal de titels van de onkosten
+            var onkostenTitels = onkosten
+                .Select(o => o.Titel)
+                .ToList();
+
+            // Retourneer de resultaten als JSON
+            return Json(onkostenTitels);
+        }
+
     }
+    #endregion
+
+
 }

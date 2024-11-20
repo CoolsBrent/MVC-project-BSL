@@ -61,6 +61,11 @@ namespace MVC_Project_BSL.Data.UnitOfWork
 		IGenericRepository<Opleiding> OpleidingRepository { get; }
 
 
+		/// <summary>
+		/// Repository voor het beheren van onkosten.
+		/// </summary>
+		IGenericRepository<Onkosten> OnkostenRepository { get; }
+
 		#endregion
 
 		#region Save Changes
