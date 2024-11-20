@@ -35,8 +35,7 @@ namespace MVC_Project_BSL.Models
         [Range(1, int.MaxValue, ErrorMessage = "Aantal plaatsen moet minimaal 1 zijn.")]
         public int AantalPlaatsen { get; set; }
 
-        [Required(ErrorMessage = "Opleiding vereist is verplicht.")]
-        public int OpleidingVereist { get; set; }
+        public int? OpleidingVereist { get; set; }
 
         [ValidateNever]
         public ICollection<OpleidingPersoon> OpleidingPersonen { get; set; }

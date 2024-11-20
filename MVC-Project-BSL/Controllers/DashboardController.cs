@@ -84,7 +84,7 @@ namespace MVC_Project_BSL.Controllers
 				{
 					gearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen.Where(g => g.IsArchived);
 				}
-				// Filter op bestemming als deze is opgegeven
+				//Filter op bestemming als deze is opgegeven
 				if (!string.IsNullOrEmpty(bestemming))
 				{
 					alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
