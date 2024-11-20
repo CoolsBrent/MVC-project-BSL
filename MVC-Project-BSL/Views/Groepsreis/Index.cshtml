@@ -53,16 +53,16 @@ else
                         <td>@groepsreis.Begindatum.ToShortDateString()</td>
                         <td>@groepsreis.Einddatum.ToShortDateString()</td>
                         <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
-                        <td style="width: 35%">
+                        <td style="width: 35%; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal";>
                             <div style="max-height: 100px; overflow-y: auto;">
                                 @groepsreis.Bestemming?.Beschrijving
                             </div>
                         </td>
                         <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
-                        <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
-                        <td>
-                            <!-- Bekijken knop -->
-                            <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Bekijken">
+                        <td style="width: 15%">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
+                        <td style="width:25%">
+                            <!-- Details knop -->
+                            <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Details">
                                 <i class="bi bi-eye h5 text-white"></i>
                             </a>
 
@@ -117,13 +117,13 @@ else
                         <td>@groepsreis.Begindatum.ToShortDateString()</td>
                         <td>@groepsreis.Einddatum.ToShortDateString()</td>
                         <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
-                        <td style="width: 35%">
+                        <td style="width: 35%; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal">
                             <div style="max-height: 100px; overflow-y: auto;">
                                 @groepsreis.Bestemming?.Beschrijving
                             </div>
                         </td>
                         <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
-                        <td>@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
+                        <td style="width: 15%">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
                         <td>
                             <!-- Bekijken knop -->
                             <a asp-action="ArchivedDetail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Bekijken">

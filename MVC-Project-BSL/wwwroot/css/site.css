@@ -207,3 +207,7 @@ footer {
         .suggestions .list-group-item:hover {
             background-color: #f0f0f0;
         }
+.nav-link:not(.active) {
+    color: #D4592B;
+}
+

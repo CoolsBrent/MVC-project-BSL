@@ -1,0 +1,74 @@
+﻿@model MVC_Project_BSL.Models.Opleiding
+
+@{
+    ViewData["Title"] = "Nieuwe Opleiding";
+}
+
+<h2>Nieuwe Opleiding</h2>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <strong>Er zijn fouten opgetreden:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div class="form-group mb-3">
+        <label asp-for="Naam" class="form-label"></label>
+        <input asp-for="Naam" class="form-control" />
+        <span asp-validation-for="Naam" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Beschrijving" class="form-label"></label>
+        <textarea asp-for="Beschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Beschrijving" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Begindatum" class="form-label"></label>
+        <input asp-for="Begindatum" class="form-control" type="date" />
+        <span asp-validation-for="Begindatum" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="Einddatum" class="form-label"></label>
+        <input asp-for="Einddatum" class="form-control" type="date" />
+        <span asp-validation-for="Einddatum" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="AantalPlaatsen" class="form-label"></label>
+        <input asp-for="AantalPlaatsen" class="form-control" type="number" min="1" />
+        <span asp-validation-for="AantalPlaatsen" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="OpleidingVereist" class="form-label"></label>
+        <input asp-for="OpleidingVereist" class="form-control" type="number" min="0" />
+        <span asp-validation-for="OpleidingVereist" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <input type="submit" value="Opslaan" class="btn btn-primary" data-bs-toggle="tooltip" title="Opslaan" />
+        <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Initialiseer tooltips
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+    </script>
+}

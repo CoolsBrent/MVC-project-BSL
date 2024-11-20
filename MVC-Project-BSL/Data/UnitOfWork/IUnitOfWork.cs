@@ -55,6 +55,11 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         /// Repository voor het beheren van foto's.
         /// </summary>
         IGenericRepository<Foto> FotoRepository { get; }
+		/// <summary>
+		/// Repository voor het beheren van opleidingen.
+		/// </summary>
+		IGenericRepository<Opleiding> OpleidingRepository { get; }
+
 
 		/// <summary>
 		/// Repository voor het beheren van onkosten.

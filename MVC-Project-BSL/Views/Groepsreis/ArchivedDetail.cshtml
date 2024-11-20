@@ -76,76 +76,175 @@
 </div>
 @if (User.IsInRole("Beheerder"))
 {
-    <div class="row">
-        <!-- Ingeschreven Monitoren -->
-        <div class="col-md-6">
-            <h2>Ingeschreven Monitoren</h2>
-            @if (Model.Monitoren.Any())
-            {
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Naam</th>
-                            <th>Hoofdmonitor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var monitor in Model.Monitoren)
-                        {
-                            <tr>
-                                <td>@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td> <!-- Toon naam van de monitor -->
-                                <td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td> <!-- Hoofdmonitor check -->
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <div class="alert alert-warning">
-                    Geen monitoren geregistreerd voor deze groepsreis.
-                </div>
-            }
-        </div>
+	<div class="col-md-6">
+		<div>
+			<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenMonitorenModal">
+				Bekijk Ingeschreven Monitoren
+			</button>
+		</div>
+		<div>
+				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenDeelnemersModal">
+					Bekijk Ingeschreven Deelnemers
+				</button>
+		</div>
+		
+	</div>
+	<!-- Modal voor Ingeschreven Monitoren -->
+	<div class="modal fade" id="ingeschrevenMonitorenModal" tabindex="-1" aria-labelledby="ingeschrevenMonitorenModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="ingeschrevenMonitorenModalLabel">Ingeschreven Monitoren</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="row mb-3">
+						<div class="col">
+							<input type="text" class="form-control user-filter-input" id="filterIngeschrevenMonitoren" placeholder="Filter op volledige naam...">
+						</div>
+					</div>
+					@if (Model.Monitoren.Any())
+					{
+						<table class="table">
+							<thead>
+								<tr>
+									<th>Naam</th>
+									<th>Hoofdmonitor</th>
+									<th>Telefoonnummer</th>
+									<th>Emailadres</th>
+									
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var monitor in Model.Monitoren)
+								{
+									<tr class="user-row">
+										<td class="user-fullname">@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td>
+										<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
+										<td>@monitor.Monitor.Persoon.TelefoonNummer</td>
+										<td>@monitor.Monitor.Persoon.Email</td>
+										
+									</tr>
+								}
+							</tbody>
+						</table>
+						<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
 
-        <!-- Ingeschreven Deelnemers -->
-        <div class="col-md-6">
-            <h2>Ingeschreven Deelnemers</h2>
-            @if (Model.Deelnemers.Any())
-            {
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Naam</th>
-                            <th>Leeftijd</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var deelnemer in Model.Deelnemers)
-                        {
-                            var geboortedatum = deelnemer.Kind.Geboortedatum;
-                            var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-                            if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+					}
+					else
+					{
+						<div class="alert alert-warning">
+							Geen monitoren geregistreerd voor deze groepsreis.
+						</div>
+					}
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-                            <tr>
-                                <td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td> <!-- Toon naam van het kind -->
-                                <td>@leeftijd jaar</td> <!-- Toon leeftijd -->
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            }
-            else
-            {
-                <div class="alert alert-warning">
-                    Geen deelnemers geregistreerd voor deze groepsreis.
-                </div>
-            }
-        </div>
-    </div>
+		<!-- Modal voor Ingeschreven Deelnemers -->
+		<div class="modal fade" id="ingeschrevenDeelnemersModal" tabindex="-1" aria-labelledby="ingeschrevenDeelnemersModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="ingeschrevenDeelnemersModalLabel">Ingeschreven Deelnemers</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="row mb-3">
+							<div class="col">
+								<input type="text" class="form-control user-filter-input" id="filterIngeschrevenDeelnemers" placeholder="Filter op volledige naam...">
+							</div>
+						</div>
+						@if (Model.Deelnemers.Any())
+						{
+							<table class="table">
+								<thead>
+									<tr>
+										<th>Naam</th>
+										<th>Leeftijd</th>
+										<th>Telefoonnummer</th>
+										<th>Ouder/Voogd</th>
+										
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var deelnemer in Model.Deelnemers)
+									{
+										var geboortedatum = deelnemer.Kind.Geboortedatum;
+										var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+										if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+										<tr class="user-row">
+											<td class="user-fullname">@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
+											<td>@leeftijd jaar</td>
+											<td>@deelnemer.Kind.Persoon.TelefoonNummer</td>
+											<td>@deelnemer.Kind.Persoon.Voornaam @deelnemer.Kind.Persoon.Naam</td>
+										 
+										</tr>
+									}
+								</tbody>
+							</table>
+							<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+
+						}
+						else
+						{
+							<div class="alert alert-warning">
+								Geen deelnemers geregistreerd voor deze groepsreis.
+							</div>
+						}
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+					</div>
+				</div>
+			</div>
+		</div>
 }
 
 
 <p>
     <a href="javascript:history.back()" class="btn btn-primary">Terug</a>
 </p>
+@section Scripts {
+
+	<script>
+		$(document).ready(function () {
+			// Functie voor filtering
+			function filterUsers(modalId) {
+				var volledigeNaamFilter = $(modalId).find('.user-filter-input').val().toLowerCase();
+				var hasVisibleUsers = false;
+
+				// Loop door alle rijen en controleer de voornaam
+				$(modalId).find('.user-row').each(function () {
+					var volledigeNaam = $(this).find('.user-fullname').text().toLowerCase();
+					var matches = volledigeNaam.includes(volledigeNaamFilter) || !volledigeNaamFilter;
+					$(this).toggle(matches);
+
+					if (matches) {
+						hasVisibleUsers = true;
+					}
+				});
+
+				// Toon of verberg het 'Geen deelnemers gevonden' bericht
+				$(modalId).find('#noUsersMessage').toggle(!hasVisibleUsers);
+			}
+
+			// Event listeners voor elk filter in de modals
+			$('#filterIngeschrevenMonitoren').on('input', function () {
+				filterUsers('#ingeschrevenMonitorenModal');
+			});
+			$('#filterIngeschrevenDeelnemers').on('input', function () {
+				filterUsers('#ingeschrevenDeelnemersModal');
+			});
+
+			// Voeg vergelijkbare logica toe voor de andere modals indien nodig
+		});
+
+	</script>
+}
+
