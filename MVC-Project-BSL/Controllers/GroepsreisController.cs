@@ -80,8 +80,13 @@ namespace MVC_Project_BSL.Controllers
                 query => query.Include(g => g.Monitoren).ThenInclude(m => m.Monitor.Persoon)
                               .Include(g => g.Bestemming).ThenInclude(b => b.Fotos)
                               .Include(g => g.Deelnemers)).FirstOrDefaultAsync(g => g.Id == id);
+			var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
+			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
 
-            return groepsreis == null ? NotFound() : View(groepsreis);
+
+			return groepsreis == null ? NotFound() : View(groepsreis);
         }
 
         #endregion
