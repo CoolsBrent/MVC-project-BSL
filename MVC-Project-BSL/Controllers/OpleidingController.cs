@@ -32,7 +32,9 @@ namespace MVC_Project_BSL.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var opleiding = await _unitOfWork.OpleidingRepository.GetQueryable(
-                query => query.Include(o => o.OpleidingPersonen))
+                query => query
+                    .Include(o => o.OpleidingPersonen)
+                    .Include(o => o.OpleidingVereist)) // Vereiste opleiding expliciet laden
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (opleiding == null)
@@ -42,6 +44,7 @@ namespace MVC_Project_BSL.Controllers
 
             return View(opleiding);
         }
+
 
         #endregion
 
