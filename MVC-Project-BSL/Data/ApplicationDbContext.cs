@@ -128,10 +128,10 @@ namespace MVC_Project_BSL.Data
 
             // R9: Opleiding - Opleiding (self-referencing)
             modelBuilder.Entity<Opleiding>()
-                .HasMany(o => o.OpleidingPersonen)
-                .WithOne(op => op.Opleiding)
-                .HasForeignKey(op => op.OpleidingId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(o => o.OpleidingVereist)
+                .WithMany(o => o.OpleidingenAfhankelijk)
+                .HasForeignKey(o => o.OpleidingVereistId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // R11: CustomUser - Kind (one-to-many)
             modelBuilder.Entity<Kind>()

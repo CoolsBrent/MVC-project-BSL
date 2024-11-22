@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using MVC_Project_BSL.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MVC_Project_BSL.Models
 {
     public class Opleiding
     {
-        public Opleiding() 
+        public Opleiding()
         {
             OpleidingPersonen = new List<OpleidingPersoon>();
+            OpleidingenAfhankelijk = new List<Opleiding>();
         }
+
         public int Id { get; set; }
 
         [Required(ErrorMessage = "Naam is verplicht.")]
@@ -35,13 +36,19 @@ namespace MVC_Project_BSL.Models
         [Range(1, int.MaxValue, ErrorMessage = "Aantal plaatsen moet minimaal 1 zijn.")]
         public int AantalPlaatsen { get; set; }
 
-        public int? OpleidingVereist { get; set; }
+        // Foreign key property voor de vereiste opleiding
+        public int? OpleidingVereistId { get; set; }
+
+        // Navigatie-eigenschap voor de vereiste opleiding
+        [ForeignKey("OpleidingVereistId")]
+        public Opleiding? OpleidingVereist { get; set; }
+
+        // Navigatie-eigenschap voor afhankelijke opleidingen
+        [InverseProperty("OpleidingVereist")]
+        public ICollection<Opleiding> OpleidingenAfhankelijk { get; set; }
 
         [ValidateNever]
         public ICollection<OpleidingPersoon> OpleidingPersonen { get; set; }
-
-
-
 
         /// <summary>
         /// Om te checken dat de datum van de start eerder is dan de einddatum

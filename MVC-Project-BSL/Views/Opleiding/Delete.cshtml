@@ -6,6 +6,20 @@
 
 <h1>Verwijder Opleiding</h1>
 
+<!-- ModelState Foutmeldingen -->
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <strong>Er zijn fouten opgetreden:</strong>
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}
+
 <div class="alert alert-danger" role="alert">
     Weet je zeker dat je de opleiding <strong>@Model.Naam</strong> wilt verwijderen?
 </div>
