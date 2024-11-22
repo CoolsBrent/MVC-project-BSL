@@ -49,11 +49,16 @@ namespace MVC_Project_BSL.Models
 
         [ValidateNever]
         public ICollection<OpleidingPersoon> OpleidingPersonen { get; set; }
+		[NotMapped]
+		public ICollection<CustomUser>? Monitoren { get; set; }
 
-        /// <summary>
-        /// Om te checken dat de datum van de start eerder is dan de einddatum
-        /// </summary>
-        public class DateGreaterThanAttribute : ValidationAttribute
+		[NotMapped]
+		public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
+
+		/// <summary>
+		/// Om te checken dat de datum van de start eerder is dan de einddatum
+		/// </summary>
+		public class DateGreaterThanAttribute : ValidationAttribute
         {
             private readonly string _comparisonProperty;
 

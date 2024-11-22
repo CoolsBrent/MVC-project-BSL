@@ -125,7 +125,7 @@ namespace MVC_Project_BSL.Controllers
 				);
 				var toekomstigeOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
 					query.Include(o => o.OpleidingPersonen)
-							.Where(o => o.Begindatum > DateTime.Now));
+							.Where(o => o.Begindatum > DateTime.Now && !o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
 				var ingeschrevenOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
 					query.Include(o => o.OpleidingPersonen)
 							.Where(o => o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
