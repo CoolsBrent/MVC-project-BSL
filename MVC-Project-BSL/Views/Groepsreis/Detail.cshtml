@@ -157,28 +157,30 @@
 									@if (User.IsInRole("Beheerder"))
 									{
 										<td class="text-center align-middle">
-											@if (!monitor.Monitor.IsHoofdMonitor)
-											{
-												<!-- Knop om hoofdmonitor te maken -->
-												<form asp-action="MaakHoofdmonitor" method="post" style="display:inline;">
+											<div class="d-flex justify-content-center gap-2">
+												@if (!monitor.Monitor.IsHoofdMonitor)
+												{
+													<!-- Knop om hoofdmonitor te maken -->
+													<form asp-action="MaakHoofdmonitor" method="post" style="display:inline;">
+														<input type="hidden" name="groepsreisId" value="@Model.Id" />
+														<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
+														<button type="submit" class="btn btn-success btn-sm" style="white-space: nowrap;">Maak Hoofdmonitor</button>
+													</form>
+												}
+												else
+												{
+													<form asp-action="MaakGewoneMonitor" method="post" style="display:inline;">
+														<input type="hidden" name="groepsreisId" value="@Model.Id" />
+														<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
+														<button type="submit" class="btn btn-success btn-sm" style="white-space: nowrap;">Maak monitor</button>
+													</form>
+												}
+												<form asp-action="DeleteMonitor" method="post" style="display:inline;">
 													<input type="hidden" name="groepsreisId" value="@Model.Id" />
 													<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
-													<button type="submit" class="btn btn-success btn-sm me-1">Maak Hoofdmonitor</button>
+													<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
 												</form>
-											}
-											else
-											{
-												<form asp-action="MaakGewoneMonitor" method="post" style="display:inline;">
-													<input type="hidden" name="groepsreisId" value="@Model.Id" />
-													<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
-													<button type="submit" class="btn btn-success btn-sm me-1">Maak monitor</button>
-												</form>
-											}
-											<form asp-action="DeleteMonitor" method="post" style="display:inline;">
-												<input type="hidden" name="groepsreisId" value="@Model.Id" />
-												<input type="hidden" name="monitorId" value="@monitor.Monitor.Id" />
-												<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
-											</form>
+											</div>
 										</td>
 									}
 								</tr>
@@ -306,7 +308,7 @@
 											<form asp-action="DeleteDeelnemer" method="post">
 												<input type="hidden" name="groepsreisId" value="@Model.Id" />
 												<input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
-												<button type="submit" class="btn btn-danger">Verwijderen</button>
+												<button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
 											</form>
 										</td>
 									}
@@ -372,7 +374,7 @@
 										<form asp-action="VoegDeelnemerToe" method="post">
 											<input type="hidden" name="groepsreisId" value="@Model.Id" />
 											<input type="hidden" name="kindId" value="@kind.Id" />
-											<button type="submit" class="btn btn-success">Toevoegen</button>
+											<button type="submit" class="btn btn-primary btn-sm">Voeg Toe</button>
 										</form>
 									</td>
 								</tr>
