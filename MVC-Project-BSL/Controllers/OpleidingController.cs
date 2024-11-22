@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
@@ -31,7 +32,9 @@ namespace MVC_Project_BSL.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var opleiding = await _unitOfWork.OpleidingRepository.GetQueryable(
-                query => query.Include(o => o.OpleidingPersonen))
+                query => query
+                    .Include(o => o.OpleidingPersonen)
+                    .Include(o => o.OpleidingVereist)) // Vereiste opleiding expliciet laden
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (opleiding == null)
@@ -42,14 +45,24 @@ namespace MVC_Project_BSL.Controllers
             return View(opleiding);
         }
 
+
         #endregion
 
         #region Create Actions
-
-        // GET: Opleiding/Create
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var opleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync();
+            ViewBag.Opleidingen = opleidingen
+                .Select(o => new SelectListItem
+                {
+                    Value = o.Id.ToString(),
+                    Text = o.Naam
+                }).ToList();
+
+            // Voeg een optie toe voor "Geen"
+            ViewBag.Opleidingen.Insert(0, new SelectListItem { Value = "", Text = "Geen" });
+
             return View();
         }
 
@@ -62,14 +75,47 @@ namespace MVC_Project_BSL.Controllers
 
             if (ModelState.IsValid)
             {
-                await _unitOfWork.OpleidingRepository.AddAsync(opleiding);
-                _unitOfWork.SaveChanges();
+                // Prevent cyclische vereisten
+                if (IsCyclicPrerequisite(opleiding.Id, opleiding.OpleidingVereistId))
+                {
+                    ModelState.AddModelError("OpleidingVereistId", "Cylische vereiste opleiding gedetecteerd.");
+                }
+                else
+                {
+                    await _unitOfWork.OpleidingRepository.AddAsync(opleiding);
+                    _unitOfWork.SaveChanges();
 
-                return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
-            // Laad eventuele benodigde data opnieuw als dat nodig is
+            // Als ModelState niet geldig is, laad de opleidingen opnieuw
+            var opleidingenList = await _unitOfWork.OpleidingRepository.GetAllAsync();
+            ViewBag.Opleidingen = opleidingenList
+                .Select(o => new SelectListItem
+                {
+                    Value = o.Id.ToString(),
+                    Text = o.Naam
+                }).ToList();
+
+            ViewBag.Opleidingen.Insert(0, new SelectListItem { Value = "", Text = "Geen" });
+
             return View(opleiding);
+        }
+
+        private bool IsCyclicPrerequisite(int opleidingId, int? vereisteOpleidingId)
+        {
+            if (!vereisteOpleidingId.HasValue)
+                return false;
+
+            if (opleidingId == vereisteOpleidingId.Value)
+                return true;
+
+            var vereisteOpleiding = _unitOfWork.OpleidingRepository.GetByIdAsync(vereisteOpleidingId.Value).Result;
+            if (vereisteOpleiding == null)
+                return false;
+
+            return IsCyclicPrerequisite(opleidingId, vereisteOpleiding.OpleidingVereistId);
         }
 
         #endregion
@@ -84,6 +130,18 @@ namespace MVC_Project_BSL.Controllers
             {
                 return NotFound();
             }
+
+            var opleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync();
+            ViewBag.Opleidingen = opleidingen
+                .Where(o => o.Id != id) // Vermijd zelfreferentie
+                .Select(o => new SelectListItem
+                {
+                    Value = o.Id.ToString(),
+                    Text = o.Naam
+                }).ToList();
+
+            ViewBag.Opleidingen.Insert(0, new SelectListItem { Value = "", Text = "Geen" });
+
             return View(opleiding);
         }
 
@@ -101,8 +159,17 @@ namespace MVC_Project_BSL.Controllers
             {
                 try
                 {
-                    _unitOfWork.OpleidingRepository.Update(opleiding);
-                    _unitOfWork.SaveChanges();
+                    // Prevent cyclische vereisten
+                    if (IsCyclicPrerequisite(opleiding.Id, opleiding.OpleidingVereistId))
+                    {
+                        ModelState.AddModelError("OpleidingVereistId", "Cylische vereiste opleiding gedetecteerd.");
+                    }
+                    else
+                    {
+                        _unitOfWork.OpleidingRepository.Update(opleiding);
+                        _unitOfWork.SaveChanges();
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -115,12 +182,22 @@ namespace MVC_Project_BSL.Controllers
                         throw;
                     }
                 }
-
-                return RedirectToAction(nameof(Index));
             }
+
+            var opleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync();
+            ViewBag.Opleidingen = opleidingen
+                .Where(o => o.Id != id)
+                .Select(o => new SelectListItem
+                {
+                    Value = o.Id.ToString(),
+                    Text = o.Naam
+                }).ToList();
+
+            ViewBag.Opleidingen.Insert(0, new SelectListItem { Value = "", Text = "Geen" });
 
             return View(opleiding);
         }
+
 
         #endregion
 
@@ -130,13 +207,26 @@ namespace MVC_Project_BSL.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var opleiding = await _unitOfWork.OpleidingRepository.GetQueryable(
-                query => query.Include(o => o.OpleidingPersonen))
+                query => query.Include(o => o.OpleidingPersonen)
+                              .Include(o => o.OpleidingenAfhankelijk))
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (opleiding == null)
             {
                 return NotFound();
             }
+
+            // Controleer of deze opleiding als vereiste wordt gebruikt
+            bool isPrerequisite = await _unitOfWork.OpleidingRepository.AnyAsync(o => o.OpleidingVereistId == id);
+            var afhankelijkeOpleidingen = new List<Opleiding>();
+
+            if (isPrerequisite)
+            {
+                afhankelijkeOpleidingen = (await _unitOfWork.OpleidingRepository.GetAllAsync(query => query.Where(o => o.OpleidingVereistId == id))).ToList();
+            }
+
+            ViewBag.IsPrerequisite = isPrerequisite;
+            ViewBag.AfhankelijkeOpleidingen = afhankelijkeOpleidingen;
 
             return View(opleiding);
         }
@@ -147,11 +237,39 @@ namespace MVC_Project_BSL.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var opleiding = await _unitOfWork.OpleidingRepository.GetByIdAsync(id);
-            if (opleiding != null)
+            if (opleiding == null)
             {
-                _unitOfWork.OpleidingRepository.Delete(opleiding);
+                return NotFound();
+            }
+
+            // Controleer of deze opleiding als vereiste wordt gebruikt
+            bool isPrerequisite = await _unitOfWork.OpleidingRepository.AnyAsync(o => o.OpleidingVereistId == id);
+
+            if (isPrerequisite)
+            {
+                // Voeg een modelstate-fout toe
+                ModelState.AddModelError("", "Deze opleiding kan niet worden verwijderd omdat deze als vereiste wordt gebruikt door andere opleidingen.");
+
+                // Laad de opleiding en gerelateerde data opnieuw voor de view
+                var afhankelijkeOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query => query.Where(o => o.OpleidingVereistId == id));
+                ViewBag.IsPrerequisite = isPrerequisite;
+                ViewBag.AfhankelijkeOpleidingen = afhankelijkeOpleidingen;
+
+                return View("Delete", opleiding);
+            }
+
+            _unitOfWork.OpleidingRepository.Delete(opleiding);
+            try
+            {
                 _unitOfWork.SaveChanges();
             }
+            catch (DbUpdateException ex)
+            {
+                // Log de fout indien nodig en toon een algemene foutmelding
+                ModelState.AddModelError("", "Kan de opleiding niet verwijderen. Probeer het opnieuw of neem contact op met de beheerder.");
+                return View("Delete", opleiding);
+            }
+
             return RedirectToAction(nameof(Index));
         }
 

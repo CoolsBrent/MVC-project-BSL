@@ -47,10 +47,11 @@
         <span asp-validation-for="AantalPlaatsen" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="OpleidingVereist" class="form-label"></label>
-        <input asp-for="OpleidingVereist" class="form-control" type="number" min="0" />
-        <span asp-validation-for="OpleidingVereist" class="text-danger"></span>
+        <label asp-for="OpleidingVereistId" class="form-label">Vereiste Opleiding</label>
+        <select asp-for="OpleidingVereistId" class="form-control" asp-items="ViewBag.Opleidingen"></select>
+        <span asp-validation-for="OpleidingVereistId" class="text-danger"></span>
     </div>
+
     <div class="form-group mb-3">
         <input type="submit" value="Opslaan" class="btn btn-primary" data-bs-toggle="tooltip" title="Opslaan" />
         <a asp-action="Index" class="btn btn-secondary">Annuleren</a>

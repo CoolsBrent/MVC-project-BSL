@@ -36,7 +36,7 @@ else
             @foreach (var opleiding in Model)
             {
                 <tr>
-                    <td style="max-width: 15%; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal;">
+                    <td style="width: 15%; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal;">
                         <div style="max-height: 100px; overflow-y: auto;">
                             @opleiding.Naam
                         </div>
@@ -49,7 +49,7 @@ else
                     <td>@opleiding.Begindatum.ToShortDateString()</td>
                     <td>@opleiding.Einddatum.ToShortDateString()</td>
                     <td>@opleiding.AantalPlaatsen</td>
-                    <td>@opleiding.OpleidingVereist</td>
+                    <td>@opleiding.OpleidingVereist?.Naam</td>
                     <td width="15%">
                         <a asp-action="Details" asp-route-id="@opleiding.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Details">
                             <i class="bi bi-eye h5 text-white"></i>
