@@ -47,6 +47,9 @@ namespace MVC_Project_BSL.Data
             // Gebruikers koppelen aan opleidingen
             AddOpleidingPersonen(context);
 
+            // Deelnemers toevoegen
+            AddDeelnemers(context);
+
             // Opslaan in de database
             await context.SaveChangesAsync();
         }
@@ -199,6 +202,31 @@ namespace MVC_Project_BSL.Data
                 context.OpleidingPersonen.AddRange(
                     new OpleidingPersoon { OpleidingId = 1, PersoonId = 2 }, // Monitor volgt EHBO
                     new OpleidingPersoon { OpleidingId = 2, PersoonId = 3 }  // Hoofdmonitor volgt Reisleiding
+                );
+            }
+        }
+
+        private static void AddDeelnemers(ApplicationDbContext context)
+        {
+            if (!context.Deelnemers.Any())
+            {
+                context.Deelnemers.AddRange(
+                    new Deelnemer
+                    {
+                        KindId = 1, // Emma Doe
+                        GroepsreisDetailId = 1,
+                        Opmerkingen = "Heeft notenallergie.",
+                        ReviewScore = 5,
+                        Review = "Fantastische reis, goed georganiseerd."
+                    },
+                    new Deelnemer
+                    {
+                        KindId = 2, // Tom Doe
+                        GroepsreisDetailId = 2,
+                        Opmerkingen = "Genoten van alle activiteiten.",
+                        ReviewScore = 4,
+                        Review = "Leuke reis, aanrader!"
+                    }
                 );
             }
         }
