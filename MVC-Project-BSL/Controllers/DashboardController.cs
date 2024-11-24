@@ -128,7 +128,7 @@ namespace MVC_Project_BSL.Controllers
 							.Where(o => o.Begindatum > DateTime.Now && !o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
 				var ingeschrevenOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
 					query.Include(o => o.OpleidingPersonen)
-							.Where(o => o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
+							.Where(o => o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id) && o.Einddatum > DateTime.Now));
 				if (filterType == "mijnReizen")
 				{
 					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
