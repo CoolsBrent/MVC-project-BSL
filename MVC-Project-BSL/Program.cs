@@ -12,10 +12,10 @@ public partial class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-		builder.Services.AddScoped<MonitorService>();
+        builder.Services.AddScoped<MonitorService>();
 
-		// Add services to the container.
-		var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        // Add services to the container.
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
         // Voeg ApplicationDbContext en SQL Server toe
@@ -63,51 +63,18 @@ public partial class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
         app.MapRazorPages();
 
-        //Aanmaken van rollen bij opstart
+        // SeedData uitvoeren
         using (var scope = app.Services.CreateScope())
         {
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
-
-            var roles = new[] { "Deelnemer", "Monitor", "Hoofdmonitor", "Verantwoordelijke", "Beheerder" };
-
-            foreach (var role in roles)
+            var services = scope.ServiceProvider;
+            try
             {
-                if (!await roleManager.RoleExistsAsync(role))
-                {
-                    await roleManager.CreateAsync(new IdentityRole<int>(role));
-                }
+                await SeedData.Initialize(services);
             }
-        }
-
-        //Aanmaken van Admin bij opstart
-        using (var scope = app.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<CustomUser>>();
-
-            string email = "admin@mvc";
-            string password = "AdminPassword123!";
-
-            if (await userManager.FindByEmailAsync("admin@mvc") == null)
+            catch (Exception ex)
             {
-                var admin = new CustomUser
-                {
-                    UserName = email,
-                    Email = email,
-                    Gemeente = "Geel",
-                    Naam = "Admin",
-                    Voornaam = "Administrator",
-                    Straat = "AdminStraat",
-                    Huisnummer = "1",
-                    Postcode = "2440",
-                    Geboortedatum = new DateTime(1990, 1, 1),
-                    Huisdokter = "Dr. Admin",
-                    TelefoonNummer = "014/123456",
-                    RekeningNummer = "BE123456789",
-                    IsActief = true
-                };
-
-                await userManager.CreateAsync(admin, password);
-                await userManager.AddToRoleAsync(admin, "Beheerder");
+                var logger = services.GetRequiredService<ILogger<Program>>();
+                logger.LogError(ex, "An error occurred while seeding the database.");
             }
         }
 
