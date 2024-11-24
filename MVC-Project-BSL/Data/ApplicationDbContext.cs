@@ -142,8 +142,8 @@ namespace MVC_Project_BSL.Data
 
             // R12 + R13: CustomUser - Opleiding (many-to-many via OpleidingPersoon)
             modelBuilder.Entity<OpleidingPersoon>()
-                .HasKey(op => new { op.OpleidingId, op.PersoonId });
-            modelBuilder.Entity<OpleidingPersoon>()
+                .HasKey(op => op.Id);
+			modelBuilder.Entity<OpleidingPersoon>()
                 .HasOne(op => op.Opleiding)
                 .WithMany(o => o.OpleidingPersonen)
                 .HasForeignKey(op => op.OpleidingId);

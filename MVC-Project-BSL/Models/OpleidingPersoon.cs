@@ -1,4 +1,6 @@
-﻿namespace MVC_Project_BSL.Models
+﻿using System;
+
+namespace MVC_Project_BSL.Models
 {
 	public class OpleidingPersoon
 	{
@@ -8,6 +10,8 @@
 
 		public Opleiding Opleiding { get; set; }
 		public CustomUser Persoon { get; set; }
+
+
 	}
 
 }

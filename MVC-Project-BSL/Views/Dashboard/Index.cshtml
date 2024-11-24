@@ -184,6 +184,7 @@
 					@foreach (var opleiding in Model.AlleOpleidingen)
 					{
 						<div class="col-md-4 mb-4">
+							<a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
 							<div class="card h-100">
 								<div class="card-body">
 									<h5 class="card-title">@opleiding.Naam</h5>
@@ -192,6 +193,7 @@
 									<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
 								</div>
 							</div>
+							</a>
 						</div>
 					}
 				}
@@ -355,14 +357,16 @@
 						@foreach (var opleiding in Model.IngeschrevenOpleidingen)
 						{
 							<div class="col-md-4 mb-4">
-								<div class="card h-100">
-									<div class="card-body">
-										<h5 class="card-title">@opleiding.Naam</h5>
-										<p class="card-text">@opleiding.Beschrijving</p>
-										<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
-										<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+								<a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
+									<div class="card h-100">
+										<div class="card-body">
+											<h5 class="card-title">@opleiding.Naam</h5>
+											<p class="card-text">@opleiding.Beschrijving</p>
+											<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
+											<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+										</div>
 									</div>
-								</div>
+								</a>
 							</div>
 						}
 					}
@@ -383,14 +387,16 @@
 						@foreach (var opleiding in Model.ToekomstigeOpleidingen)
 						{
 							<div class="col-md-4 mb-4">
-								<div class="card h-100">
-									<div class="card-body">
-										<h5 class="card-title">@opleiding.Naam</h5>
-										<p class="card-text">@opleiding.Beschrijving</p>
-										<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
-										<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+								<a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
+									<div class="card h-100">
+										<div class="card-body">
+											<h5 class="card-title">@opleiding.Naam</h5>
+											<p class="card-text">@opleiding.Beschrijving</p>
+											<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
+											<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+										</div>
 									</div>
-								</div>
+								</a>
 							</div>
 						}
 					}
