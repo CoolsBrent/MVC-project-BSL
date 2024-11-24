@@ -20,6 +20,9 @@ namespace MVC_Project_BSL.Data
             // Gebruikers toevoegen
             await AddUsers(userManager);
 
+            // Kinderen toevoegen
+            AddKinderen(context);
+
             // Bestemmingen toevoegen
             AddBestemmingen(context);
 
@@ -37,6 +40,12 @@ namespace MVC_Project_BSL.Data
 
             // Onkosten toevoegen
             AddOnkosten(context);
+
+            // Opleidingen toevoegen
+            AddOpleidingen(context);
+
+            // Gebruikers koppelen aan opleidingen
+            AddOpleidingPersonen(context);
 
             // Opslaan in de database
             await context.SaveChangesAsync();
@@ -90,6 +99,17 @@ namespace MVC_Project_BSL.Data
                 {
                     await userManager.AddToRoleAsync(user, role);
                 }
+            }
+        }
+
+        private static void AddKinderen(ApplicationDbContext context)
+        {
+            if (!context.Kinderen.Any())
+            {
+                context.Kinderen.AddRange(
+                    new Kind { Voornaam = "Emma", Naam = "Doe", Geboortedatum = new DateTime(2010, 6, 1), Allergieen = "Noten", Medicatie = "Epipen", PersoonId = 1 },
+                    new Kind { Voornaam = "Tom", Naam = "Doe", Geboortedatum = new DateTime(2012, 12, 15), Allergieen = "Geen", Medicatie = "Geen", PersoonId = 1 }
+                );
             }
         }
 
@@ -157,6 +177,28 @@ namespace MVC_Project_BSL.Data
                 context.Onkosten.AddRange(
                     new Onkosten { Titel = "Lunch in Parijs", Omschrijving = "Groepslunch tijdens reis.", Bedrag = 150.0f, Datum = new DateTime(2024, 5, 3), Foto = "lunch.jpg", GroepsreisId = 1 },
                     new Onkosten { Titel = "Treintickets", Omschrijving = "Reis naar Londen.", Bedrag = 300.0f, Datum = new DateTime(2024, 6, 11), Foto = null, GroepsreisId = 2 }
+                );
+            }
+        }
+
+        private static void AddOpleidingen(ApplicationDbContext context)
+        {
+            if (!context.Opleidingen.Any())
+            {
+                context.Opleidingen.AddRange(
+                    new Opleiding { Naam = "EHBO", Beschrijving = "Eerste hulp bij ongelukken.", Begindatum = new DateTime(2024, 1, 1), Einddatum = new DateTime(2024, 1, 15), AantalPlaatsen = 10, OpleidingVereist = null },
+                    new Opleiding { Naam = "Reisleiding", Beschrijving = "Training voor reisleiders.", Begindatum = new DateTime(2024, 2, 1), Einddatum = new DateTime(2024, 2, 10), AantalPlaatsen = 5, OpleidingVereist = 1 }
+                );
+            }
+        }
+
+        private static void AddOpleidingPersonen(ApplicationDbContext context)
+        {
+            if (!context.OpleidingPersonen.Any())
+            {
+                context.OpleidingPersonen.AddRange(
+                    new OpleidingPersoon { OpleidingId = 1, PersoonId = 2 }, // Monitor volgt EHBO
+                    new OpleidingPersoon { OpleidingId = 2, PersoonId = 3 }  // Hoofdmonitor volgt Reisleiding
                 );
             }
         }
