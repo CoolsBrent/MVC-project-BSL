@@ -190,7 +190,7 @@ namespace MVC_Project_BSL.Data
             {
                 context.Opleidingen.AddRange(
                     new Opleiding { Naam = "EHBO", Beschrijving = "Eerste hulp bij ongelukken.", Begindatum = new DateTime(2024, 1, 1), Einddatum = new DateTime(2024, 1, 15), AantalPlaatsen = 10, OpleidingVereist = null },
-                    new Opleiding { Naam = "Reisleiding", Beschrijving = "Training voor reisleiders.", Begindatum = new DateTime(2024, 2, 1), Einddatum = new DateTime(2024, 2, 10), AantalPlaatsen = 5, OpleidingVereist = 1 }
+                    new Opleiding { Naam = "Reisleiding", Beschrijving = "Training voor reisleiders.", Begindatum = new DateTime(2024, 2, 1), Einddatum = new DateTime(2024, 2, 10), AantalPlaatsen = 5, OpleidingVereist = null }
                 );
             }
         }

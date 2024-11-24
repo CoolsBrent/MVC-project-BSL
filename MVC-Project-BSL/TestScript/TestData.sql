@@ -38,14 +38,6 @@ INSERT INTO Programmas (Id, ActiviteitId, GroepsreisId) VALUES
 (2, 2, 1), -- Activiteit 2 bij Parijs
 (3, 3, 2); -- Activiteit 3 bij Londen
 
--- Foto's toevoegen
-DELETE FROM Fotos WHERE Id IN (1, 2);
-SET IDENTITY_INSERT Fotos ON;
-INSERT INTO Fotos (Id, Naam, BestemmingId) VALUES
-(1, 'eiffeltoren.jpg', 1),
-(2, 'londonbridge.jpg', 2);
-SET IDENTITY_INSERT Fotos OFF;
-
 -- Onkosten toevoegen
 DELETE FROM Onkosten WHERE Id IN (1, 2);
 SET IDENTITY_INSERT Onkosten ON;
@@ -54,6 +46,12 @@ INSERT INTO Onkosten (Id, Titel, Omschrijving, Bedrag, Datum, Foto, GroepsreisId
 (2, 'Treintickets', 'Reis naar Londen.', 300.00, '2024-06-11', NULL, 2);
 SET IDENTITY_INSERT Onkosten OFF;
 
+-- Monitoren toevoegen
+SET IDENTITY_INSERT Monitoren ON;
+INSERT INTO Monitoren (Id, PersoonId, IsHoofdMonitor) VALUES
+(1, 2, 0), -- Monitor
+(2, 3, 1); -- Hoofdmonitor
+SET IDENTITY_INSERT Monitoren OFF;
 
 -- Monitoren koppelen aan groepsreizen
 DELETE FROM GroepsreisMonitor WHERE GroepsreisId IN (1, 2);
@@ -72,7 +70,7 @@ SET IDENTITY_INSERT Deelnemers OFF;
 -- Opleidingen toevoegen
 DELETE FROM Opleidingen WHERE Id IN (1, 2);
 SET IDENTITY_INSERT Opleidingen ON;
-INSERT INTO Opleidingen (Id, Naam, Beschrijving, BeginDatum, EindDatum, AantalPlaatsen, OpleidingVereist) VALUES
+INSERT INTO Opleidingen (Id, Naam, Beschrijving, BeginDatum, EindDatum, AantalPlaatsen, OpleidingVereistId) VALUES
 (1, 'EHBO', 'Eerste hulp bij ongelukken', '2024-01-01', '2024-01-15', 10, NULL),
 (2, 'Reisleiding', 'Training voor reisleiders', '2024-02-01', '2024-02-10', 5, 1);
 SET IDENTITY_INSERT Opleidingen OFF;
@@ -82,6 +80,14 @@ DELETE FROM OpleidingPersonen WHERE Id IN (1, 2);
 INSERT INTO OpleidingPersonen (Id, OpleidingId, PersoonId) VALUES
 (1, 1, 2), -- Monitor volgt EHBO
 (2, 2, 3); -- Hoofdmonitor volgt Reisleiding
+
+-- Foto's toevoegen
+DELETE FROM Fotos WHERE Id IN (1, 2); -- Verwijder bestaande foto's voordat je nieuwe toevoegt
+    SET IDENTITY_INSERT Fotos ON;
+    INSERT INTO Fotos (Id, Naam, BestemmingId) VALUES
+    (1, 'eiffeltoren.jpg', 1),
+    (2, 'londonbridge.jpg', 2);
+    SET IDENTITY_INSERT Fotos OFF;
 
 -- Onkosten registreren
 DELETE FROM Onkosten WHERE Id IN (3, 4);
