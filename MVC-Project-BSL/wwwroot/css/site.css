@@ -210,4 +210,7 @@ footer {
 .nav-link:not(.active) {
     color: #D4592B;
 }
-
+.btn.w-100:hover {
+    transform: none; /* Verhindert de vergroting van de knop */
+    box-shadow: none; /* Verhindert eventuele schaduwen bij hover */
+}

@@ -54,6 +54,19 @@ namespace MVC_Project_BSL.Models
 
 		[NotMapped]
 		public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
+		[NotMapped]
+		public int IngeschrevenPersonen { get; set; }
+		[NotMapped]
+		public int AantalBeschikbarePlaatsen
+		{
+			get
+			{
+				// Het aantal beschikbare plaatsen is het verschil tussen AantalPlaatsen en IngeschrevenPersonen
+				return AantalPlaatsen - IngeschrevenPersonen;
+			}
+		}
+		[NotMapped]
+		public bool IsIngeschreven { get; set; }
 
 		/// <summary>
 		/// Om te checken dat de datum van de start eerder is dan de einddatum
