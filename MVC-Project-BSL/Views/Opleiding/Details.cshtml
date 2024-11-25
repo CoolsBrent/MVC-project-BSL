@@ -37,7 +37,10 @@
 		{
 			<!-- Toon de Uitschrijven knop als de gebruiker is ingeschreven -->
 			<form method="post" asp-action="Uitschrijven" asp-route-opleidingId="@Model.Id">
-				<button type="submit" class="btn btn-danger w-100">Uitschrijven</button>
+				<button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#uitschrijvenModal">
+					Uitschrijven
+				</button>
+
 			</form>
 		}
 
@@ -48,7 +51,10 @@
 			{
 				<!-- Toon de Uitschrijven knop als de gebruiker is ingeschreven -->
 				<form method="post" asp-action="Uitschrijven" asp-route-opleidingId="@Model.Id">
-					<button type="submit" class="btn btn-danger w-100">Uitschrijven</button>
+				<button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#uitschrijvenModal">
+					Uitschrijven
+				</button>
+
 				</form>
 			}
 			else
@@ -212,6 +218,28 @@
 		</div>
 	</div>
 </div>
+<!-- Modal voor Uitschrijven Bevestigen -->
+<div class="modal fade" id="uitschrijvenModal" tabindex="-1" aria-labelledby="uitschrijvenModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="uitschrijvenModalLabel">Weet je zeker dat je je wilt uitschrijven?</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				Je staat op het punt je uit te schrijven voor deze opleiding. Ben je zeker?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+				<!-- De bevestigingsknop voor uitschrijven, die de form submit aanroept -->
+				<form method="post" asp-action="Uitschrijven" asp-route-opleidingId="@Model.Id">
+					<button type="submit" class="btn btn-danger">Ja, uitschrijven</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
 
 
 

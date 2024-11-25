@@ -27,6 +27,10 @@ namespace MVC_Project_BSL.Controllers
         {
             var opleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(
                 query => query.Include(o => o.OpleidingPersonen));
+            foreach (var opleiding in opleidingen)
+            {
+                opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+            }
             return View(opleidingen);
         }
 
@@ -66,8 +70,11 @@ namespace MVC_Project_BSL.Controllers
 					ViewData["HeeftVereisteOpleidingAfgerond"] = heeftAfgerond;
 				}
 			}
+			
 
 			opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+
+			
 			// Haal alle actieve monitoren op
 			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
 				query => query.Include(m => m.Persoon).Where(m => m.Persoon.IsActief));
