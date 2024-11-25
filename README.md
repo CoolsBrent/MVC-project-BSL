@@ -10,7 +10,9 @@ Hieronder volgen enkele hoofdingen je moet aanvullen tegen de deadline.
 
 ### Teamleden
 
-_Voeg hieronder je teamleden aan._
+Brent
+Sybe
+Laurens
 
 ### Inloggegevens
 
