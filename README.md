@@ -16,24 +16,24 @@ Laurens
 
 ### Inloggegevens
 
-Beheerder: 
+## Beheerder: 
 Gebruikersnaam (Email): beheerder@example.com
 Wachtwoord: Password123!
 
 
-Hoofdmonitor:
+## Hoofdmonitor:
 Gebruikersnaam (Email): hoofdmonitor@example.com
 Wachtwoord: Password123!
 
-Monitor:
+## Monitor:
 Gebruikersnaam (Email): monitor@example.com
 Wachtwoord: Password123!
 
-Verantwoordelijke:
+## Verantwoordelijke:
 Gebruikersnaam (Email): verantwoordelijke@example.com
 Wachtwoord: Password123!
 
-Deelnemer:
+## Deelnemer:
 Gebruikersnaam (Email): deelnemer@example.com
 Wachtwoord: Password123!
 
