@@ -28,6 +28,7 @@ else
                 <th>Begindatum</th>
                 <th>Einddatum</th>
                 <th>Aantal Plaatsen</th>
+                <th>Aantal Beschikbare Plaatsen</th>
                 <th>Opleiding Vereist</th>
                 <th>Acties</th>
             </tr>
@@ -49,6 +50,7 @@ else
                     <td>@opleiding.Begindatum.ToShortDateString()</td>
                     <td>@opleiding.Einddatum.ToShortDateString()</td>
                     <td>@opleiding.AantalPlaatsen</td>
+                    <td>@opleiding.AantalBeschikbarePlaatsen</td>
                     <td>@opleiding.OpleidingVereist?.Naam</td>
                     <td width="15%">
                         <a asp-action="Details" asp-route-id="@opleiding.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Details">

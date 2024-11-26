@@ -10,12 +10,32 @@ Hieronder volgen enkele hoofdingen je moet aanvullen tegen de deadline.
 
 ### Teamleden
 
-_Voeg hieronder je teamleden aan._
+Brent
+Sybe
+Laurens
 
 ### Inloggegevens
 
-_Voeg hieronder de inloggegevens toe voor elke geïmplementeerde rol.
-Voorzie voldoende data voor elke rol zodat de applicatie grondig getest kan worden_
+#### Beheerder: 
+Gebruikersnaam (Email): beheerder@example.com
+Wachtwoord: Password123!
+
+
+#### Hoofdmonitor:
+Gebruikersnaam (Email): hoofdmonitor@example.com
+Wachtwoord: Password123!
+
+#### Monitor:
+Gebruikersnaam (Email): monitor@example.com
+Wachtwoord: Password123!
+
+#### Verantwoordelijke:
+Gebruikersnaam (Email): verantwoordelijke@example.com
+Wachtwoord: Password123!
+
+#### Deelnemer:
+Gebruikersnaam (Email): deelnemer@example.com
+Wachtwoord: Password123!
 
 ### Extra functionaliteit
 

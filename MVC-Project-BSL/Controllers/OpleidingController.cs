@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -25,6 +27,10 @@ namespace MVC_Project_BSL.Controllers
         {
             var opleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(
                 query => query.Include(o => o.OpleidingPersonen));
+            foreach (var opleiding in opleidingen)
+            {
+                opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+            }
             return View(opleidingen);
         }
 
@@ -42,7 +48,33 @@ namespace MVC_Project_BSL.Controllers
 			{
 				return NotFound();
 			}
+			var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(userId);
 
+			bool isIngeschreven = false;
+			
+				// Controleer of de gebruiker al ingeschreven is
+				isIngeschreven = opleiding.OpleidingPersonen
+					.Any(op => op.PersoonId == userId);
+
+			ViewData["IsIngeschreven"] = isIngeschreven;
+			// Check of de gebruiker de vereiste opleiding heeft afgerond
+			if (opleiding.OpleidingVereistId.HasValue)
+			{
+				
+				if (opleiding != null)
+				{
+					var heeftAfgerond = opleiding.OpleidingPersonen
+						.Any(op => op.OpleidingId == opleiding.Id && op.Opleiding.Einddatum < DateTime.Now);
+
+					ViewData["HeeftVereisteOpleidingAfgerond"] = heeftAfgerond;
+				}
+			}
+			
+
+			opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+
+			
 			// Haal alle actieve monitoren op
 			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
 				query => query.Include(m => m.Persoon).Where(m => m.Persoon.IsActief));
@@ -426,6 +458,98 @@ namespace MVC_Project_BSL.Controllers
             return await _unitOfWork.OpleidingRepository.AnyAsync(o => o.Id == id);
         }
 
-        #endregion
-    }
+		#endregion
+
+		#region Subscribe Actions
+
+		[HttpPost]
+		public async Task<IActionResult> Inschrijven(int opleidingId)
+		{
+			var opleiding = await _unitOfWork.OpleidingRepository.GetByIdAsync(opleidingId);
+			
+
+			if (opleiding == null)
+			{
+				return NotFound();
+			}
+
+			var user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+			if (user == 0)
+			{
+				return NotFound("Gebruiker niet gevonden.");
+			}
+			// Controleer of de opleiding een vereiste opleiding heeft
+			if (opleiding.OpleidingVereistId.HasValue)
+			{
+
+				if (opleiding != null)
+				{
+					var heeftAfgerond = opleiding.OpleidingPersonen
+						.Any(op => op.OpleidingId == opleiding.Id && op.Opleiding.Einddatum < DateTime.Now);
+
+					if (!heeftAfgerond)
+					{
+						// Als de gebruiker de vereiste opleiding niet heeft afgerond, toon een foutmelding
+						return BadRequest("Je moet eerst de vereiste opleiding hebben afgerond voordat je je kunt inschrijven voor deze opleiding.");
+					}
+				}
+			}
+
+		
+
+			opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+			// Voeg de gebruiker toe aan de opleiding
+			opleiding.OpleidingPersonen.Add(new OpleidingPersoon
+			{
+				OpleidingId = opleiding.Id,
+				PersoonId = user // Zorg ervoor dat je de juiste relatie hebt
+			});
+
+			_unitOfWork.SaveChanges();
+
+			return RedirectToAction(nameof(Details), new { id = opleiding.Id });
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Uitschrijven(int opleidingId)
+		{
+			// Haal de opleiding op, inclusief de OpleidingPersonen (ingeschreven gebruikers)
+			var opleiding = await _unitOfWork.OpleidingRepository
+				.GetByIdWithIncludesAsync(opleidingId, o => o.OpleidingPersonen);
+
+			if (opleiding == null)
+			{
+				return NotFound();
+			}
+			var user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+			if (user == 0)
+			{
+				return NotFound("Gebruiker niet gevonden.");
+			}
+
+			// Zoek de OpleidingPersoon die de gebruiker aan deze opleiding koppelt
+			var opleidingPersoon = opleiding.OpleidingPersonen
+				.FirstOrDefault(op => op.PersoonId == user);
+
+			if (opleidingPersoon == null)
+			{
+				return NotFound("Gebruiker is niet ingeschreven voor deze opleiding.");
+			}
+
+			// Verwijder de OpleidingPersoon
+			opleiding.OpleidingPersonen.Remove(opleidingPersoon);
+			opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+			// Sla de wijzigingen op
+			_unitOfWork.SaveChanges();
+
+			// Redirect naar de details van de opleiding
+			return RedirectToAction(nameof(Details), new { id = opleiding.Id });
+		}
+
+
+
+		#endregion
+	}
 }
