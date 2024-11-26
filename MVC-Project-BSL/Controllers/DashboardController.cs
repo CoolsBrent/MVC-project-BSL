@@ -58,19 +58,19 @@ namespace MVC_Project_BSL.Controllers
 			{
 				// Haal alle groepsreizen op voor beheerders, inclusief filters
 				var alleGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
+					query.Include(g => g.Deelnemers!)
 							.ThenInclude(d => d.Kind)
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
+							.ThenInclude(b => b!.Fotos)
 							.Where(g => !g.IsArchived) // Haal alleen niet-gearchiveerde groepsreizen op
 				);
 				var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
+					query.Include(g => g.Deelnemers!)
 							.ThenInclude(d => d.Kind)
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
+							.ThenInclude(b => b!.Fotos)
 							.Where(g => g.IsArchived) // Haal alleen gearchiveerde groepsreizen op
 				);
 				var alleOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
@@ -87,8 +87,8 @@ namespace MVC_Project_BSL.Controllers
 				//Filter op bestemming als deze is opgegeven
 				if (!string.IsNullOrEmpty(bestemming))
 				{
-					alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-					gearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+					alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming?.BestemmingsNaam == bestemming);
+					gearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen.Where(g => g.Bestemming?.BestemmingsNaam == bestemming);
 				}
 
 				alleGroepsreizen = alleGroepsreizen.OrderBy(g => g.Begindatum);
@@ -106,21 +106,21 @@ namespace MVC_Project_BSL.Controllers
 			{
 				// Haal alle ingeschreven groepsreizen op waarvoor de gebruiker als monitor is aangesteld
 				var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
+					query.Include(g => g.Deelnemers!)
 							.ThenInclude(d => d.Kind)
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
-							.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived) // Alleen groepsreizen waarvoor de monitor is aangesteld
+							.ThenInclude(b => b!.Fotos)
+							.Where(g => g.Monitoren!.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived) // Alleen groepsreizen waarvoor de monitor is aangesteld
 				);
 
 				// Haal toekomstige groepsreizen op waarvoor de gebruiker als monitor is aangesteld
 				var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-					query.Include(g => g.Deelnemers)
+					query.Include(g => g.Deelnemers!)
 							.ThenInclude(d => d.Kind)
 							.Include(g => g.Monitoren)
 							.Include(g => g.Bestemming)
-							.ThenInclude(b => b.Fotos)
+							.ThenInclude(b => b!.Fotos)
 							.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Alleen toekomstige reizen waarvoor de monitor is aangesteld
 				);
 				var toekomstigeOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
@@ -128,10 +128,10 @@ namespace MVC_Project_BSL.Controllers
 							.Where(o => o.Begindatum > DateTime.Now && !o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
 				var ingeschrevenOpleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync(query =>
 					query.Include(o => o.OpleidingPersonen)
-							.Where(o => o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id)));
+							.Where(o => o.OpleidingPersonen.Any(op => op.PersoonId == gebruiker.Id) && o.Einddatum > DateTime.Now));
 				if (filterType == "mijnReizen")
 				{
-					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
+					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren!.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
 				}
 				else if (filterType == "teOntdekkenReizen")
 				{
@@ -140,8 +140,8 @@ namespace MVC_Project_BSL.Controllers
 				// Filter op bestemming als deze is opgegeven
 				if (!string.IsNullOrEmpty(bestemming))
 				{
-					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
-					toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
+					geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming).ToList();
+					toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming).ToList();
 				}
 
 				// Sorteren op Begindatum
@@ -171,11 +171,11 @@ namespace MVC_Project_BSL.Controllers
 				{
 					// Geen kinderen gevonden, dus we halen de toekomstige groepsreizen op
 					var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-						query.Include(g => g.Deelnemers)
+						query.Include(g => g.Deelnemers!)
 								.ThenInclude(d => d.Kind)
 								.Include(g => g.Monitoren)
 								.Include(g => g.Bestemming)
-								.ThenInclude(b => b.Fotos)
+								.ThenInclude(b => b!.Fotos)
 								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived) // Haal alleen toekomstige reizen op
 					);
 					
@@ -186,7 +186,7 @@ namespace MVC_Project_BSL.Controllers
 					// Filter op bestemming als deze is opgegeven
 					if (!string.IsNullOrEmpty(bestemming))
 					{
-						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
 					}
 
 					// Sorteren op Begindatum
@@ -204,26 +204,26 @@ namespace MVC_Project_BSL.Controllers
 				{
 					// Haal de groepsreizen op waarin de kinderen zijn ingeschreven, inclusief filters
 					var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-						query.Include(g => g.Deelnemers)
+						query.Include(g => g.Deelnemers!)
 								.ThenInclude(d => d.Kind)
 								.Include(g => g.Monitoren)
 								.Include(g => g.Bestemming)
-								.ThenInclude(b => b.Fotos)
-								.Where(g => g.Deelnemers.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived))
+								.ThenInclude(b => b!.Fotos)
+								.Where(g => g.Deelnemers!.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived))
 					);
 
 					// Haal de toekomstige groepsreizen op, inclusief filters
 					var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-						query.Include(g => g.Deelnemers)
+						query.Include(g => g.Deelnemers!)
 								.ThenInclude(d => d.Kind)
 								.Include(g => g.Monitoren)
 								.Include(g => g.Bestemming)
-								.ThenInclude(b => b.Fotos)
+								.ThenInclude(b => b!.Fotos)
 								.Where(g => g.Begindatum > DateTime.Now && !g.IsArchived)
 					);
 					if (filterType == "mijnReizen")
 					{
-						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
+						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Monitoren!.Any(m => m.Monitor.PersoonId == gebruiker.Id) && !g.IsArchived);
 					}
 					else if (filterType == "teOntdekkenReizen")
 					{
@@ -232,8 +232,8 @@ namespace MVC_Project_BSL.Controllers
 					// Filter op bestemming als deze is opgegeven
 					if (!string.IsNullOrEmpty(bestemming))
 					{
-						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+						geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
+						toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
 
 					}
 
@@ -261,25 +261,25 @@ namespace MVC_Project_BSL.Controllers
 		private async Task<GroepsreisViewModel> LoadGroepsreizenForBeheerder(string bestemming)
         {
             var alleGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                query.Include(g => g.Deelnemers)
+                query.Include(g => g.Deelnemers!)
                      .ThenInclude(d => d.Kind)
                      .Include(g => g.Monitoren)
                      .Include(g => g.Bestemming)
-                     .ThenInclude(b => b.Fotos)
+                     .ThenInclude(b => b!.Fotos)
                      .Where(g => !g.IsArchived));
 
             var gearchriveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                query.Include(g => g.Deelnemers)
+                query.Include(g => g.Deelnemers!)
                      .ThenInclude(d => d.Kind)
                      .Include(g => g.Monitoren)
                      .Include(g => g.Bestemming)
-                     .ThenInclude(b => b.Fotos)
+                     .ThenInclude(b => b!.Fotos)
                      .Where(g => g.IsArchived));
 
             if (!string.IsNullOrEmpty(bestemming))
             {
-                alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-                gearchriveerdeGroepsreizen = gearchriveerdeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                alleGroepsreizen = alleGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
+                gearchriveerdeGroepsreizen = gearchriveerdeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
             }
 
             alleGroepsreizen = alleGroepsreizen.OrderBy(g => g.Begindatum);
@@ -296,25 +296,25 @@ namespace MVC_Project_BSL.Controllers
         private async Task<GroepsreisViewModel> LoadGroepsreizenForMonitor(int userId, string bestemming)
         {
             var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                query.Include(g => g.Deelnemers)
+                query.Include(g => g.Deelnemers!)
                      .ThenInclude(d => d.Kind)
                      .Include(g => g.Monitoren)
                      .Include(g => g.Bestemming)
-                     .ThenInclude(b => b.Fotos)
-                     .Where(g => g.Monitoren.Any(m => m.Monitor.PersoonId == userId) && !g.IsArchived));
+                     .ThenInclude(b => b!.Fotos)
+                     .Where(g => g.Monitoren!.Any(m => m.Monitor.PersoonId == userId) && !g.IsArchived));
 
             var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                query.Include(g => g.Deelnemers)
+                query.Include(g => g.Deelnemers!)
                      .ThenInclude(d => d.Kind)
                      .Include(g => g.Monitoren)
                      .Include(g => g.Bestemming)
-                     .ThenInclude(b => b.Fotos)
+                     .ThenInclude(b => b!.Fotos)
                      .Where(g => g.Begindatum > DateTime.Now && !g.IsArchived));
 
             if (!string.IsNullOrEmpty(bestemming))
             {
-                geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
-                toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming).ToList();
+                geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming).ToList();
+                toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming).ToList();
             }
 
             geboekteGroepsreizen = geboekteGroepsreizen.OrderBy(g => g.Begindatum).ToList();
@@ -338,16 +338,16 @@ namespace MVC_Project_BSL.Controllers
             if (!gebruikersKinderen.Any())
             {
                 var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                    query.Include(g => g.Deelnemers)
+                    query.Include(g => g.Deelnemers!)
                          .ThenInclude(d => d.Kind)
                          .Include(g => g.Monitoren)
                          .Include(g => g.Bestemming)
-                         .ThenInclude(b => b.Fotos)
+                         .ThenInclude(b => b!.Fotos)
                          .Where(g => g.Begindatum > DateTime.Now && !g.IsArchived));
 
                 if (!string.IsNullOrEmpty(bestemming))
                 {
-                    toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                    toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
                 }
 
                 toekomstigeGroepsreizen = toekomstigeGroepsreizen.OrderBy(g => g.Begindatum);
@@ -363,25 +363,25 @@ namespace MVC_Project_BSL.Controllers
             else
             {
                 var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                    query.Include(g => g.Deelnemers)
+                    query.Include(g => g.Deelnemers!)
                          .ThenInclude(d => d.Kind)
                          .Include(g => g.Monitoren)
                          .Include(g => g.Bestemming)
-                         .ThenInclude(b => b.Fotos)
-                         .Where(g => g.Deelnemers.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived)));
+                         .ThenInclude(b => b!.Fotos)
+                         .Where(g => g.Deelnemers!.Any(d => gebruikersKinderen.Select(k => k.Id).Contains(d.KindId) && !g.IsArchived)));
 
                 var toekomstigeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
-                    query.Include(g => g.Deelnemers)
+                    query.Include(g => g.Deelnemers!)
                          .ThenInclude(d => d.Kind)
                          .Include(g => g.Monitoren)
                          .Include(g => g.Bestemming)
-                         .ThenInclude(b => b.Fotos)
+                         .ThenInclude(b => b!.Fotos)
                          .Where(g => g.Begindatum > DateTime.Now && !g.IsArchived));
 
                 if (!string.IsNullOrEmpty(bestemming))
                 {
-                    geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
-                    toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming.BestemmingsNaam == bestemming);
+                    geboekteGroepsreizen = geboekteGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
+                    toekomstigeGroepsreizen = toekomstigeGroepsreizen.Where(g => g.Bestemming!.BestemmingsNaam == bestemming);
                 }
 
                 geboekteGroepsreizen = geboekteGroepsreizen.OrderBy(g => g.Begindatum);

@@ -6,7 +6,7 @@ namespace MVC_Project_BSL.Attributes
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class RequiredIfNoFotoAttribute : ValidationAttribute
     {
-        protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+        protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
         {
             var onkost = (Onkosten)validationContext.ObjectInstance;
 
@@ -20,7 +20,7 @@ namespace MVC_Project_BSL.Attributes
                 }
             }
 
-            return ValidationResult.Success;
+            return ValidationResult.Success!;
         }
     }
 }

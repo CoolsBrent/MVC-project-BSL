@@ -18,10 +18,10 @@ namespace MVC_Project_BSL.Models
 
         [Required(ErrorMessage = "Naam is verplicht.")]
         [StringLength(100, ErrorMessage = "Naam mag maximaal 100 tekens lang zijn.")]
-        public string Naam { get; set; }
+        public required string Naam { get; set; }
 
         [Required(ErrorMessage = "Beschrijving is verplicht.")]
-        public string Beschrijving { get; set; }
+        public required string Beschrijving { get; set; }
 
         [Required(ErrorMessage = "Begindatum is verplicht.")]
         [DataType(DataType.Date)]
@@ -67,20 +67,25 @@ namespace MVC_Project_BSL.Models
                 _comparisonProperty = comparisonProperty;
             }
 
-            protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+            protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
             {
-                var currentValue = (DateTime)value;
+				if (value == null)
+				{
+					// Indien nodig, een foutmelding retourneren als de waarde null is
+					return new ValidationResult("Een waarde is vereist.");
+				}
+				var currentValue = (DateTime)value;
 
                 var property = validationContext.ObjectType.GetProperty(_comparisonProperty);
                 if (property == null)
                     throw new ArgumentException("Property with this name not found");
 
-                var comparisonValue = (DateTime)property.GetValue(validationContext.ObjectInstance);
+                var comparisonValue = (DateTime)property.GetValue(validationContext.ObjectInstance)!;
 
                 if (currentValue < comparisonValue)
                     return new ValidationResult(ErrorMessage);
 
-                return ValidationResult.Success;
+                return ValidationResult.Success!;
             }
         }
     }

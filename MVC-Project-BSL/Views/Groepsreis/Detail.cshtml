@@ -75,7 +75,8 @@
 	</dl>
 </div>
 @{
-	var gebruikerId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value);
+	var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+    var gebruikerId = userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
 	var gebruikerIsIngeschreven = Model.Monitoren.Any(d => d.Monitor.PersoonId == gebruikerId);
 }
 <!-- Knoppen om de modals te openen -->

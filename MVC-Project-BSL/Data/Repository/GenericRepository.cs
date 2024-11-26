@@ -125,12 +125,13 @@ namespace MVC_Project_BSL.Data.Repository
             return await _dbSet.AnyAsync(predicate);
         }
 
-        // Haalt de eerste entiteit op die voldoet aan een opgegeven voorwaarde
-        public async Task<TEntity> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
-        {
-            return await _dbSet.FirstOrDefaultAsync(predicate);
-        }
+		// Haalt de eerste entiteit op die voldoet aan een opgegeven voorwaarde
+		public async Task<TEntity?> GetFirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+		{
+			return await _dbSet.FirstOrDefaultAsync(predicate);
+		}
 
-        #endregion
-    }
+
+		#endregion
+	}
 }

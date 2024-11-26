@@ -33,7 +33,7 @@ namespace MVC_Project_BSL.Controllers
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
                 query => query.Include(g => g.Bestemming)
                               .ThenInclude(b => b.Fotos)
-                              .Where(g => !g.IsArchived)); // Filter de niet-gearchiveerde reizen
+                              .Where(g => !g.IsArchived && g.Einddatum > DateTime.Now)); // Filter de niet-gearchiveerde reizen
 
             // Haal unieke leeftijdscategorieën op uit de database
             var leeftijdscategorieën = groepsreizen

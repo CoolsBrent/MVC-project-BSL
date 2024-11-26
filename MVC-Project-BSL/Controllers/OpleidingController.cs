@@ -397,8 +397,9 @@ namespace MVC_Project_BSL.Controllers
             }
             catch (DbUpdateException ex)
             {
-                // Log de fout indien nodig en toon een algemene foutmelding
-                ModelState.AddModelError("", "Kan de opleiding niet verwijderen. Probeer het opnieuw of neem contact op met de beheerder.");
+				// Log de fout indien nodig en toon een algemene foutmelding
+				Debug.Print($"Fout bij het verwijderen van opleiding: {ex.Message}");
+				ModelState.AddModelError("", "Kan de opleiding niet verwijderen. Probeer het opnieuw of neem contact op met de beheerder.");
                 return View("Delete", opleiding);
             }
 
