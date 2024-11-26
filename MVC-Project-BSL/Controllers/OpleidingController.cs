@@ -48,7 +48,7 @@ namespace MVC_Project_BSL.Controllers
 			{
 				return NotFound();
 			}
-			var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 			var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(userId);
 
 			bool isIngeschreven = false;
@@ -72,7 +72,7 @@ namespace MVC_Project_BSL.Controllers
 			}
 			
 
-			opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+			opleiding!.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
 
 			
 			// Haal alle actieve monitoren op
@@ -473,7 +473,7 @@ namespace MVC_Project_BSL.Controllers
 				return NotFound();
 			}
 
-			var user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			var user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
 			if (user == 0)
 			{
@@ -498,7 +498,7 @@ namespace MVC_Project_BSL.Controllers
 
 		
 
-			opleiding.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
+			opleiding!.IngeschrevenPersonen = opleiding.OpleidingPersonen.Count;
 			// Voeg de gebruiker toe aan de opleiding
 			opleiding.OpleidingPersonen.Add(new OpleidingPersoon
 			{
@@ -522,7 +522,7 @@ namespace MVC_Project_BSL.Controllers
 			{
 				return NotFound();
 			}
-			var user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+			var user = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
 			if (user == 0)
 			{

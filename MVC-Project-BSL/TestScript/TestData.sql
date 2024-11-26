@@ -76,9 +76,7 @@ SET IDENTITY_INSERT Onkosten OFF;
 SET IDENTITY_INSERT Monitoren ON;
 INSERT INTO Monitoren (Id, PersoonId, IsHoofdMonitor) VALUES
 (1, 2, 0), -- Monitor
-(2, 3, 1), -- Hoofdmonitor
-(3, 4, 0),
-(4, 5, 0);
+(2, 3, 1); -- Hoofdmonitor
 SET IDENTITY_INSERT Monitoren OFF;
 
 -- Monitoren koppelen aan groepsreizen
@@ -86,8 +84,8 @@ DELETE FROM GroepsreisMonitor WHERE GroepsreisId IN (1, 2, 3, 4);
 INSERT INTO GroepsreisMonitor (GroepsreisId, MonitorId) VALUES
 (1, 1), -- Monitor bij Parijs
 (2, 2), -- Hoofdmonitor bij Londen
-(3, 3), -- Monitor bij Rome
-(4, 4); -- Monitor bij Barcelona
+(3, 2), -- Monitor bij Rome
+(4, 1); -- Monitor bij Barcelona
 
 -- Deelnemers toevoegen
 DELETE FROM Deelnemers WHERE Id IN (1, 2, 3, 4);
@@ -107,7 +105,7 @@ INSERT INTO Opleidingen (Id, Naam, Beschrijving, BeginDatum, EindDatum, AantalPl
 (2, 'Reisleiding', 'Training voor reisleiders', '2024-02-01', '2024-02-10', 5, 1),
 (3, 'Groepsmanagement', 'Cursus voor groepsleiders', '2024-03-01', '2024-03-10', 8, 1),
 (4, 'Avanced EHBO', 'Uitgebreide eerste hulp technieken', '2025-01-01', '2025-01-15', 10, 1),
-(5, 'Culturele gids', 'Cursus over culturele gidsvaardigheden', '2025-02-01', '2025-02-10', 6, NULL),
+(5, 'Culturele gids', 'Cursus over culturele gidsvaardigheden', '2025-02-01', '2025-02-10', 1, NULL),
 (6, 'Eventplanning', 'Voorbereiding en organisatie van evenementen', '2025-03-01', '2025-03-10', 8, 2);
 SET IDENTITY_INSERT Opleidingen OFF;
 
