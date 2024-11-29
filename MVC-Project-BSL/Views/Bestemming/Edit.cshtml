@@ -1,6 +1,6 @@
 ﻿@model MVC_Project_BSL.ViewModels.BestemmingViewModel
 
-<h1>Bestemming Bewerken</h1>
+<h1>Bestemming bewerken</h1>
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     @Html.AntiForgeryToken()
@@ -12,7 +12,7 @@
         <span asp-validation-for="Code" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="BestemmingsNaam"></label>
+        <label asp-for="BestemmingsNaam">Naam</label>
         <input asp-for="BestemmingsNaam" class="form-control" />
         <span asp-validation-for="BestemmingsNaam" class="text-danger"></span>
     </div>
@@ -22,18 +22,18 @@
         <span asp-validation-for="Beschrijving" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="MinLeeftijd"></label>
+        <label asp-for="MinLeeftijd">Minimum leeftijd</label>
         <input asp-for="MinLeeftijd" class="form-control" />
         <span asp-validation-for="MinLeeftijd" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="MaxLeeftijd"></label>
+        <label asp-for="MaxLeeftijd">Maximum leeftijd</label>
         <input asp-for="MaxLeeftijd" class="form-control" />
         <span asp-validation-for="MaxLeeftijd" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label>Bestaande Foto's</label>
+        <label>Bestaande foto's</label>
         @if (Model.BestaandeFotos != null && Model.BestaandeFotos.Any())
         {
             <div class="row">
@@ -57,7 +57,7 @@
 
     <!-- Nieuwe foto's toevoegen -->
     <div class="form-group">
-        <label asp-for="FotoBestanden">Nieuwe Foto's Toevoegen</label>
+        <label asp-for="FotoBestanden">Nieuwe foto's toevoegen</label>
         <input asp-for="FotoBestanden" type="file" class="form-control" multiple data-val="false"/>
         <span asp-validation-for="FotoBestanden" class="text-danger"></span>
     </div>

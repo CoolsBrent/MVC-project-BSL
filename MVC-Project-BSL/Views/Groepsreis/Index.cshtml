@@ -19,7 +19,7 @@
 {
     <div class="alert alert-warning">
         Er zijn momenteel geen groepsreizen beschikbaar. <br />
-        <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe Groepsreis">
+        <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe groepsreis">
             <i class="bi bi-plus-circle h4 text-white"></i>
         </a>
     </div>
@@ -27,7 +27,7 @@
 else
 {
     <!-- Actieve Groepsreizen -->
-    <h2>Actieve Groepsreizen</h2>
+    <h2>Actieve groepsreizen</h2>
     @if (!Model.ActieveGroepsreizen.Any())
     {
         <p>Er zijn geen actieve groepsreizen.</p>
@@ -91,7 +91,7 @@ else
     }
 
     <!-- Gearchiveerde Groepsreizen -->
-    <h2>Gearchiveerde Groepsreizen</h2>
+    <h2>Gearchiveerde groepsreizen</h2>
     @if (!Model.GearchiveerdeGroepsreizen.Any())
     {
         <p>Er zijn geen gearchiveerde groepsreizen.</p>

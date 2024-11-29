@@ -70,7 +70,7 @@
 		<dt class="col-sm-2">Leeftijdscategorie</dt>
 		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
-		<dt class="col-sm-2">Aantal Deelnemers</dt>
+		<dt class="col-sm-2">Aantal deelnemers</dt>
 		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
 	</dl>
 </div>
@@ -86,14 +86,14 @@
 		<div class="col-md-6">
 			<div>
 				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenMonitorenModal">
-					Bekijk Ingeschreven Monitoren
+					Bekijk Ingeschreven monitoren
 				</button>
 			</div>
 			@if (User.IsInRole("Beheerder") || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven))
 			{
 				<div>
 					<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenDeelnemersModal">
-						Bekijk Ingeschreven Deelnemers
+						Bekijk Ingeschreven deelnemers
 					</button>
 				</div>
 			}
@@ -105,12 +105,12 @@
 		<div class="col-md-6">
 			<div>
 			<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareMonitorenModal">
-				Bekijk Beschikbare Monitoren
+				Bekijk beschikbare monitoren
 			</button>
 			</div>
 			<div>
 			<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#beschikbareDeelnemersModal">
-				Bekijk Beschikbare Deelnemers
+				Bekijk beschikbare deelnemers
 			</button>
 			</div>
 		</div>
@@ -267,7 +267,7 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="ingeschrevenDeelnemersModalLabel">Ingeschreven Deelnemers</h5>
+				<h5 class="modal-title" id="ingeschrevenDeelnemersModalLabel">Ingeschreven deelnemers</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
