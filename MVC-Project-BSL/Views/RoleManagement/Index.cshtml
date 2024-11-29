@@ -11,7 +11,7 @@
 </div>
 
 <div class="row">
-	<div class="col-md-9">
+	<div class="col-md-12">
 		<h3>Gebruikers</h3>
 		<table class="table">
 			<thead>
@@ -72,23 +72,24 @@
 					</tr>
 				}
 			</tbody>
+			<!-- Rol Filter -->
+			<div class="col-md-3 mb-3">
+				<label for="roleFilterSelect">Filter op Rol:</label>
+				<select id="roleFilterSelect" class="form-control">
+					<option value="">Alle rollen</option>
+					@foreach (var role in Model.Roles)
+					{
+						<option value="@role.Name">@role.Name</option>
+					}
+				</select>
+			</div>
 		</table>
 
 		<!-- Geen Gebruikers Bericht -->
 		<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen gebruikers gevonden voor de geselecteerde filters.</p>
 	</div>
 
-	<!-- Rol Filter -->
-	<div class="col-md-3 mb-3">
-		<label for="roleFilterSelect">Filter op Rol:</label>
-		<select id="roleFilterSelect" class="form-control">
-			<option value="">Alle rollen</option>
-			@foreach (var role in Model.Roles)
-			{
-				<option value="@role.Name">@role.Name</option>
-			}
-		</select>
-	</div>
+	
 
 </div>
 <!-- Modal voor het toewijzen van rollen -->
