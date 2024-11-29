@@ -671,6 +671,43 @@ namespace MVC_Project_BSL.Controllers
             return Json(onkostenTitels);
         }
 
+        [HttpGet]
+        public async Task<JsonResult> GetBestemmingen(string term)
+        {
+            // Log de zoekterm
+            Debug.WriteLine($"GetBestemmingen aangeroepen met term: {term}");
+
+            // Simuleer een lijst van bestemmingen als voorbeeld
+            var bestemmingen = await _unitOfWork.BestemmingRepository.GetAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                // Filter bestemmingen
+                bestemmingen = bestemmingen
+                    .Where(b => b.BestemmingsNaam != null && b.BestemmingsNaam.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .Take(10)
+                    .ToList();
+            }
+            else
+            {
+                // Geef maximaal 10 resultaten als er geen zoekterm is
+                bestemmingen = bestemmingen.Take(10).ToList();
+            }
+
+            // Controleer of bestemmingen leeg zijn
+            if (!bestemmingen.Any())
+            {
+                Debug.WriteLine("Geen resultaten gevonden.");
+            }
+            else
+            {
+                Debug.WriteLine($"Resultaten gevonden: {string.Join(", ", bestemmingen.Select(b => b.BestemmingsNaam))}");
+            }
+
+            // Stuur de resultaten terug
+            return Json(bestemmingen.Select(b => b.BestemmingsNaam).ToList());
+        }
+
     }
     #endregion
 
