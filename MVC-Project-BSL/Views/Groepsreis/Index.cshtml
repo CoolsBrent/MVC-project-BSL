@@ -79,7 +79,7 @@ else
                             <!-- Archiveren knop -->
                             <form asp-action="Archive" asp-route-id="@groepsreis.Id" method="post" style="display:inline;">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-warning me-1" data-bs-toggle="tooltip" title="Archiveren">
+                                <button type="button" style="width: 45.6px; height:39.2px" class="btn btn-warning me-1 archive-button" data-bs-toggle="modal" data-bs-target="#archiveModal" data-id="@groepsreis.Id" data-name="@groepsreis.Bestemming?.BestemmingsNaam">
                                     <i class="bi bi-archive h5"></i>
                                 </button>
                             </form>
@@ -153,6 +153,28 @@ else
             </tbody>
         </table>
     }
+    <!-- Modal voor bevestiging -->
+    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="archiveModalLabel">Groepsreis archiveren</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                </div>
+                <div class="modal-body">
+                    Ben je zeker dat je de groepsreis met bestemming"<span id="modalGroupName"></span>" wilt archiveren?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <form id="archiveForm" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-warning">Ja, archiveren</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
 
 @section Scripts {
@@ -230,6 +252,25 @@ else
                     filterTabel(zoekterm); // Roep de filterfunctie aan
                 });
             });
+
+            //Modal archiveren
+        document.addEventListener('DOMContentLoaded', function () {
+            const archiveModal = document.getElementById('archiveModal');
+            const archiveForm = document.getElementById('archiveForm');
+            const modalGroupName = document.getElementById('modalGroupName');
+
+            archiveModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const groupId = button.getAttribute('data-id');
+                const groupName = button.getAttribute('data-name');
+
+                // Update modal content
+                modalGroupName.textContent = groupName || "onbekend";
+
+                // Update form action URL
+                archiveForm.action = `/Groepsreis/Archive/${groupId}`;
+            });
+        });
 
 </script>
 }
