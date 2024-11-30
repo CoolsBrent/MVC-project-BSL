@@ -71,10 +71,7 @@
 		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
 		<dt class="col-sm-2">Aantal deelnemers</dt>
-		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
-
-		<dt class="col-sm-2">Maximum aantal deelnemers</dt>
-		<dd class="col-sm-10">@Model.MaxAantalDeelnemers</dd>
+		<dd class="col-sm-10">@Model.Deelnemers.Count() / @Model.MaxAantalDeelnemers</dd>
 	</dl>
 </div>
 @{
@@ -396,6 +393,61 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+			</div>
+		</div>
+	</div>
+</div>
+	<!-- Knop voor het openen van de modal -->
+	<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareKinderenModal">
+		Schrijf een kind in
+	</button>
+
+<!-- Modal voor Beschikbare Kinderen -->
+<div class="modal fade" id="beschikbareKinderenModal" tabindex="-1" aria-labelledby="beschikbareKinderenModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="beschikbareKinderenModalLabel">Beschikbare Kinderen</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				@if (Model.BeschikbareDeelnemers != null && Model.BeschikbareDeelnemers.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Naam</th>
+								<th>Leeftijd</th>
+								<th>Actie</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var kind in Model.BeschikbareDeelnemers)
+							{
+								var leeftijd = DateTime.Now.Year - kind.Geboortedatum.Year;
+								if (DateTime.Now < kind.Geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+								<tr>
+									<td>@kind.Voornaam @kind.Naam</td>
+									<td>@leeftijd jaar</td>
+									<td>
+										<form asp-action="VoegDeelnemerToe" method="post">
+											<input type="hidden" name="groepsreisId" value="@Model.Id" />
+											<input type="hidden" name="kindId" value="@kind.Id" />
+											<button type="submit" class="btn btn-primary btn-sm">Schrijf In</button>
+										</form>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+				else
+				{
+					<div class="alert alert-warning">
+						Geen beschikbare kinderen om in te schrijven.
+					</div>
+				}
 			</div>
 		</div>
 	</div>

@@ -67,8 +67,13 @@ namespace MVC_Project_BSL.Controllers
             var uniekeMonitoren = monitoren.Where(m => !ingeschrevenMonitoren.Contains(m.PersoonId)).ToList();
             var ingeschrevenDeelnemers = groepsreis.Deelnemers.Select(m => m.KindId).ToList();
             var uniekeDeelnemers = deelnemers.Where(m => !ingeschrevenDeelnemers.Contains(m.Id)).ToList();
+			var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+			var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(userId);
 
-            groepsreis.BeschikbareMonitoren = uniekeMonitoren;
+			groepsreis.BeschikbareDeelnemers = user?.Kinderen?.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id)).ToList() ?? new List<Kind>();
+
+
+			groepsreis.BeschikbareMonitoren = uniekeMonitoren;
             groepsreis.BeschikbareDeelnemers = uniekeDeelnemers;
 
             return View(groepsreis);
@@ -361,43 +366,74 @@ namespace MVC_Project_BSL.Controllers
 
 		#region Monitor and Participant Management
 
+		[HttpGet]
+		public async Task<IActionResult> BeschikbareKinderen(int groepsreisId)
+		{
+			// Haal het ID van de ingelogde gebruiker op
+			var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+			if (userIdClaim == null) return Unauthorized();
+
+			var gebruikerId = int.Parse(userIdClaim.Value);
+
+			// Haal de groepsreis op
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
+			if (groepsreis == null) return NotFound();
+
+			// Haal de kinderen van de ingelogde gebruiker op
+			var kinderen = await _unitOfWork.KindRepository.GetQueryable()
+				.Include(k => k.Persoon)
+				.Where(k => k.PersoonId == gebruikerId)
+				.ToListAsync();
+
+			// Filter kinderen die voldoen aan leeftijdscriteria en nog niet zijn ingeschreven
+			var beschikbareKinderen = kinderen
+				.Where(k =>
+					!groepsreis.Deelnemers.Any(d => d.KindId == k.Id) && // Nog niet ingeschreven
+					k.Geboortedatum <= DateTime.Now.AddYears(-groepsreis.Bestemming.MinLeeftijd) && // Oud genoeg
+					k.Geboortedatum >= DateTime.Now.AddYears(-groepsreis.Bestemming.MaxLeeftijd)) // Niet te oud
+				.ToList();
+
+			return PartialView("_BeschikbareKinderen", beschikbareKinderen);
+		}
+
+
 		[HttpPost]
 		public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
 		{
-			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
-			var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
+			var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+			if (userIdClaim == null) return Unauthorized();
 
-			if (groepsreis == null || kind == null)
-			{
-				return NotFound();
-			}
+			var gebruikerId = int.Parse(userIdClaim.Value);
 
-			// Initialiseer Deelnemers en Wachtlijst als ze null zijn
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable()
+				.Include(g => g.Deelnemers)
+				.Include(g => g.Wachtlijst)
+				.FirstOrDefaultAsync(g => g.Id == groepsreisId);
+
+			if (groepsreis == null) return NotFound();
+
+			var kind = await _unitOfWork.KindRepository.GetQueryable()
+				.Include(k => k.Persoon)
+				.FirstOrDefaultAsync(k => k.Id == kindId && k.PersoonId == gebruikerId);
+
+			if (kind == null) return Unauthorized();
+
 			groepsreis.Deelnemers ??= new List<Deelnemer>();
 			groepsreis.Wachtlijst ??= new List<Deelnemer>();
 
 			if (groepsreis.Deelnemers.Count >= groepsreis.MaxAantalDeelnemers)
 			{
-				// Voeg de deelnemer toe aan de wachtlijst
-				groepsreis.Wachtlijst.Add(new Deelnemer
-				{
-					KindId = kind.Id,
-					GroepsreisDetailId = groepsreis.Id // Stel GroepsreisDetailId correct in
-				});
+				groepsreis.Wachtlijst.Add(new Deelnemer { KindId = kind.Id, GroepsreisDetailId = groepsreis.Id });
 			}
 			else
 			{
-				// Voeg de deelnemer toe aan de reis
-				groepsreis.Deelnemers.Add(new Deelnemer
-				{
-					KindId = kind.Id,
-					GroepsreisDetailId = groepsreis.Id // Stel GroepsreisDetailId correct in
-				});
+				groepsreis.Deelnemers.Add(new Deelnemer { KindId = kind.Id, GroepsreisDetailId = groepsreis.Id });
 			}
 
 			_unitOfWork.SaveChanges();
 			return RedirectToAction("Detail", new { id = groepsreisId });
 		}
+
 
 
 		[HttpPost]
