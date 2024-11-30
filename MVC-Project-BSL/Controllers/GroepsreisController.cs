@@ -62,7 +62,15 @@ namespace MVC_Project_BSL.Controllers
 
 			// Haal de ID van de ingelogde gebruiker
 			var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
-			var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(userId);
+			var user = await _unitOfWork.CustomUserRepository.GetQueryable()
+				.Include(u => u.Kinderen)
+				.FirstOrDefaultAsync(u => u.Id == userId);
+
+			if (user == null)
+			{
+				Debug.WriteLine($"Gebruiker met ID {userId} niet gevonden.");
+				return Unauthorized();
+			}
 
 			// Check of de gebruiker een beheerder is
 			var isAdmin = User.IsInRole("Beheerder");
@@ -78,45 +86,32 @@ namespace MVC_Project_BSL.Controllers
 					.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id) &&
 								IsLeeftijdToegestaan(k.Geboortedatum, groepsreis.Bestemming.MinLeeftijd, groepsreis.Bestemming.MaxLeeftijd))
 					.ToList();
+
+				Debug.WriteLine($"Admin heeft {groepsreis.BeschikbareDeelnemers.Count} kinderen gevonden.");
 			}
 			else
 			{
-				// Debugging logica: Controleer of de user kinderen heeft
-				if (user?.Kinderen == null || !user.Kinderen.Any())
-				{
-					Console.WriteLine($"Gebruiker met ID {userId} heeft geen kinderen gekoppeld.");
-				}
-
 				// Voor een gewone gebruiker, toon alleen hun eigen kinderen die beschikbaar zijn
-				groepsreis.BeschikbareDeelnemers = user?.Kinderen?
-					.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id) &&
-								IsLeeftijdToegestaan(k.Geboortedatum, groepsreis.Bestemming.MinLeeftijd, groepsreis.Bestemming.MaxLeeftijd))
-					.ToList() ?? new List<Kind>();
-			}
-
-			// Debugging logica: Controleer of er kinderen beschikbaar zijn
-			if (!groepsreis.BeschikbareDeelnemers.Any())
-			{
-				Console.WriteLine($"Geen beschikbare kinderen voor groepsreis ID {groepsreis.Id}. Controleer de filters.");
-				Console.WriteLine($"Minimum leeftijd: {groepsreis.Bestemming.MinLeeftijd}, Maximum leeftijd: {groepsreis.Bestemming.MaxLeeftijd}");
-				if (isAdmin)
+				if (user.Kinderen == null || !user.Kinderen.Any())
 				{
-					Console.WriteLine("Alle kinderen:");
-					foreach (var kind in await _unitOfWork.KindRepository.GetAllAsync(query => query.Include(k => k.Persoon)))
-					{
-						var leeftijd = CalculateLeeftijd(kind.Geboortedatum);
-						Console.WriteLine($"Kind: {kind.Voornaam} {kind.Naam}, Leeftijd: {leeftijd}");
-					}
+					Debug.WriteLine($"Gebruiker met ID {userId} heeft geen kinderen gekoppeld.");
 				}
 				else
 				{
-					Console.WriteLine($"Kinderen van gebruiker met ID {userId}:");
-					foreach (var kind in user?.Kinderen ?? new List<Kind>())
+					Debug.WriteLine($"Kinderen van gebruiker {userId}:");
+					foreach (var kind in user.Kinderen)
 					{
 						var leeftijd = CalculateLeeftijd(kind.Geboortedatum);
-						Console.WriteLine($"Kind: {kind.Voornaam} {kind.Naam}, Leeftijd: {leeftijd}");
+						Debug.WriteLine($"Kind: {kind.Voornaam} {kind.Naam}, Leeftijd: {leeftijd}");
 					}
 				}
+
+				groepsreis.BeschikbareDeelnemers = user.Kinderen
+					.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id) &&
+								IsLeeftijdToegestaan(k.Geboortedatum, groepsreis.Bestemming.MinLeeftijd, groepsreis.Bestemming.MaxLeeftijd))
+					.ToList();
+
+				Debug.WriteLine($"Beschikbare kinderen voor gebruiker {userId}: {groepsreis.BeschikbareDeelnemers.Count}");
 			}
 
 			// Beschikbare monitoren filteren
