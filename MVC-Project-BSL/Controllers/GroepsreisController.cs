@@ -218,6 +218,7 @@ namespace MVC_Project_BSL.Controllers
                 bestaandeGroepsreis.Einddatum = groepsreis.Einddatum;
                 bestaandeGroepsreis.Prijs = groepsreis.Prijs;
                 bestaandeGroepsreis.BestemmingId = groepsreis.BestemmingId;
+                bestaandeGroepsreis.MaxAantalDeelnemers = groepsreis.MaxAantalDeelnemers;
 
                 Debug.WriteLine("Basisgegevens bijgewerkt.");
 
@@ -366,40 +367,74 @@ namespace MVC_Project_BSL.Controllers
 			var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
 			var kind = await _unitOfWork.KindRepository.GetByIdAsync(kindId);
 
-			// Controleer of zowel de groepsreis als het kind bestaan
 			if (groepsreis == null || kind == null)
 			{
 				return NotFound();
 			}
 
-			// Zorg ervoor dat Deelnemers niet null is
-			if (groepsreis.Deelnemers == null)
+			// Initialiseer Deelnemers en Wachtlijst als ze null zijn
+			groepsreis.Deelnemers ??= new List<Deelnemer>();
+			groepsreis.Wachtlijst ??= new List<Deelnemer>();
+
+			if (groepsreis.Deelnemers.Count >= groepsreis.MaxAantalDeelnemers)
 			{
-				groepsreis.Deelnemers = new List<Deelnemer>();
+				// Voeg de deelnemer toe aan de wachtlijst
+				groepsreis.Wachtlijst.Add(new Deelnemer
+				{
+					KindId = kind.Id,
+					GroepsreisDetailId = groepsreis.Id // Stel GroepsreisDetailId correct in
+				});
+			}
+			else
+			{
+				// Voeg de deelnemer toe aan de reis
+				groepsreis.Deelnemers.Add(new Deelnemer
+				{
+					KindId = kind.Id,
+					GroepsreisDetailId = groepsreis.Id // Stel GroepsreisDetailId correct in
+				});
 			}
 
-			// Maak een nieuwe deelnemer aan en koppel deze aan het kind
-			var deelnemer = new Deelnemer
-			{
-				KindId = kind.Id,
-				GroepsreisDetailId = groepsreis.Id, // Zorg ervoor dat je de juiste property gebruikt
-				Opmerkingen = "",
-				Review = "",
-				ReviewScore = 0,
-			};
-
-			// Voeg de deelnemer toe aan de groepsreis
-			groepsreis.Deelnemers.Add(deelnemer);
-
-
-			// Sla de wijzigingen op
-			_unitOfWork.SaveChanges(); // Zorg ervoor dat je de async versie gebruikt
-
-			// Redirect naar de detailpagina van de groepsreis
+			_unitOfWork.SaveChanges();
 			return RedirectToAction("Detail", new { id = groepsreisId });
 		}
 
+
 		[HttpPost]
+        public async Task<IActionResult> MaakNieuweGroep(int groepsreisId)
+        {
+            var groepsreis = await _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
+            if (groepsreis == null || !groepsreis.Wachtlijst.Any())
+            {
+                return NotFound();
+            }
+
+            var nieuweGroepsreis = new Groepsreis
+            {
+                Begindatum = groepsreis.Begindatum,
+                Einddatum = groepsreis.Einddatum,
+                Prijs = groepsreis.Prijs,
+                BestemmingId = groepsreis.BestemmingId,
+                MaxAantalDeelnemers = groepsreis.MaxAantalDeelnemers
+            };
+
+            // Verplaats wachtlijstdeelnemers naar de nieuwe groep
+            while (groepsreis.Wachtlijst.Any() && nieuweGroepsreis.Deelnemers.Count < nieuweGroepsreis.MaxAantalDeelnemers)
+            {
+                var deelnemer = groepsreis.Wachtlijst.First();
+                groepsreis.Wachtlijst.Remove(deelnemer);
+                nieuweGroepsreis.Deelnemers.Add(deelnemer);
+            }
+
+            await _unitOfWork.GroepsreisRepository.AddAsync(nieuweGroepsreis);
+            _unitOfWork.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+
+
+        [HttpPost]
 		public async Task<IActionResult> DeleteDeelnemer(int groepsreisId, int kindId)
 		{
 			Debug.WriteLine($"Verzoek ontvangen om kind met ID {kindId} te verwijderen uit groepsreis met ID {groepsreisId}.");
