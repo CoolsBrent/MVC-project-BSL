@@ -125,10 +125,10 @@ namespace MVC_Project_BSL.Controllers
 			return View(groepsreis);
 		}
 
-		// Helper-methode om te controleren of de leeftijd van een kind binnen de toegestane leeftijdscategorie valt
 		private bool IsLeeftijdToegestaan(DateTime geboortedatum, int minLeeftijd, int maxLeeftijd)
 		{
 			var leeftijd = CalculateLeeftijd(geboortedatum);
+			Debug.WriteLine($"Leeftijd berekend: {leeftijd}, Toegestaan: {minLeeftijd} - {maxLeeftijd}");
 			return leeftijd >= minLeeftijd && leeftijd <= maxLeeftijd;
 		}
 
