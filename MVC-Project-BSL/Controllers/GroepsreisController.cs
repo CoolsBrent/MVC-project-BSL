@@ -45,41 +45,108 @@ namespace MVC_Project_BSL.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Detail(int id)
-        {
-            var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
-                query => query.Include(m => m.Persoon).Where(m => m.Persoon.IsActief));
-            var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
-                query => query.Include(m => m.Persoon));
-            var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable()
-                .Include(g => g.Monitoren).ThenInclude(m => m.Monitor.Persoon)
-                .Include(g => g.Bestemming).ThenInclude(b => b.Fotos)
-                .Include(g => g.Deelnemers)
-                .Include(g => g.Programmas).ThenInclude(p => p.Activiteit)
-                .FirstOrDefaultAsync(g => g.Id == id);
+		public async Task<IActionResult> Detail(int id)
+		{
+			// Haal de groepsreis op met alle benodigde gerelateerde gegevens
+			var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable()
+				.Include(g => g.Monitoren).ThenInclude(m => m.Monitor.Persoon)
+				.Include(g => g.Bestemming).ThenInclude(b => b.Fotos)
+				.Include(g => g.Deelnemers).ThenInclude(d => d.Kind.Persoon)
+				.Include(g => g.Programmas).ThenInclude(p => p.Activiteit)
+				.FirstOrDefaultAsync(g => g.Id == id);
 
-            if (groepsreis == null)
-            {
-                return NotFound();
-            }
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
 
-            var ingeschrevenMonitoren = groepsreis.Monitoren.Select(m => m.Monitor.PersoonId).ToList();
-            var uniekeMonitoren = monitoren.Where(m => !ingeschrevenMonitoren.Contains(m.PersoonId)).ToList();
-            var ingeschrevenDeelnemers = groepsreis.Deelnemers.Select(m => m.KindId).ToList();
-            var uniekeDeelnemers = deelnemers.Where(m => !ingeschrevenDeelnemers.Contains(m.Id)).ToList();
+			// Haal de ID van de ingelogde gebruiker
 			var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
 			var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(userId);
 
-			groepsreis.BeschikbareDeelnemers = user?.Kinderen?.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id)).ToList() ?? new List<Kind>();
+			// Check of de gebruiker een beheerder is
+			var isAdmin = User.IsInRole("Beheerder");
+
+			// Beschikbare deelnemers filteren
+			if (isAdmin)
+			{
+				// Als admin, toon alle kinderen die niet zijn ingeschreven en binnen de leeftijdscategorie vallen
+				var alleKinderen = await _unitOfWork.KindRepository.GetAllAsync(
+					query => query.Include(k => k.Persoon));
+
+				groepsreis.BeschikbareDeelnemers = alleKinderen
+					.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id) &&
+								IsLeeftijdToegestaan(k.Geboortedatum, groepsreis.Bestemming.MinLeeftijd, groepsreis.Bestemming.MaxLeeftijd))
+					.ToList();
+			}
+			else
+			{
+				// Debugging logica: Controleer of de user kinderen heeft
+				if (user?.Kinderen == null || !user.Kinderen.Any())
+				{
+					Console.WriteLine($"Gebruiker met ID {userId} heeft geen kinderen gekoppeld.");
+				}
+
+				// Voor een gewone gebruiker, toon alleen hun eigen kinderen die beschikbaar zijn
+				groepsreis.BeschikbareDeelnemers = user?.Kinderen?
+					.Where(k => !groepsreis.Deelnemers.Any(d => d.KindId == k.Id) &&
+								IsLeeftijdToegestaan(k.Geboortedatum, groepsreis.Bestemming.MinLeeftijd, groepsreis.Bestemming.MaxLeeftijd))
+					.ToList() ?? new List<Kind>();
+			}
+
+			// Debugging logica: Controleer of er kinderen beschikbaar zijn
+			if (!groepsreis.BeschikbareDeelnemers.Any())
+			{
+				Console.WriteLine($"Geen beschikbare kinderen voor groepsreis ID {groepsreis.Id}. Controleer de filters.");
+				Console.WriteLine($"Minimum leeftijd: {groepsreis.Bestemming.MinLeeftijd}, Maximum leeftijd: {groepsreis.Bestemming.MaxLeeftijd}");
+				if (isAdmin)
+				{
+					Console.WriteLine("Alle kinderen:");
+					foreach (var kind in await _unitOfWork.KindRepository.GetAllAsync(query => query.Include(k => k.Persoon)))
+					{
+						var leeftijd = CalculateLeeftijd(kind.Geboortedatum);
+						Console.WriteLine($"Kind: {kind.Voornaam} {kind.Naam}, Leeftijd: {leeftijd}");
+					}
+				}
+				else
+				{
+					Console.WriteLine($"Kinderen van gebruiker met ID {userId}:");
+					foreach (var kind in user?.Kinderen ?? new List<Kind>())
+					{
+						var leeftijd = CalculateLeeftijd(kind.Geboortedatum);
+						Console.WriteLine($"Kind: {kind.Voornaam} {kind.Naam}, Leeftijd: {leeftijd}");
+					}
+				}
+			}
+
+			// Beschikbare monitoren filteren
+			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon).Where(m => m.Persoon.IsActief));
+			var ingeschrevenMonitorenIds = groepsreis.Monitoren.Select(m => m.Monitor.PersoonId).ToList();
+			groepsreis.BeschikbareMonitoren = monitoren
+				.Where(m => !ingeschrevenMonitorenIds.Contains(m.PersoonId))
+				.ToList();
+
+			return View(groepsreis);
+		}
+
+		// Helper-methode om te controleren of de leeftijd van een kind binnen de toegestane leeftijdscategorie valt
+		private bool IsLeeftijdToegestaan(DateTime geboortedatum, int minLeeftijd, int maxLeeftijd)
+		{
+			var leeftijd = CalculateLeeftijd(geboortedatum);
+			return leeftijd >= minLeeftijd && leeftijd <= maxLeeftijd;
+		}
+
+		// Helper-methode om de leeftijd van een persoon te berekenen
+		private int CalculateLeeftijd(DateTime geboortedatum)
+		{
+			var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+			if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--; // Corrigeer voor niet-gepasseerde verjaardag
+			return leeftijd;
+		}
 
 
-			groepsreis.BeschikbareMonitoren = uniekeMonitoren;
-            groepsreis.BeschikbareDeelnemers = uniekeDeelnemers;
-
-            return View(groepsreis);
-        }
-
-        public async Task<IActionResult> ArchivedDetail(int id)
+		public async Task<IActionResult> ArchivedDetail(int id)
         {
             var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable(
                 query => query.Include(g => g.Monitoren).ThenInclude(m => m.Monitor.Persoon)
@@ -601,11 +668,11 @@ namespace MVC_Project_BSL.Controllers
             return result;
         }
 
-        #endregion
+		#endregion
 
-        #region Helper Methods
+		#region Helper Methods
 
-        private void LoadDropdownData(Groepsreis groepsreis = null)
+		private void LoadDropdownData(Groepsreis groepsreis = null)
         {
             ViewBag.Bestemmingen = new SelectList(_unitOfWork.BestemmingRepository.GetAllAsync().Result, "Id", "BestemmingsNaam", groepsreis?.BestemmingId);
             ViewBag.Activiteiten = new SelectList(_unitOfWork.ActiviteitRepository.GetAllAsync().Result, "Id", "Naam");
