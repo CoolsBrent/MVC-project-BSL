@@ -458,11 +458,27 @@ namespace MVC_Project_BSL.Controllers
             return await _unitOfWork.OpleidingRepository.AnyAsync(o => o.Id == id);
         }
 
-		#endregion
+        [HttpGet]
+        public async Task<JsonResult> GetOpleidingen(string term)
+        {
+            var opleidingen = await _unitOfWork.OpleidingRepository.GetAllAsync();
 
-		#region Subscribe Actions
+            if (!string.IsNullOrWhiteSpace(term))
+            {
+                opleidingen = opleidingen
+                    .Where(o => o.Naam.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    .Take(10)
+                    .ToList();
+            }
 
-		[HttpPost]
+            return Json(opleidingen.Select(o => o.Naam).ToList());
+        }
+
+        #endregion
+
+        #region Subscribe Actions
+
+        [HttpPost]
 		public async Task<IActionResult> Inschrijven(int opleidingId)
 		{
 			var opleiding = await _unitOfWork.OpleidingRepository.GetByIdAsync(opleidingId);
