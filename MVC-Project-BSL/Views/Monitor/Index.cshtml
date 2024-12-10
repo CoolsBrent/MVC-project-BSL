@@ -1,0 +1,121 @@
+﻿@model IEnumerable<MVC_Project_BSL.ViewModels.MonitorViewModel>
+
+
+
+<h2>Monitor</h2>
+<div class="row mb-3">
+	<div class="col-md-6">
+		<input type="text" class="form-control" id="userVoornaamInput" placeholder="Filter op voornaam...">
+	</div>
+	<div class="col-md-6">
+		<input type="text" class="form-control" id="userAchternaamInput" placeholder="Filter op achternaam...">
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-md-9">
+		<h3>Monitoren</h3>
+		<p>
+			<a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe monitor toevoegen">
+				<i class="bi bi-plus-circle h4 text-white"></i>
+			</a>
+		</p>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Naam</th>
+					<th>Voornaam</th>
+					<th>Leeftijd</th>
+					<th>Rol</th>
+					<th>Actief</th>
+					<th>Acties</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var monitor in Model)
+				{
+					<tr class="user-row">
+						<td class="user-lastname">@monitor.Naam</td>
+						<td class="user-firstname">@monitor.Voornaam</td>
+						<td>
+
+							@{
+								var geboortedatum = monitor.Geboortedatum;
+								var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+								if (DateTime.Now < geboortedatum.AddYears(leeftijd)) { leeftijd--; }
+								@leeftijd
+							}
+						</td>
+						<td>
+							@(monitor.IsHoofdMonitor ? "Hoofdmonitor" : "Monitor")
+						</td>
+						<td>
+							@(monitor.IsActief ? "Ja" : "Nee")
+						</td>
+						<td>
+							<!-- Details knop -->
+							<a href="@Url.Action("Details", "Monitor", new { id = monitor.Id })" class="btn btn-info">Details</a>
+							<form asp-action="DeactivateUser" method="post" style="display:inline;">
+								<input type="hidden" name="userId" value="@monitor.PersoonId" />
+								<button type="submit" class="btn btn-warning">
+									<i class="bi bi-person-fill-slash"></i>
+								</button>
+							</form>
+							<a asp-action="Edit" asp-route-id="@monitor.PersoonId" class="btn btn-secondary">
+								<i class="bi bi-pencil-square"></i>
+							</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
+
+
+<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen gebruikers gevonden voor de geselecteerde filters.</p>
+
+
+@section Scripts {
+	<script>
+		$(document).ready(function () {
+		  // Functie voor filtering
+			 function filterUsers() {
+				 var voornaamFilter = $('#userVoornaamInput').val().toLowerCase().trim();
+					var achternaamFilter = $('#userAchternaamInput').val().toLowerCase().trim();
+					var hasVisibleUsers = false;
+
+					$('.user-row').each(function () {
+					var voornaam = $(this).find('.user-firstname').text().toLowerCase().trim();
+						var achternaam = $(this).find('.user-lastname').text().toLowerCase().trim();
+
+						   // Log de waarden voor debugging
+						   console.log("Voornaam filter:", voornaamFilter);
+					console.log("Achternaam filter:", achternaamFilter);
+						   console.log("Vergelijking voornaam:", voornaam);
+							  console.log("Vergelijking achternaam:", achternaam);
+
+					var matches = (voornaam.includes(voornaamFilter) || !voornaamFilter) &&
+							   (achternaam.includes(achternaamFilter) || !achternaamFilter);
+
+						   $(this).toggle(matches);
+
+						   if (matches) {
+							hasVisibleUsers = true;
+					}
+					});
+
+					   // Toon of verberg het 'Geen Gebruikers' bericht
+					if (hasVisibleUsers) {
+						   $('#noUsersMessage').hide();
+					} else {
+					 $('#noUsersMessage').show();
+				}
+			 }
+
+			// Event listeners voor filtervelden
+			 $('#userVoornaamInput, #userAchternaamInput').on('input', filterUsers);
+		});
+
+	</script>
+}

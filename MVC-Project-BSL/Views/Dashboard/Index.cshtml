@@ -35,7 +35,15 @@
 		</div>
 	</div>
 }
-
+@if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+{
+	<div class="row mb-4">
+		<div class="col-md-3">
+			<a href="@Url.Action("Index", "Monitor")" class="btn btn-primary btn-block">Monitoren Beheren</a>
+		</div>
+	
+	</div>
+}
 
 
 
@@ -206,7 +214,7 @@
 
 
 
-	@if (User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
+@if (User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor") || User.IsInRole("Verantwoordelijke"))
 	{
 	<ul class="nav nav-tabs" id="userTab">
 
@@ -216,7 +224,7 @@
 		<li class="nav-item">
 			<a class="nav-link" data-bs-toggle="tab" href="#toekomstigeGroepsReizen">Te Ontdekken Groepsreizen</a>
 		</li>
-		@if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
+		@if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor") || User.IsInRole("Verantwoordelijke"))
 		{
 
 			<li class="nav-item">

@@ -6,12 +6,21 @@ namespace MVC_Project_BSL.ViewModels
     {
         // Persoonlijke gegevens
         public int Id { get; set; }
-        public string Naam { get; set; }
-        public string Voornaam { get; set; }
-        public DateTime Geboortedatum { get; set; }
-        public string Huisdokter { get; set; }
-        public string TelefoonNummer { get; set; }
-        public string RekeningNummer { get; set; }
+		[Required(ErrorMessage = "Naam is verplicht.")]
+
+		public string Naam { get; set; }
+		[Required(ErrorMessage = "Voornaam is verplicht.")]
+
+		public string Voornaam { get; set; }
+		[Required(ErrorMessage = "Geboortedatum is verplicht.")]
+
+		public DateTime Geboortedatum { get; set; }
+		[Required(ErrorMessage = "Huisdokter is verplicht.")]
+		public string Huisdokter { get; set; }
+		[Required(ErrorMessage = "Telefoonnummer is verplicht.")]
+		public string TelefoonNummer { get; set; }
+		[Required(ErrorMessage = "Rekeningnummer is verplicht.")]
+		public string RekeningNummer { get; set; }
         public bool IsActief { get; set; }
 
         // Gegevens van de kinderen
