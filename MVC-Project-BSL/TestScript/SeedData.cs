@@ -132,8 +132,8 @@ namespace MVC_Project_BSL.Data
             if (!context.Groepsreizen.Any())
             {
                 context.Groepsreizen.AddRange(
-                    new Groepsreis { BestemmingId = 1, Begindatum = new DateTime(2024, 5, 1), Einddatum = new DateTime(2024, 5, 7), Prijs = 500.0f, IsArchived = false },
-                    new Groepsreis { BestemmingId = 2, Begindatum = new DateTime(2024, 6, 10), Einddatum = new DateTime(2024, 6, 15), Prijs = 600.0f, IsArchived = false }
+                    new Groepsreis { BestemmingId = 1, Begindatum = new DateTime(2025, 5, 1), Einddatum = new DateTime(2025, 5, 7), Prijs = 500.0f, IsArchived = false },
+                    new Groepsreis { BestemmingId = 2, Begindatum = new DateTime(2025, 6, 10), Einddatum = new DateTime(2025, 6, 15), Prijs = 600.0f, IsArchived = false }
                 );
             }
         }
