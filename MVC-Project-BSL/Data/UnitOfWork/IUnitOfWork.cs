@@ -34,7 +34,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         /// <summary>
         /// Repository voor het beheren van monitoren.
         /// </summary>
-        IGenericRepository<Monitor> MonitorRepository { get; }
+        IGenericRepository<Models.Monitor> MonitorRepository { get; }
 
         /// <summary>
         /// Repository voor het beheren van deelnemers.

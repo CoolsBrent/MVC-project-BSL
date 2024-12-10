@@ -1,0 +1,43 @@
+﻿@model MVC_Project_BSL.Models.Onkosten
+
+@{
+    ViewData["Title"] = "Onkosten Bewerken";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<h3>Onkosten voor Groepsreis: @ViewBag.GroepsreisId</h3>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="Titel" class="control-label"></label>
+        <input asp-for="Titel" class="form-control" />
+        <span asp-validation-for="Titel" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Omschrijving" class="control-label"></label>
+        <textarea asp-for="Omschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Omschrijving" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Bedrag" class="control-label"></label>
+        <input asp-for="Bedrag" class="form-control" />
+        <span asp-validation-for="Bedrag" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Datum" class="control-label"></label>
+        <input asp-for="Datum" class="form-control" type="date" />
+        <span asp-validation-for="Datum" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="FotoFile" class="control-label"></label>
+        <input asp-for="FotoFile" type="file" class="form-control" />
+        <span asp-validation-for="FotoFile" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="GroepsreisId" />
+
+    <button type="submit" class="btn btn-primary">Opslaan</button>
+</form>
+
+<a href="@Url.Action("Index", new { groepsreisId = ViewBag.GroepsreisId })" class="btn btn-secondary">Annuleren</a>

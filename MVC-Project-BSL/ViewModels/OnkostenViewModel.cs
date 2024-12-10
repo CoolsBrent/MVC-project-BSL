@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using MVC_Project_BSL.Attributes;
 using MVC_Project_BSL.Models;
-namespace MVC_Project_BSL.Models
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace MVC_Project_BSL.ViewModels
 {
-    public class Onkosten
+    public class OnkostenViewModel
     {
         public int Id { get; set; }
 
@@ -19,8 +20,6 @@ namespace MVC_Project_BSL.Models
         public float Bedrag { get; set; }
 
         [Required(ErrorMessage = "Datum is verplicht.")]
-        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
-
         public DateTime Datum { get; set; }
 
         public string? Foto { get; set; }
