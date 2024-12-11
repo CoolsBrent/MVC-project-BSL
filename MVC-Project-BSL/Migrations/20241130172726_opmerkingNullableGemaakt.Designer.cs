@@ -4,6 +4,7 @@ using MVC_Project_BSL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC_Project_BSL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241130172726_opmerkingNullableGemaakt")]
+    partial class opmerkingNullableGemaakt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,9 +211,10 @@ namespace MVC_Project_BSL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Review")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ReviewScore")
+                    b.Property<int>("ReviewScore")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

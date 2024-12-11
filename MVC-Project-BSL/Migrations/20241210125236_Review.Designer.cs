@@ -4,6 +4,7 @@ using MVC_Project_BSL.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MVC_Project_BSL.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241210125236_Review")]
+    partial class Review
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,9 +201,6 @@ namespace MVC_Project_BSL.Migrations
                     b.Property<int>("GroepsreisDetailId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("GroepsreisId")
-                        .HasColumnType("int");
-
                     b.Property<int>("KindId")
                         .HasColumnType("int");
 
@@ -216,8 +216,6 @@ namespace MVC_Project_BSL.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GroepsreisDetailId");
-
-                    b.HasIndex("GroepsreisId");
 
                     b.HasIndex("KindId");
 
@@ -265,9 +263,6 @@ namespace MVC_Project_BSL.Migrations
 
                     b.Property<bool>("IsArchived")
                         .HasColumnType("bit");
-
-                    b.Property<int>("MaxAantalDeelnemers")
-                        .HasColumnType("int");
 
                     b.Property<float>("Prijs")
                         .HasColumnType("real");
@@ -607,10 +602,6 @@ namespace MVC_Project_BSL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MVC_Project_BSL.Models.Groepsreis", null)
-                        .WithMany("Wachtlijst")
-                        .HasForeignKey("GroepsreisId");
-
                     b.HasOne("MVC_Project_BSL.Models.Kind", "Kind")
                         .WithMany()
                         .HasForeignKey("KindId")
@@ -825,8 +816,6 @@ namespace MVC_Project_BSL.Migrations
                     b.Navigation("Onkosten");
 
                     b.Navigation("Programmas");
-
-                    b.Navigation("Wachtlijst");
                 });
 
             modelBuilder.Entity("MVC_Project_BSL.Models.Opleiding", b =>
