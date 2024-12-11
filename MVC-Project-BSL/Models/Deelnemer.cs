@@ -8,7 +8,6 @@ namespace MVC_Project_BSL.Models
         public int Id { get; set; }
         public int KindId { get; set; }
         public int GroepsreisDetailId { get; set; }
-
 		[Column(TypeName = "nvarchar(max)")]
 		public string? Opmerkingen { get; set; }
 

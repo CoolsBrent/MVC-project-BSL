@@ -2,10 +2,10 @@
 DELETE FROM Kinderen WHERE PersoonId IN (1, 2, 3, 4);
 SET IDENTITY_INSERT Kinderen ON;
 INSERT INTO Kinderen (Id, PersoonId, Voornaam, Naam, Geboortedatum, Allergieen, Medicatie) VALUES
-(1, 1, 'Emma', 'Doe', '2010-06-01', 'Noten', 'Epipen'),
-(2, 1, 'Tom', 'Doe', '2012-12-15', 'Geen', 'Geen'),
-(3, 2, 'Lisa', 'Smith', '2013-03-21', 'Pollen', 'Antihistamine'),
-(4, 3, 'Ben', 'Johnson', '2014-08-09', 'Geen', 'Geen');
+(11, 1011, 'Emma', 'Doe', '2010-06-01', 'Noten', 'Epipen'),
+(12, 1011, 'Tom', 'Doe', '2012-12-15', 'Geen', 'Geen'),
+(13, 1011, 'Lisa', 'Smith', '2013-03-21', 'Pollen', 'Antihistamine'),
+(14, 1011, 'Ben', 'Johnson', '2014-08-09', 'Geen', 'Geen');
 SET IDENTITY_INSERT Kinderen OFF;
 
 -- Bestemmingen
@@ -75,8 +75,8 @@ SET IDENTITY_INSERT Onkosten OFF;
 -- Monitoren toevoegen
 SET IDENTITY_INSERT Monitoren ON;
 INSERT INTO Monitoren (Id, PersoonId, IsHoofdMonitor) VALUES
-(1, 2, 0), -- Monitor
-(2, 3, 1); -- Hoofdmonitor
+(11, 1012, 0), -- Monitor
+(12, 1013, 1); -- Hoofdmonitor
 SET IDENTITY_INSERT Monitoren OFF;
 
 -- Monitoren koppelen aan groepsreizen
@@ -113,12 +113,10 @@ SET IDENTITY_INSERT Opleidingen OFF;
 DELETE FROM OpleidingPersonen WHERE Id IN (1, 2, 3);
 SET IDENTITY_INSERT OpleidingPersonen ON;
 INSERT INTO OpleidingPersonen (Id, OpleidingId, PersoonId) VALUES
-(1, 1, 2), -- Monitor volgt EHBO
-(2, 2, 3), -- Hoofdmonitor volgt Reisleiding
-(3, 3, 4), -- Extra monitor volgt Groepsmanagement
-(4, 4, 2), -- Monitor volgt Advanced EHBOdate
-(5, 5, 3), -- Hoofdmonitor volgt Culturele gids
-(6, 6, 4); -- Monitor volgt Eventplanning
+(1, 1, 1012), -- Monitor volgt EHBO
+(2, 2, 1013), -- Hoofdmonitor volgt Reisleiding
+(4, 4, 1012), -- Monitor volgt Advanced EHBOdate
+(5, 5, 1013) -- Hoofdmonitor volgt Culturele gids
 SET IDENTITY_INSERT OpleidingPersonen OFF;
 
 -- Foto's toevoegen

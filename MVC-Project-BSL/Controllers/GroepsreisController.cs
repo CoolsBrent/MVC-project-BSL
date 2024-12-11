@@ -9,49 +9,52 @@ using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
-    /// <summary>
-    /// De GroepsreisController biedt functionaliteiten voor het beheren van groepsreizen, 
-    /// inclusief het aanmaken, bewerken, archiveren en activeren van groepsreizen. 
-    /// Ook beheert deze controller de deelname van deelnemers en monitoren aan specifieke reizen.
-    /// </summary>
-    public class GroepsreisController : Controller
-    {
-        #region Fields and Constructor
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly MonitorService _monitorService;
+	/// <summary>
+	/// De GroepsreisController biedt functionaliteiten voor het beheren van groepsreizen, 
+	/// inclusief het aanmaken, bewerken, archiveren en activeren van groepsreizen. 
+	/// Ook beheert deze controller de deelname van deelnemers en monitoren aan specifieke reizen.
+	/// </summary>
+	public class GroepsreisController : Controller
+	{
+		#region Fields and Constructor
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly MonitorService _monitorService;
 
-        public GroepsreisController(IUnitOfWork unitOfWork, MonitorService monitorService)
-        {
-            _unitOfWork = unitOfWork;
-            _monitorService = monitorService;
-        }
-        #endregion
+		public GroepsreisController(IUnitOfWork unitOfWork, MonitorService monitorService)
+		{
+			_unitOfWork = unitOfWork;
+			_monitorService = monitorService;
+		}
+		#endregion
 
-        #region Index and Details Actions
+		#region Index and Details Actions
 
-        public async Task<IActionResult> Index()
-        {
-            var actieveGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
-                query => query.Include(g => g.Bestemming).Where(g => !g.IsArchived));
-            var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
-                query => query.Include(g => g.Bestemming).Where(g => g.IsArchived));
+		public async Task<IActionResult> Index()
+		{
+			var actieveGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Bestemming).Where(g => !g.IsArchived));
+			var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
+				query => query.Include(g => g.Bestemming).Where(g => g.IsArchived));
 
-            var viewModel = new GroepsreisViewModel
-            {
-                ActieveGroepsreizen = actieveGroepsreizen,
-                GearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen
-            };
+			var viewModel = new GroepsreisViewModel
+			{
+				ActieveGroepsreizen = actieveGroepsreizen,
+				GearchiveerdeGroepsreizen = gearchiveerdeGroepsreizen
+			};
 
-            return View(viewModel);
-        }
+			return View(viewModel);
+		}
 
 		public async Task<IActionResult> Detail(int id)
 		{
-			// Haal de groepsreis op met alle benodigde gerelateerde gegevens
+			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon).Where(m => m.Persoon.IsActief));
+			var deelnemers = await _unitOfWork.KindRepository.GetAllAsync(
+				query => query.Include(m => m.Persoon));
 			var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable()
 				.Include(g => g.Monitoren).ThenInclude(m => m.Monitor.Persoon)
 				.Include(g => g.Bestemming).ThenInclude(b => b.Fotos)
-				.Include(g => g.Deelnemers).ThenInclude(d => d.Kind.Persoon)
+				.Include(g => g.Deelnemers).ThenInclude(d => d.Kind)
 				.Include(g => g.Programmas).ThenInclude(p => p.Activiteit)
 				.FirstOrDefaultAsync(g => g.Id == id);
 
@@ -59,6 +62,22 @@ namespace MVC_Project_BSL.Controllers
 			{
 				return NotFound();
 			}
+
+			// Bereken gemiddelde reviewscore
+			var reviews = groepsreis.Deelnemers.Where(d => d.ReviewScore.HasValue).ToList();
+			var gemiddeldeScore = reviews.Any() ? reviews.Average(d => d.ReviewScore.Value) : 0;
+
+			var ingeschrevenMonitoren = groepsreis.Monitoren.Select(m => m.Monitor.PersoonId).ToList();
+			var uniekeMonitoren = monitoren.Where(m => !ingeschrevenMonitoren.Contains(m.PersoonId)).ToList();
+			var ingeschrevenDeelnemers = groepsreis.Deelnemers.Select(m => m.KindId).ToList();
+			var uniekeDeelnemers = deelnemers.Where(m => !ingeschrevenDeelnemers.Contains(m.Id)).ToList();
+
+			groepsreis.BeschikbareMonitoren = uniekeMonitoren;
+			groepsreis.BeschikbareDeelnemers = uniekeDeelnemers;
+
+			// ViewBag gebruiken voor eenvoudigheid (of voeg een nieuwe property toe aan het ViewModel)
+			ViewBag.Reviews = reviews;
+			ViewBag.GemiddeldeScore = gemiddeldeScore;
 
 			// Haal de ID van de ingelogde gebruiker
 			var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
@@ -124,7 +143,7 @@ namespace MVC_Project_BSL.Controllers
 
 			return View(groepsreis);
 		}
-
+    
 		private bool IsLeeftijdToegestaan(DateTime geboortedatum, int minLeeftijd, int maxLeeftijd)
 		{
 			var leeftijd = CalculateLeeftijd(geboortedatum);
@@ -843,6 +862,4 @@ namespace MVC_Project_BSL.Controllers
 
     }
     #endregion
-
-
 }
