@@ -134,7 +134,7 @@ namespace MVC_Project_BSL.Controllers
 			}
 
 			// Beschikbare monitoren filteren
-			var monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
+			monitoren = await _unitOfWork.MonitorRepository.GetAllAsync(
 				query => query.Include(m => m.Persoon).Where(m => m.Persoon.IsActief));
 			var ingeschrevenMonitorenIds = groepsreis.Monitoren.Select(m => m.Monitor.PersoonId).ToList();
 			groepsreis.BeschikbareMonitoren = monitoren

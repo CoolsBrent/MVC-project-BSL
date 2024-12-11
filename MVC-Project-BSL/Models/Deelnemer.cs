@@ -11,7 +11,7 @@ namespace MVC_Project_BSL.Models
 		[Column(TypeName = "nvarchar(max)")]
 		public string? Opmerkingen { get; set; }
 
-		public int ReviewScore { get; set; }
+		public int? ReviewScore { get; set; }
 
 		[Column(TypeName = "nvarchar(max)")]
 		public string? Review { get; set; }
