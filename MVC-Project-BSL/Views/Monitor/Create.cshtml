@@ -1,0 +1,87 @@
+﻿@model List<MVC_Project_BSL.Models.CustomUser>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="userVoornaamInput" placeholder="Filter op voornaam...">
+    </div>
+    <div class="col-md-6">
+        <input type="text" class="form-control" id="userAchternaamInput" placeholder="Filter op achternaam...">
+    </div>
+</div>
+@if (Model == null || !Model.Any())
+{
+	<p id="noUsersMessage" class="text-center text-muted">Geen gebruikers gevonden.</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Voornaam</th>
+				<th>Naam</th>
+				<th>Actie</th>
+			</tr>
+		</thead>
+		<tbody id="userTableBody">
+			@foreach (var user in Model)
+			{
+				<tr class="user-row">
+					<td class="user-firstname">@user.Voornaam</td>
+					<td class="user-lastname">@user.Naam</td>
+					<td>
+						<form asp-action="MaakMonitor" method="post" style="display:inline;">
+							<input type="hidden" name="monitorId" value="@user.Id" />
+							<button type="submit" class="btn btn-success btn-sm" style="white-space: nowrap;">Maak monitor</button>
+						</form>
+					</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	<!-- Filter-gebaseerd 'Geen Gebruikers' Bericht -->
+	<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen gebruikers gevonden voor de geselecteerde filters.</p>
+}
+<p>
+	<a href="javascript:history.back()" class="btn btn-primary">Terug</a>
+</p>
+@section Scripts{
+	<script>
+		$(document).ready(function () {
+			// Functie voor filtering
+			function filterUsers() {
+				var voornaamFilter = $('#userVoornaamInput').val().toLowerCase().trim();
+				var achternaamFilter = $('#userAchternaamInput').val().toLowerCase().trim();
+				var hasVisibleUsers = false;
+
+				$('.user-row').each(function () {
+					var voornaam = $(this).find('.user-firstname').text().toLowerCase().trim();
+					var achternaam = $(this).find('.user-lastname').text().toLowerCase().trim();
+
+					// Log de waarden voor debugging
+					console.log("Voornaam filter:", voornaamFilter);
+					console.log("Achternaam filter:", achternaamFilter);
+					console.log("Vergelijking voornaam:", voornaam);
+					console.log("Vergelijking achternaam:", achternaam);
+
+					var matches = (voornaam.includes(voornaamFilter) || !voornaamFilter) &&
+						(achternaam.includes(achternaamFilter) || !achternaamFilter);
+
+					$(this).toggle(matches);
+
+					if (matches) {
+						hasVisibleUsers = true;
+					}
+				});
+
+				// Toon of verberg het 'Geen Gebruikers' bericht
+				if (hasVisibleUsers) {
+					$('#noUsersMessage').hide();
+				} else {
+					$('#noUsersMessage').show();
+				}
+			}
+
+			// Event listeners voor filtervelden
+			$('#userVoornaamInput, #userAchternaamInput').on('input', filterUsers);
+		});
+	</script>
+}

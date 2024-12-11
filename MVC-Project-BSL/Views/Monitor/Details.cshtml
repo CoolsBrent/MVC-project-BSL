@@ -1,0 +1,95 @@
+﻿@model MVC_Project_BSL.ViewModels.MonitorViewModel
+
+@{
+    ViewData["Title"] = "Monitor Details";
+}
+
+<h1>Details van Monitor</h1>
+
+<div class="card">
+    <div class="card-body">
+        <h3>Persoonlijke Gegevens</h3>
+        <p><strong>Voornaam:</strong> @Model.Voornaam</p>
+        <p><strong>Naam:</strong> @Model.Naam</p>
+        <p><strong>Geboortedatum:</strong> @Model.Geboortedatum.ToString("dd-MM-yyyy")</p>
+        <p><strong>Rol:</strong> @(Model.IsHoofdMonitor ? "Hoofdmonitor" : "Monitor")</p>
+        @if (Model.IsHoofdMonitor)
+        {
+            <!-- Maak Monitor Knop -->
+            <form asp-action="MaakHoofdMonitorGewoneMonitor" method="post" style="display:inline;">
+                <input type="hidden" name="userId" value="@Model.Id" />
+                <button type="submit" class="btn btn-warning btn-sm" style="white-space: nowrap;">Maak Monitor</button>
+            </form>
+        }
+        else
+        {
+            <!-- Maak Hoofdmonitor Knop -->
+            <form asp-action="MaakHoofdMonitor" method="post" style="display:inline;">
+                <input type="hidden" name="userId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success btn-sm" style="white-space: nowrap;">Maak Hoofdmonitor</button>
+            </form>
+        }
+    </div>
+</div>
+
+<hr />
+
+<h2>Groepsreizen</h2>
+@if (Model.Groepsreizen.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Bestemming</th>
+                <th>Begindatum</th>
+                <th>Einddatum</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var groepsreis in Model.Groepsreizen)
+            {
+                <tr>
+                    <td>@groepsreis.Naam</td>
+                    <td>@groepsreis.Begindatum.ToString("dd-MM-yyyy")</td>
+                    <td>@groepsreis.Einddatum.ToString("dd-MM-yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Geen groepsreizen gevonden.</p>
+}
+
+<hr />
+
+<h2>Opleidingen</h2>
+@if (Model.Opleidingen.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Naam</th>
+                <th>Behaald Op</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var opleiding in Model.Opleidingen)
+            {
+                <tr>
+                    <td>@opleiding.Titel</td>
+                    <td>@opleiding.BehaaldOp.ToString("dd-MM-yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Geen opleidingen gevonden.</p>
+}
+
+<hr />
+
+<a asp-action="Index" class="btn btn-secondary">Terug naar overzicht</a>
