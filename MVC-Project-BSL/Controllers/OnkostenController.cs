@@ -5,23 +5,44 @@ using MVC_Project_BSL.Models;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
+using MVC_Project_BSL.ViewModels;
 
 public class OnkostenController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly UserManager<CustomUser> _userManager;
 
-    public OnkostenController(IUnitOfWork unitOfWork)
+
+    public OnkostenController(IUnitOfWork unitOfWork, UserManager<CustomUser> userManager)
     {
         _unitOfWork = unitOfWork;
+        _userManager = userManager;
     }
 
     // GET: Onkosten/Index
     public async Task<IActionResult> Index(int groepsreisId)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized(); // Als het gebruikers-ID niet beschikbaar is
+        }
+
+        var gebruiker = await _userManager.FindByIdAsync(userId);
+        if (gebruiker == null)
+        {
+            return NotFound("Gebruiker niet gevonden."); // Als de gebruiker niet gevonden wordt
+        }
+
+        // Haal de groepsreis op
         var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable(
             query => query
                 .Include(g => g.Onkosten)
-                .Include(g => g.Bestemming))
+                .Include(g => g.Bestemming)
+                .Include(g => g.Deelnemers))
             .FirstOrDefaultAsync(g => g.Id == groepsreisId);
 
         if (groepsreis == null)
@@ -29,26 +50,84 @@ public class OnkostenController : Controller
             return NotFound("Groepsreis niet gevonden.");
         }
 
+        // Splits de onkosten op in twee groepen
+        var VerantwoordelijkeOnkosten = groepsreis.Onkosten
+            .Where(o => o.TypeOnkost == "Verantwoordelijke")
+            .ToList();
+
+        var HoofdmonitorOnkosten = groepsreis.Onkosten
+            .Where(o => o.TypeOnkost == "Hoofdmonitor")
+            .ToList();
+        var onkost = groepsreis.Onkosten.ToList();
+
+     
+        // Zet de groepsreisgegevens in de ViewBag voor context in de view
         ViewBag.GroepsreisId = groepsreis.Id;
-        ViewBag.GroepsreisNaam = groepsreis.Bestemming.BestemmingsNaam; // Optioneel: voeg groepsreisnaam toe voor context
-        return View(groepsreis.Onkosten); // Stuur de lijst met onkosten naar de view
+        ViewBag.GroepsreisNaam = groepsreis.Bestemming.BestemmingsNaam;
+
+        // Maak een ViewModel om de gesplitste gegevens door te geven aan de view
+        var model = new Onkosten
+        {
+            VerantwoordelijkeOnkosten = VerantwoordelijkeOnkosten,
+            HoofdmonitorOnkosten = HoofdmonitorOnkosten,
+            AlleOnkosten = onkost,
+            Groepsreis = groepsreis,
+        };
+
+        return View(model); // Stuur het ViewModel naar de view
     }
+
 
     // CREATE
     // GET: Onkosten/Create
-    public IActionResult Create(int groepsreisId)
+    public async Task<IActionResult> Create(int groepsreisId)
     {
-        var groepsreis = _unitOfWork.GroepsreisRepository.GetByIdAsync(groepsreisId);
+        var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable(
+            query => query
+                .Include(g => g.Onkosten)
+                .Include(g => g.Bestemming)
+                .Include(g => g.Deelnemers))
+            .FirstOrDefaultAsync(g => g.Id == groepsreisId);
+
         if (groepsreis == null)
         {
             return NotFound("Groepsreis niet gevonden.");
         }
 
-        // Stel een nieuw Onkosten object in voor de view
-        var onkosten = new Onkosten { GroepsreisId = groepsreisId };
+        // Bereken het totaal bedrag (prijs per deelnemer * aantal deelnemers)
+        var totaalPrijs = groepsreis.Deelnemers?.Count() * groepsreis.Prijs;
 
+        // Budget voor hoofdmonitor is 30% van de totale opbrengst
+        var budget = groepsreis.Deelnemers?.Count() * (groepsreis.Prijs * 0.3);
+
+        // Haal de onkosten op voor de specifieke groepsreis
+        var onkost = await _unitOfWork.OnkostenRepository
+            .GetAllAsync(query => query.Where(o => o.GroepsreisId == groepsreisId) // Filter op GroepsreisId
+            .Include(o => o.Groepsreis));
+
+        // Gebruik expliciete selectie en zet het om naar een lijst
+        var onkostenList = onkost.Select(o => o.Bedrag).ToList();
+
+        // Bereken de som van de bedragen van de onkosten
+        var totaleOnkosten = onkostenList.Sum();
+
+        // Bereken het resterende budget
+        var resterendBudget = budget - totaleOnkosten;
+
+        // Stel een nieuw Onkosten object in voor de view
+        var onkosten = new Onkosten
+        {
+            GroepsreisId = groepsreisId
+        };
+
+        // Zet de resterende budgetwaarde in de ViewBag om deze naar de view te sturen
+        ViewBag.ResterendBudget = resterendBudget;
+        ViewBag.GroepsreisNaam = groepsreis.Bestemming.BestemmingsNaam;
+
+        // Stuur het Onkosten object naar de view
         return View(onkosten);
     }
+
 
     // POST: Onkosten/Create
     [HttpPost]

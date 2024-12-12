@@ -59,17 +59,17 @@ INSERT INTO Programmas (Id, ActiviteitId, GroepsreisId) VALUES
 -- Onkosten toevoegen
 DELETE FROM Onkosten WHERE Id IN (1, 2, 3, 4, 5, 6);
 SET IDENTITY_INSERT Onkosten ON;
-INSERT INTO Onkosten (Id, Titel, Omschrijving, Bedrag, Datum, Foto, GroepsreisId) VALUES
-(1, 'Lunch in Parijs', 'Groepslunch tijdens reis.', 150.00, '2024-05-03', 'lunch.jpg', 1),
-(2, 'Treintickets', 'Reis naar Londen.', 300.00, '2024-06-11', NULL, 2),
-(3, 'Extra drankjes', 'Drankjes tijdens diner', 50.00, '2024-05-04', NULL, 1),
-(4, 'Souvenirs', 'Kleine cadeaus', 30.00, '2024-06-12', NULL, 2),
-(5, 'Museumtickets', 'Tickets voor musea in Rome', 120.00, '2024-07-03', 'museum.jpg', 3),
-(6, 'Stranddag', 'Toegang strandclub in Barcelona', 90.00, '2024-08-17', 'strand.jpg', 4),
-(7, 'Picknick in Parijs', 'Lunch op het gras bij de Eiffeltoren.', 160.00, '2025-05-03', 'picknick.jpg', 5),
-(8, 'Metrokaartjes', 'Reis binnen Londen.', 80.00, '2025-06-16', 'metro.jpg', 6),
-(9, 'Gidskosten', 'Professionele gids in Rome', 200.00, '2025-07-12', NULL, 7),
-(10, 'Paella-avond', 'Gezamenlijk diner in Barcelona', 140.00, '2025-08-21', 'paella.jpg', 8);
+INSERT INTO Onkosten (Id, Titel, Omschrijving, Bedrag, Datum, Foto, GroepsreisId, TypeOnkost) VALUES
+(1, 'Lunch in Parijs', 'Groepslunch tijdens reis.', 150.00, '2024-05-03', 'lunch.jpg', 1, 'Verantwoordelijke'),
+(2, 'Treintickets', 'Reis naar Londen.', 300.00, '2024-06-11', NULL, 2, 'Hoofdmonitor'),
+(3, 'Extra drankjes', 'Drankjes tijdens diner', 50.00, '2024-05-04', NULL, 1, 'Hoofdmonitor'),
+(4, 'Souvenirs', 'Kleine cadeaus', 30.00, '2024-06-12', NULL, 2, 'Verantwoordelijke'),
+(5, 'Museumtickets', 'Tickets voor musea in Rome', 120.00, '2024-07-03', 'museum.jpg', 3, 'Verantwoordelijke'),
+(6, 'Stranddag', 'Toegang strandclub in Barcelona', 90.00, '2024-08-17', 'strand.jpg', 4, 'Verantwoordelijke'),
+(7, 'Picknick in Parijs', 'Lunch op het gras bij de Eiffeltoren.', 160.00, '2025-05-03', 'picknick.jpg', 5, 'Verantwoordelijke'),
+(8, 'Metrokaartjes', 'Reis binnen Londen.', 80.00, '2025-06-16', 'metro.jpg', 6, 'Verantwoordelijke'),
+(9, 'Gidskosten', 'Professionele gids in Rome', 200.00, '2025-07-12', NULL, 7, 'Verantwoordelijke'),
+(10, 'Paella-avond', 'Gezamenlijk diner in Barcelona', 140.00, '2025-08-21', 'paella.jpg', 8, 'Verantwoordelijke');
 SET IDENTITY_INSERT Onkosten OFF;
 
 -- Monitoren toevoegen

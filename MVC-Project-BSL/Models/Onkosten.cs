@@ -33,5 +33,14 @@ namespace MVC_Project_BSL.Models
 
         [ValidateNever]
         public Groepsreis Groepsreis { get; set; }
+        
+        public string TypeOnkost { get; set; } // Dit veld geeft aan of het de hoofdmonitor of de verantwoordelijke betreft
+        [NotMapped]
+        public List<Onkosten> HoofdmonitorOnkosten = new List<Onkosten>();
+
+        [NotMapped]
+        public List<Onkosten> VerantwoordelijkeOnkosten = new List<Onkosten>();
+        [NotMapped]
+        public List<Onkosten> AlleOnkosten = new List<Onkosten>();
     }
 }

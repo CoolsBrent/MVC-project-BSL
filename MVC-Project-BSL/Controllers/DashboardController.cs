@@ -49,12 +49,13 @@ namespace MVC_Project_BSL.Controllers
 
 			// Controleer of de gebruiker een beheerder is
 			bool isBeheerder = await _userManager.IsInRoleAsync(gebruiker, "Beheerder");
+			bool isVerantwoordelijke = await _userManager.IsInRoleAsync(gebruiker, "Verantwoordelijke");
 			bool isMonitor = await _userManager.IsInRoleAsync(gebruiker, "Monitor");
 			bool isHoofdmonitor = await _userManager.IsInRoleAsync(gebruiker, "Hoofdmonitor");
 
 			GroepsreisViewModel model;
 
-			if (isBeheerder)
+			if (isBeheerder || isVerantwoordelijke)
 			{
 				// Haal alle groepsreizen op voor beheerders, inclusief filters
 				var alleGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>

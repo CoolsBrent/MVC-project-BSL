@@ -18,12 +18,17 @@
 
 
 <!-- Knoppen voor beheer -->
-@if (User.IsInRole("Beheerder"))
+@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 {
+
 	<div class="row mb-4">
-		<div class="col-md-3">
-			<a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
-		</div>
+		@if (User.IsInRole("Beheerder"))
+		{
+			<div class="col-md-3">
+				<a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
+			</div>
+		}
+		
 		<div class="col-md-3">
 			<a href="@Url.Action("Index", "Groepsreis")" class="btn btn-success btn-block">Groepsreizen Beheren</a>
 		</div>
@@ -34,13 +39,14 @@
 			<a href="@Url.Action("Index", "Opleiding")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
 		</div>
 	</div>
+
 }
 
 
 
 
 
-@if (User.IsInRole("Beheerder"))
+@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 {
 	<ul class="nav nav-tabs" id="myTab">
 		<li class="nav-item">
