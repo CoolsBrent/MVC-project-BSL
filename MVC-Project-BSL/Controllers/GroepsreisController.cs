@@ -32,9 +32,13 @@ namespace MVC_Project_BSL.Controllers
 		public async Task<IActionResult> Index()
 		{
 			var actieveGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
-				query => query.Include(g => g.Bestemming).Where(g => !g.IsArchived));
+				query => query.Include(g => g.Bestemming)
+                              .Include(g => g.Deelnemers)
+                              .Where(g => !g.IsArchived));
 			var gearchiveerdeGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
-				query => query.Include(g => g.Bestemming).Where(g => g.IsArchived));
+				query => query.Include(g => g.Bestemming)
+                              .Include(g => g.Deelnemers)
+                              .Where(g => g.IsArchived));
 
 			var viewModel = new GroepsreisViewModel
 			{
