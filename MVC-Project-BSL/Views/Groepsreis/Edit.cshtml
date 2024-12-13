@@ -2,10 +2,10 @@
 @model MVC_Project_BSL.Models.Groepsreis
 
 @{
-    ViewBag.Title = "Bewerk Groepsreis";
+    ViewBag.Title = "Bewerk groepsreis";
 }
 
-<h2>Bewerk Groepsreis</h2>
+<h2>Bewerk groepsreis</h2>
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -48,6 +48,12 @@
         <label asp-for="BestemmingId" class="control-label">Bestemming</label>
         <select asp-for="BestemmingId" asp-items="ViewBag.Bestemmingen" class="form-control"></select>
         <span asp-validation-for="BestemmingId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="MaxAantalDeelnemers" class="control-label">Maximum aantal deelnemers</label>
+        <input asp-for="MaxAantalDeelnemers" class="form-control" />
+        <span asp-validation-for="MaxAantalDeelnemers" class="text-danger"></span>
     </div>
 
     <!-- Onkosten Sectie -->
@@ -136,7 +142,7 @@
     <button type="button" class="btn btn-primary" id="btnAddOnkost">Voeg onkost toe</button>
 
     <!-- Totaal onkosten -->
-    <p><strong>Totaal Onkosten:</strong> @(Model.Onkosten?.Sum(o => o.Bedrag).ToString("C", new CultureInfo("nl-BE")) ?? "€ 0,00")</p>
+    <p><strong>Totaal onkosten:</strong> @(Model.Onkosten?.Sum(o => o.Bedrag).ToString("C", new CultureInfo("nl-BE")) ?? "€ 0,00")</p>
 
     <div class="form-group mt-2">
         <input type="submit" value="Opslaan" class="btn btn-primary" />

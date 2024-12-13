@@ -18,10 +18,10 @@
 		<p class="card-text">Begindatum: @Model.Begindatum.ToShortDateString()</p>
 		<p class="card-text">Einddatum: @Model.Einddatum.ToShortDateString()</p>
 
-		<h5 class="card-title">Aantal Plaatsen</h5>
+		<h5 class="card-title">Aantal plaatsen</h5>
 		<p class="card-text">@Model.IngeschrevenPersonen / @Model.AantalPlaatsen</p>
 
-		<h5 class="card-title">Opleiding Vereist</h5>
+		<h5 class="card-title">Vereiste opleiding</h5>
 		<p class="card-text">
 			@(Model.OpleidingVereist != null ? Model.OpleidingVereist.Naam : "Geen vereiste opleiding")
 		</p>
@@ -73,7 +73,7 @@
 		<div class="col-md-6">
 			<div>
 				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenMonitorenModal">
-					Bekijk Ingeschreven Monitoren
+					Bekijk ingeschreven monitoren
 				</button>
 			</div>
 		</div>
@@ -82,7 +82,7 @@
 			<div class="col-md-6">
 				<div>
 				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareMonitorenModal">
-					Bekijk Beschikbare Monitoren
+					Bekijk beschikbare monitoren
 				</button>
 				</div>
 			</div>

@@ -1,10 +1,10 @@
 ﻿@model MVC_Project_BSL.Models.Opleiding
 
 @{
-    ViewData["Title"] = "Nieuwe Opleiding";
+    ViewData["Title"] = "Nieuwe opleiding";
 }
 
-<h2>Nieuwe Opleiding</h2>
+<h2>Nieuwe opleiding</h2>
 
 @if (!ViewData.ModelState.IsValid)
 {
@@ -42,12 +42,12 @@
         <span asp-validation-for="Einddatum" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="AantalPlaatsen" class="form-label"></label>
+        <label asp-for="AantalPlaatsen" class="form-label">Aantal plaatsen</label>
         <input asp-for="AantalPlaatsen" class="form-control" type="number" min="1" />
         <span asp-validation-for="AantalPlaatsen" class="text-danger"></span>
     </div>
     <div class="form-group mb-3">
-        <label asp-for="OpleidingVereistId" class="form-label">Vereiste Opleiding</label>
+        <label asp-for="OpleidingVereistId" class="form-label">Vereiste opleiding</label>
         <select asp-for="OpleidingVereistId" class="form-control" asp-items="ViewBag.Opleidingen"></select>
         <span asp-validation-for="OpleidingVereistId" class="text-danger"></span>
     </div>

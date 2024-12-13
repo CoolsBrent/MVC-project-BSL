@@ -1,448 +1,497 @@
 ﻿@{
-	ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Dashboard";
 }
 ﻿@using System.Globalization
 @using MVC_Project_BSL.ViewModels
 @model GroepsreisViewModel
 
 <div class="hero-section-dashboard bg-navbar text-black text-center py-5 rounded-3 mb-3 position-relative">
-	<div class="container">
-		<h2 class="display-4">Welkom op je dashboard, @User.Identity.Name!</h2>
+    <div class="container">
+        <h2 class="display-4">Welkom op je dashboard, @User.Identity.Name!</h2>
 
-		<!-- Knop wordt absoluut gepositioneerd -->
-		<a href="@Url.Action("Index", "PersoonlijkeGegevens")" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px;">
-			<i class="bi bi-person-lines-fill"></i> Beheer
-		</a>
-	</div>
+        <!-- Knop wordt absoluut gepositioneerd -->
+        <a href="@Url.Action("Index", "PersoonlijkeGegevens")" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px;">
+            <i class="bi bi-person-lines-fill"></i> Beheer
+        </a>
+    </div>
 </div>
 
 
 <!-- Knoppen voor beheer -->
 @if (User.IsInRole("Beheerder"))
 {
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers beheren</a>
+        </div>
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "Groepsreis")" class="btn btn-success btn-block">Groepsreizen beheren</a>
+        </div>
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "Activiteit")" class="btn btn-info btn-block">Activiteiten beheren</a>
+        </div>
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "Opleiding")" class="btn btn-warning btn-block">Opleidingen beheren</a>
+        </div>
+    </div>
+}
+@if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+{
 	<div class="row mb-4">
 		<div class="col-md-3">
-			<a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
+			<a href="@Url.Action("Index", "Monitor")" class="btn btn-primary btn-block">Monitoren Beheren</a>
 		</div>
-		<div class="col-md-3">
-			<a href="@Url.Action("Index", "Groepsreis")" class="btn btn-success btn-block">Groepsreizen Beheren</a>
-		</div>
-		<div class="col-md-3">
-			<a href="@Url.Action("Index", "Activiteit")" class="btn btn-info btn-block">Activiteiten Beheren</a>
-		</div>
-		<div class="col-md-3">
-			<a href="@Url.Action("Index", "Opleiding")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
-		</div>
+	
 	</div>
 }
-
 
 
 
 
 @if (User.IsInRole("Beheerder"))
 {
-	<ul class="nav nav-tabs" id="myTab">
-		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="tab" href="#actieveGroepsreizen">Actieve Groepsreizen</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="tab" href="#gearchiveerdeGroepsreizen">Gearchiveerde Groepsreizen</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="tab" href="#opleidingen">Opleidingen</a>
-		</li>
-	</ul>
+    <ul class="nav nav-tabs" id="myTab">
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#actieveGroepsreizen">Actieve groepsreizen</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#gearchiveerdeGroepsreizen">Gearchiveerde groepsreizen</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#opleidingen">Opleidingen</a>
+        </li>
+    </ul>
 
-	<div class="tab-content">
-		<div id="actieveGroepsreizen" class="tab-pane fade show active">
-			<form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
-				<input type="hidden" name="filterType" value="active" />
-				<div class="d-flex">
-					<div class="form-group me-2">
-						<select class="form-control" name="bestemming">
-							<option value="">Alle bestemmingen</option>
-							@foreach (var bestemming in Model.AlleBestemmingen)
-							{
-								<option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
-							}
-						</select>
-					</div>
-					<div class="form-group">
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-sliders"></i>
-						</button>
-					</div>
-				</div>
-			</form>
+    <div class="tab-content">
+        <div id="actieveGroepsreizen" class="tab-pane fade show active">
+            <form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
+                <input type="hidden" name="filterType" value="active" />
+                <div class="d-flex">
+                    <div class="form-group me-2">
+                        <select class="form-control" name="bestemming">
+                            <option value="">Alle bestemmingen</option>
+                            @foreach (var bestemming in Model.AlleBestemmingen)
+                            {
+                                <option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-sliders"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-			<div class="row mb-4 mt-4">
+            <div class="row mb-4 mt-4">
 
-				@if (!Model.AlleGroepsReizen.Any())
-				{
-					<div class="alert alert-warning">
-						Geen groepsreizen gevonden.
-					</div>
-				}
-				else
-				{
+                @if (!Model.AlleGroepsReizen.Any())
+                {
+                    <div class="alert alert-warning">
+                        Geen groepsreizen gevonden.
+                    </div>
+                }
+                else
+                {
 
-					@foreach (var groepsreis in Model.AlleGroepsReizen)
-					{
-						<div class="col-md-4 mb-4">
-							<div class="card h-100">
-								<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-									@{
-										// Haal de eerste foto op, als deze beschikbaar is
-										var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-									}
-									<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
+                    @foreach (var groepsreis in Model.AlleGroepsReizen)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+                                    @{
+                                        // Haal de eerste foto op, als deze beschikbaar is
+                                        var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                    }
+                                    <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
 													object-position: center;" />
-									<div class="card-body">
-										<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-										<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-										<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-										<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-										<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-									</div>
-								</a>
-							</div>
-						</div>
-					}
-				}
-			</div>
-		</div>
-		<div id="gearchiveerdeGroepsreizen" class="tab-pane fade">
-			<form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
-				<input type="hidden" name="filterType" value="archived" />
-				<div class="d-flex">
-					<div class="form-group me-2">
-						<select class="form-control" name="bestemming">
-							<option value="">Alle bestemmingen</option>
-							@foreach (var bestemming in Model.AlleBestemmingen)
-							{
-								<option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
-							}
-						</select>
-					</div>
-					<div class="form-group">
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-sliders"></i>
-						</button>
-					</div>
-				</div>
-			</form>
-			<div class="row mb-4 mt-4">
-				@if (!Model.GearchiveerdeGroepsreizen.Any())
-				{
-					<div class="alert alert-warning">
-						Geen gearchiveerde groepsreizen gevonden.
-					</div>
+                                    <div class="card-body">
+                                        <h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+                                        <p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+                                        <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+                                        <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+                                        <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div id="gearchiveerdeGroepsreizen" class="tab-pane fade">
+            <form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
+                <input type="hidden" name="filterType" value="archived" />
+                <div class="d-flex">
+                    <div class="form-group me-2">
+                        <select class="form-control" name="bestemming">
+                            <option value="">Alle bestemmingen</option>
+                            @foreach (var bestemming in Model.AlleBestemmingen)
+                            {
+                                <option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-sliders"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="row mb-4 mt-4">
+                @if (!Model.GearchiveerdeGroepsreizen.Any())
+                {
+                    <div class="alert alert-warning">
+                        Geen gearchiveerde groepsreizen gevonden.
+                    </div>
 
-				}
-				else
-				{
+                }
+                else
+                {
 
-					@foreach (var groepsreis in Model.GearchiveerdeGroepsreizen)
-					{
-						<div class="col-md-4 mb-4">
-							<div class="card h-100">
-								<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-									@{
-										// Haal de eerste foto op, als deze beschikbaar is
-										var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-									}
-									<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
+                    @foreach (var groepsreis in Model.GearchiveerdeGroepsreizen)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+                                    @{
+                                        // Haal de eerste foto op, als deze beschikbaar is
+                                        var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                    }
+                                    <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
 										object-position: center;" />
-									<div class="card-body">
-										<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-										<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-										<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-										<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-										<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-									</div>
-								</a>
-							</div>
-						</div>
-					}
-				}
-			</div>
-		</div>
-		<div id="opleidingen" class="tab-pane fade">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+                                        <p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+                                        <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+                                        <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+                                        <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div id="opleidingen" class="tab-pane fade">
 
-			<div class="row mb-4 mt-4">
-				@if (!Model.AlleOpleidingen.Any())
-				{
-					<div class="alert alert-warning">
-						Geen opleidingen gevonden.
-					</div>
+            <div class="row mb-4 mt-4">
+                @if (!Model.AlleOpleidingen.Any())
+                {
+                    <div class="alert alert-warning">
+                        Geen opleidingen gevonden.
+                    </div>
 
-				}
-				else
-				{
+                }
+                else
+                {
 
-					@foreach (var opleiding in Model.AlleOpleidingen)
-					{
-						<div class="col-md-4 mb-4">
-							<a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
-							<div class="card h-100">
-								<div class="card-body">
-									<h5 class="card-title">@opleiding.Naam</h5>
-									<p class="card-text">@opleiding.Beschrijving</p>
-									<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
-									<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
-								</div>
-							</div>
-							</a>
-						</div>
-					}
-				}
-			</div>
-		</div>
-	</div>
+                    @foreach (var opleiding in Model.AlleOpleidingen)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">@opleiding.Naam</h5>
+                                        <p class="card-text">@opleiding.Beschrijving</p>
+                                        <p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
+                                        <p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
 
 
 }
 
+@if (User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor") || User.IsInRole("Verantwoordelijke"))
+{
+    <ul class="nav nav-tabs" id="userTab">
+
+        <li class="nav-item">
+            <a class="nav-link active" data-bs-toggle="tab" href="#groepsReizen">Mijn Groepsreizen</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-bs-toggle="tab" href="#toekomstigeGroepsReizen">Te Ontdekken Groepsreizen</a>
+        </li>
+        @if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
+        {
+
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#ingeschrevenOpleidingen">Ingeschreven Opleidingen</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#toekomstigeOpleidingen">Toekomstige Opleidingen</a>
+            </li>
+        }
+
+    </ul>
+    <div class="tab-content">
+
+        <!-- Tab 3: Mijn Groepsreizen Tab -->
+        <div id="groepsReizen" class="tab-pane fade show active">
+            <form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
+                <input type="hidden" name="filterType" value="mijnReizen" />
+                <div class="d-flex">
+                    <div class="form-group me-2">
+                        <select class="form-control" name="bestemming">
+                            <option value="">Alle bestemmingen</option>
+                            @foreach (var bestemming in Model.AlleBestemmingen)
+                            {
+                                <option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-sliders"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
 
 
-	@if (User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
-	{
-	<ul class="nav nav-tabs" id="userTab">
+            <div class="row mb-4 mt-4">
+                @if (!Model.GeboekteGroepsReizen.Any())
+                {
+                    <div class="alert alert-warning">
+                        Geen groepsreizen gevonden.
+                    </div>
+                }
+                else
+                {
+                    @foreach (var groepsreis in Model.GeboekteGroepsReizen)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+                                    @{
+                                        var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                    }
+                                    <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px; object-fit: cover; object-position: center;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+                                        <p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+                                        <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+                                        <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+                                        <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                    </div>
+                                </a>
 
-		<li class="nav-item">
-			<a class="nav-link active" data-bs-toggle="tab" href="#groepsReizen">Mijn Groepsreizen</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" data-bs-toggle="tab" href="#toekomstigeGroepsReizen">Te Ontdekken Groepsreizen</a>
-		</li>
-		@if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
-		{
+                                <!-- Reviewformulier voor afgeronde groepsreizen -->
+                                @if (groepsreis.Einddatum <= DateTime.Now && groepsreis.Einddatum > DateTime.Now.AddMonths(-1))
+                                {
+                                    var heeftReviewIngediend = groepsreis.Deelnemers.Any(d => d.ReviewScore != null);
 
-			<li class="nav-item">
-				<a class="nav-link" data-bs-toggle="tab" href="#ingeschrevenOpleidingen">Ingeschreven Opleidingen</a>
-			</li>
-			<li class="nav-item">
-				<a class="nav-link" data-bs-toggle="tab" href="#toekomstigeOpleidingen">Toekomstige Opleidingen</a>
-			</li>
-		}
+                                    if (!heeftReviewIngediend)
+                                    {
+                                        <div class="alert alert-info text-center">
+                                            <strong>Je hebt nog geen review gegeven voor deze reis!</strong>
+                                        </div>
 
-	</ul>
-	<div class="tab-content">
+                                        <div class="card mt-3">
+                                            <div class="card-body">
+                                                <h5>Laat een review achter</h5>
+                                                <form method="post" asp-action="VoegReviewToe" id="reviewForm-@groepsreis.Id">
+                                                    <input type="hidden" name="deelnemerId" value="@groepsreis.Deelnemers.FirstOrDefault()?.Id" />
+                                                    <div class="form-group">
+                                                        <label for="score">Beoordeel deze reis (1-5):</label>
+                                                        <select name="score" class="form-control" required>
+                                                            <option value="">Selecteer een score</option>
+                                                            @for (int i = 1; i <= 5; i++)
+                                                            {
+                                                                <option value="@i">@i</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mt-2">
+                                                        <label for="opmerkingen">Eventuele opmerkingen:</label>
+                                                        <textarea name="opmerkingen" class="form-control" rows="3"></textarea>
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary mt-3" onclick="hideReviewForm(@groepsreis.Id)">Review indienen</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-success text-center">
+                                            <strong>Bedankt voor je review!</strong>
+                                        </div>
+                                    }
+                                }
 
-		<!-- Tab 3: Mijn Groepsreizen Tab -->
-		<div id="groepsReizen" class="tab-pane fade show active">
-			<form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
-				<input type="hidden" name="filterType" value="mijnReizen" />
-				<div class="d-flex">
-					<div class="form-group me-2">
-						<select class="form-control" name="bestemming">
-							<option value="">Alle bestemmingen</option>
-							@foreach (var bestemming in Model.AlleBestemmingen)
-							{
-								<option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
-							}
-						</select>
-					</div>
-					<div class="form-group">
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-sliders"></i>
-						</button>
-					</div>
-				</div>
-			</form>
-
-
-			<div class="row mb-4 mt-4">
-				@if (!Model.GeboekteGroepsReizen.Any())
-				{
-					<div class="alert alert-warning">
-						Geen groepsreizen gevonden.
-					</div>
-				}
-				else
-				{
-					@foreach (var groepsreis in Model.GeboekteGroepsReizen)
-					{
-						<div class="col-md-4 mb-4">
-							<div class="card h-100">
-								<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-									@{
-										var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-									}
-									<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px; object-fit: cover; object-position: center;" />
-									<div class="card-body">
-										<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-										<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-										<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-										<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-										<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-									</div>
-								</a>
-							</div>
-						</div>
-					}
-				}
-			</div>
-		</div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
 
 
-		<!-- Tab 4: Te Ontdekken Groepsreizen -->
-		<div id="toekomstigeGroepsReizen" class="tab-pane fade">
-			<form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
-				<input type="hidden" name="filterType" value="teOntdekkenReizen" />
-				<div class="d-flex">
-					<div class="form-group me-2">
-						<select class="form-control" name="bestemming">
-							<option value="">Alle bestemmingen</option>
-							@foreach (var bestemming in Model.AlleBestemmingen)
-							{
-								<option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
-							}
-						</select>
-					</div>
-					<div class="form-group">
-						<button type="submit" class="btn btn-primary">
-							<i class="bi bi-sliders"></i>
-						</button>
-					</div>
-				</div>
-			</form>
+        <!-- Tab 4: Te Ontdekken Groepsreizen -->
+        <div id="toekomstigeGroepsReizen" class="tab-pane fade">
+            <form method="get" asp-action="Index" class="mb-4 mt-4 d-flex justify-content-center">
+                <input type="hidden" name="filterType" value="teOntdekkenReizen" />
+                <div class="d-flex">
+                    <div class="form-group me-2">
+                        <select class="form-control" name="bestemming">
+                            <option value="">Alle bestemmingen</option>
+                            @foreach (var bestemming in Model.AlleBestemmingen)
+                            {
+                                <option value="@bestemming.BestemmingsNaam">@bestemming.BestemmingsNaam</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-sliders"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
 
-			<div class="row mb-4 mt-4">
-				@if (!Model.ToekomstigeGroepsReizen.Any())
-				{
-					<div class="alert alert-warning">
-						Geen toekomstige groepsreizen gevonden.
-					</div>
-				}
-				else
-				{
-					@foreach (var groepsreis in Model.ToekomstigeGroepsReizen)
-					{
-						<div class="col-md-4 mb-4">
-							<div class="card h-100">
-								<a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
-									@{
-										var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
-									}
-									<img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px; object-fit: cover; object-position: center;" />
-									<div class="card-body">
-										<h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
-										<p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
-										<p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
-										<p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
-										<p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
-									</div>
-								</a>
-							</div>
-						</div>
-					}
-				}
-			</div>
-		</div>
-		@if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
-		{
-			<!-- Tab 1: Ingeschreven Opleidingen -->
-			<div id="ingeschrevenOpleidingen" class="tab-pane fade">
-				<div class="row mb-4 mt-4">
-					@if (!Model.IngeschrevenOpleidingen.Any())
-					{
-						<div class="alert alert-warning">
-							Geen ingeschreven opleidingen gevonden.
-						</div>
-					}
-					else
-					{
-						@foreach (var opleiding in Model.IngeschrevenOpleidingen)
-						{
-							<div class="col-md-4 mb-4">
-								<a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
-									<div class="card h-100">
-										<div class="card-body">
-											<h5 class="card-title">@opleiding.Naam</h5>
-											<p class="card-text">@opleiding.Beschrijving</p>
-											<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
-											<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
-										</div>
-									</div>
-								</a>
-							</div>
-						}
-					}
-				</div>
-			</div>
+            <div class="row mb-4 mt-4">
+                @if (!Model.ToekomstigeGroepsReizen.Any())
+                {
+                    <div class="alert alert-warning">
+                        Geen toekomstige groepsreizen gevonden.
+                    </div>
+                }
+                else
+                {
+                    @foreach (var groepsreis in Model.ToekomstigeGroepsReizen)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
+                                    @{
+                                        var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                    }
+                                    <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px; object-fit: cover; object-position: center;" />
+                                    <div class="card-body">
+                                        <h5 class="card-title">@groepsreis.Bestemming?.BestemmingsNaam</h5>
+                                        <p class="card-text">@groepsreis.Bestemming?.Beschrijving</p>
+                                        <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
+                                        <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
+                                        <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        @if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
+        {
+            <!-- Tab 1: Ingeschreven Opleidingen -->
+            <div id="ingeschrevenOpleidingen" class="tab-pane fade">
+                <div class="row mb-4 mt-4">
+                    @if (!Model.IngeschrevenOpleidingen.Any())
+                    {
+                        <div class="alert alert-warning">
+                            Geen ingeschreven opleidingen gevonden.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var opleiding in Model.IngeschrevenOpleidingen)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@opleiding.Naam</h5>
+                                            <p class="card-text">@opleiding.Beschrijving</p>
+                                            <p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
+                                            <p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
 
-			<!-- Tab 2: Toekomstige Opleidingen -->
-			<div id="toekomstigeOpleidingen" class="tab-pane fade">
-				<div class="row mb-4 mt-4">
-					@if (!Model.ToekomstigeOpleidingen.Any())
-					{
-						<div class="alert alert-warning">
-							Geen aankomende opleidingen gevonden.
-						</div>
-					}
-					else
-					{
-						@foreach (var opleiding in Model.ToekomstigeOpleidingen)
-						{
-							<div class="col-md-4 mb-4">
-								<a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
-									<div class="card h-100">
-										<div class="card-body">
-											<h5 class="card-title">@opleiding.Naam</h5>
-											<p class="card-text">@opleiding.Beschrijving</p>
-											<p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
-											<p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
-										</div>
-									</div>
-								</a>
-							</div>
-						}
-					}
-				</div>
-			</div>
-		}
+            <!-- Tab 2: Toekomstige Opleidingen -->
+            <div id="toekomstigeOpleidingen" class="tab-pane fade">
+                <div class="row mb-4 mt-4">
+                    @if (!Model.ToekomstigeOpleidingen.Any())
+                    {
+                        <div class="alert alert-warning">
+                            Geen aankomende opleidingen gevonden.
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var opleiding in Model.ToekomstigeOpleidingen)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <a asp-controller="Opleiding" asp-action="Details" asp-route-id="@opleiding.Id" class="text-decoration-none text-reset">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">@opleiding.Naam</h5>
+                                            <p class="card-text">@opleiding.Beschrijving</p>
+                                            <p class="card-text"><i class="bi bi-calendar-event"></i> @opleiding.Begindatum.ToShortDateString() - @opleiding.Einddatum.ToShortDateString()</p>
+                                            <p class="card-text"><i class="bi bi-people"></i> @opleiding.AantalPlaatsen</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
 
 
-	</div>
-	}
+    </div>
+}
 
-	
 @section Scripts {
-	<script>
-		$(document).ready(function () {
-			// Bij het klikken op een tab, wordt de naam van de tab opgeslagen in localStorage
-			$('a[data-bs-toggle="tab"]').on('click', function (e) {
-				var activeTab = $(e.target).attr('href'); // Krijg de href van de actieve tab
-				var tabGroupId = $(e.target).closest('ul').attr('id'); // Verkrijg het id van de tabgroep (userTab, myTab, etc.)
+    <script>
+        $(document).ready(function () {
+            // Bij het klikken op een tab, wordt de naam van de tab opgeslagen in localStorage
+            $('a[data-bs-toggle="tab"]').on('click', function (e) {
+                var activeTab = $(e.target).attr('href'); // Krijg de href van de actieve tab
+                var tabGroupId = $(e.target).closest('ul').attr('id'); // Verkrijg het id van de tabgroep (userTab, myTab, etc.)
 
-				// Sla de actieve tab op in localStorage voor deze specifieke tabgroep
-				localStorage.setItem('activeTab-' + tabGroupId, activeTab); // Bijv. 'activeTab-myTab'
+                // Sla de actieve tab op in localStorage voor deze specifieke tabgroep
+                localStorage.setItem('activeTab-' + tabGroupId, activeTab); // Bijv. 'activeTab-myTab'
 
-				if (activeTab !== "#opleidingen" && activeTab !== "#ingeschrevenOpleidingen" && activeTab !== "#toekomstigeOpleidingen") {
-					resetFilters(); // Reset de filters
-				}
-			});
+                if (activeTab !== "#opleidingen" && activeTab !== "#ingeschrevenOpleidingen" && activeTab !== "#toekomstigeOpleidingen") {
+                    resetFilters(); // Reset de filters
+                }
+            });
 
-			// Wanneer de pagina opnieuw geladen wordt, stel de actieve tab in op basis van localStorage
-			$('#userTab, #myTab').each(function () {
-				var tabGroupId = $(this).attr('id');
-				var activeTab = localStorage.getItem('activeTab-' + tabGroupId); // Haal de actieve tab op uit localStorage voor deze groep
-				if (activeTab) {
-					$('#' + tabGroupId + ' a[href="' + activeTab + '"]').tab('show'); // Herstel de actieve tab uit localStorage
-				}
-			});
-		});
+            // Wanneer de pagina opnieuw geladen wordt, stel de actieve tab in op basis van localStorage
+            $('#userTab, #myTab').each(function () {
+                var tabGroupId = $(this).attr('id');
+                var activeTab = localStorage.getItem('activeTab-' + tabGroupId); // Haal de actieve tab op uit localStorage voor deze groep
+                if (activeTab) {
+                    $('#' + tabGroupId + ' a[href="' + activeTab + '"]').tab('show'); // Herstel de actieve tab uit localStorage
+                }
+            });
+        });
 
-		// Functie om de filters te resetten
-		function resetFilters() {
-			// Reset alle selectievakken
-			$('select[name="bestemming"]').val(""); // Reset de bestemming filter
-			$('.btn').click();
-		}
+        // Functie om de filters te resetten
+        function resetFilters() {
+            // Reset alle selectievakken
+            $('select[name="bestemming"]').val(""); // Reset de bestemming filter
+            $('.btn').click();
+        }
 
-	</script>
+    </script>
 }
 
 

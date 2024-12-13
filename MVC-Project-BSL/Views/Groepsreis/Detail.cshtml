@@ -54,26 +54,82 @@
 <hr />
 
 
-<!-- Details van de groepsreis -->
-<div>
-	<h4>Details</h4>
-	<dl class="row">
-		<dt class="col-sm-2">Begindatum</dt>
-		<dd class="col-sm-10">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
+<div class="row">
+	<!-- Details van de groepsreis -->
+	<div class="col-md-6">
+		<h4>Details</h4>
+		<dl class="row">
+			<dt class="col-sm-4">Begindatum</dt>
+			<dd class="col-sm-8">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
 
-		<dt class="col-sm-2">Einddatum</dt>
-		<dd class="col-sm-10">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
+			<dt class="col-sm-4">Einddatum</dt>
+			<dd class="col-sm-8">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
 
-		<dt class="col-sm-2">Prijs</dt>
-		<dd class="col-sm-10">@Model.Prijs.ToString("C", new CultureInfo("nl-BE"))</dd>
+			<dt class="col-sm-4">Prijs</dt>
+			<dd class="col-sm-8">@Model.Prijs.ToString("C", new CultureInfo("nl-BE"))</dd>
 
-		<dt class="col-sm-2">Leeftijdscategorie</dt>
-		<dd class="col-sm-10">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
+			<dt class="col-sm-4">Leeftijdscategorie</dt>
+			<dd class="col-sm-8">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
-		<dt class="col-sm-2">Aantal Deelnemers</dt>
-		<dd class="col-sm-10">@Model.Deelnemers.Count()</dd>
+			<dt class="col-sm-4">Aantal deelnemers</dt>
+			<dd class="col-sm-8">@Model.Deelnemers.Count() / @Model.MaxAantalDeelnemers</dd>
+		</dl>
+	</div>
+
+	<!-- Reviews sectie -->
+	<div class="col-md-3">
+		<h4>Reviews</h4>
+
+		@if (ViewBag.Reviews != null && ((List<MVC_Project_BSL.Models.Deelnemer>)ViewBag.Reviews).Any())
+		{
+			<div>
+				<h5>Gemiddelde score: @ViewBag.GemiddeldeScore.ToString("0.0")/5</h5>
+				<div class="list-group">
+					@foreach (var review in (List<MVC_Project_BSL.Models.Deelnemer>)ViewBag.Reviews)
+					{
+						<div class="list-group-item mb-2">
+							<p><strong>Deelnemer:</strong> @review.Kind?.Voornaam @review.Kind?.Naam</p>
+							<p>
+								<strong>Score:</strong>
+								@for (var i = 1; i <= 5; i++)
+								{
+									if (i <= review.ReviewScore)
+									{
+										<i class="bi bi-star-fill text-warning"></i>
+									}
+									else
+									{
+										<i class="bi bi-star text-muted"></i>
+									}
+								}
+							</p>
+							<p><strong>Opmerking:</strong> @review.Review</p>
+
+							<!-- Verwijder Review-knop -->
+							@if (review.ReviewScore.HasValue)
+							{
+								<form method="post" asp-controller="Dashboard" asp-action="VerwijderReview" class="d-inline">
+									<input type="hidden" name="deelnemerId" value="@review.Id" />
+									<button type="submit" class="btn btn-danger btn-sm mt-2">
+										<i class="bi bi-trash"></i> <!-- Bootstrap Trash Icon -->
+										<span class="visually-hidden">Review verwijderen</span>
+									</button>
+								</form>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		}
+		else
+		{
+			<p>Er zijn nog geen reviews voor deze groepsreis.</p>
+		}
+	</div>
 	</dl>
 </div>
+
+
 @{
 	var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
     var gebruikerId = userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
@@ -86,14 +142,14 @@
 		<div class="col-md-6">
 			<div>
 				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenMonitorenModal">
-					Bekijk Ingeschreven Monitoren
+					Bekijk Ingeschreven monitoren
 				</button>
 			</div>
 			@if (User.IsInRole("Beheerder") || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven))
 			{
 				<div>
 					<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenDeelnemersModal">
-						Bekijk Ingeschreven Deelnemers
+						Bekijk Ingeschreven deelnemers
 					</button>
 				</div>
 			}
@@ -105,12 +161,12 @@
 		<div class="col-md-6">
 			<div>
 			<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareMonitorenModal">
-				Bekijk Beschikbare Monitoren
+				Bekijk beschikbare monitoren
 			</button>
 			</div>
 			<div>
 			<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#beschikbareDeelnemersModal">
-				Bekijk Beschikbare Deelnemers
+				Bekijk beschikbare deelnemers
 			</button>
 			</div>
 		</div>
@@ -276,7 +332,7 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="ingeschrevenDeelnemersModalLabel">Ingeschreven Deelnemers</h5>
+				<h5 class="modal-title" id="ingeschrevenDeelnemersModalLabel">Ingeschreven deelnemers</h5>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
@@ -407,6 +463,61 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+			</div>
+		</div>
+	</div>
+</div>
+	<!-- Knop voor het openen van de modal -->
+	<button type="button" class="btn btn-primary mb-4 w-25" data-bs-toggle="modal" data-bs-target="#beschikbareKinderenModal">
+		Schrijf een kind in
+	</button>
+
+<!-- Modal voor Beschikbare Kinderen -->
+<div class="modal fade" id="beschikbareKinderenModal" tabindex="-1" aria-labelledby="beschikbareKinderenModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="beschikbareKinderenModalLabel">Beschikbare Kinderen</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				@if (Model.BeschikbareDeelnemers != null && Model.BeschikbareDeelnemers.Any())
+				{
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Naam</th>
+								<th>Leeftijd</th>
+								<th>Actie</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var kind in Model.BeschikbareDeelnemers)
+							{
+								var leeftijd = DateTime.Now.Year - kind.Geboortedatum.Year;
+								if (DateTime.Now < kind.Geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+								<tr>
+									<td>@kind.Voornaam @kind.Naam</td>
+									<td>@leeftijd jaar</td>
+									<td>
+										<form asp-action="VoegDeelnemerToe" method="post">
+											<input type="hidden" name="groepsreisId" value="@Model.Id" />
+											<input type="hidden" name="kindId" value="@kind.Id" />
+											<button type="submit" class="btn btn-primary btn-sm">Schrijf In</button>
+										</form>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+				else
+				{
+					<div class="alert alert-warning">
+						Geen beschikbare kinderen om in te schrijven.
+					</div>
+				}
 			</div>
 		</div>
 	</div>
