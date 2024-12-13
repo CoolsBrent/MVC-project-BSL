@@ -7,7 +7,7 @@
 
 <div class="hero-section-dashboard bg-navbar text-black text-center py-5 rounded-3 mb-3 position-relative">
 	<div class="container">
-		<h2 class="display-4">Welkom op je dashboard, @User.Identity.Name!</h2>
+		<h2 class="display-4">Welkom op je dashboard, @ViewData["UserName"]!</h2>
 
 		<!-- Knop wordt absoluut gepositioneerd -->
 		<a href="@Url.Action("Index", "PersoonlijkeGegevens")" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px;">

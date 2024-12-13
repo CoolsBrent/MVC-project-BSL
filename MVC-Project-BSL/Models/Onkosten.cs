@@ -26,7 +26,7 @@ namespace MVC_Project_BSL.Models
         public string? Foto { get; set; }
 
         [NotMapped]
-        [RequiredIfNoFoto(ErrorMessage = "Het uploaden van een foto is verplicht.")]
+        [RequiredIfRoleHoofdmonitor(ErrorMessage = "Het uploaden van een foto is verplicht voor hoofdmonitoren.")]
         public IFormFile? FotoFile { get; set; }
 
         public int GroepsreisId { get; set; }
