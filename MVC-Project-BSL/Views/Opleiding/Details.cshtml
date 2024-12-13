@@ -93,9 +93,14 @@
 </div>
 
 <p>
-	<a asp-action="Index" class="btn btn-secondary">Terug naar Lijst</a>
-	<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Bewerken</a>
-	<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Verwijderen</a>
+
+	<a href="javascript:history.back()" class="btn btn-secondary">Terug</a>
+	@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
+	{
+		<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Bewerken</a>
+		<a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Verwijderen</a>
+	}
+
 </p>
 
 

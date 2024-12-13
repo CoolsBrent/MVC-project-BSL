@@ -138,6 +138,7 @@
 						<thead>
 							<tr>
 								<th>Naam</th>
+								<th>Leeftijd</th>
 								<th>Hoofdmonitor</th>
 								<th>Telefoonnummer</th>
 								<th>Emailadres</th>
@@ -152,6 +153,14 @@
 							{
 								<tr class="user-row">
 									<td class="user-fullname">@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td>
+									<td>
+									@{
+										var geboortedatum = monitor.Monitor.Persoon.Geboortedatum;
+										var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+										if (DateTime.Now < geboortedatum.AddYears(leeftijd)) { leeftijd--; }
+										@leeftijd
+									}
+									</td>
 									<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
 									<td>@monitor.Monitor.Persoon.TelefoonNummer</td>
 									<td>@monitor.Monitor.Persoon.Email</td>
@@ -285,6 +294,8 @@
 								<th>Leeftijd</th>
 								<th>Telefoonnummer</th>
 								<th>Ouder/Voogd</th>
+								<th>Allergieën</th>
+								<th>Medicatie</th>
 								@if (User.IsInRole("Beheerder"))
 								{
 									<th>Actie</th>
@@ -303,6 +314,9 @@
 									<td>@leeftijd jaar</td>
 									<td>@deelnemer.Kind.Persoon.TelefoonNummer</td>
 									<td>@deelnemer.Kind.Persoon.Voornaam @deelnemer.Kind.Persoon.Naam</td>
+									<td>@deelnemer.Kind.Allergieen</td>
+									<td>@deelnemer.Kind.Medicatie</td>
+
 									@if (User.IsInRole("Beheerder"))
 									{
 										<td>

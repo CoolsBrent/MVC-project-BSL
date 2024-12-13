@@ -65,7 +65,7 @@ namespace MVC_Project_BSL.Controllers
 				if (opleiding != null)
 				{
 					var heeftAfgerond = opleiding.OpleidingPersonen
-						.Any(op => op.OpleidingId == opleiding.Id && op.Opleiding.Einddatum < DateTime.Now);
+						.Any(op => op.OpleidingId == opleiding.Id && op.Opleiding.OpleidingVereist.Einddatum < DateTime.Now);
 
 					ViewData["HeeftVereisteOpleidingAfgerond"] = heeftAfgerond;
 				}
