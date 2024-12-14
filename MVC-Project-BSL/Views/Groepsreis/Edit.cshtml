@@ -1,11 +1,11 @@
-﻿@using System.Globalization
+@using System.Globalization
 @model MVC_Project_BSL.Models.Groepsreis
 
 @{
-    ViewBag.Title = "Bewerk Groepsreis";
+    ViewBag.Title = "Bewerk groepsreis";
 }
 
-<h2>Bewerk Groepsreis</h2>
+<h2>Bewerk groepsreis</h2>
 
 <form asp-action="Edit" method="post" enctype="multipart/form-data">
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -50,7 +50,13 @@
         <span asp-validation-for="BestemmingId" class="text-danger"></span>
     </div>
 
-    
+
+    <div class="form-group">
+        <label asp-for="MaxAantalDeelnemers" class="control-label">Maximum aantal deelnemers</label>
+        <input asp-for="MaxAantalDeelnemers" class="form-control" />
+        <span asp-validation-for="MaxAantalDeelnemers" class="text-danger"></span>
+    </div>
+
     <div class="form-group mt-2">
         <input type="submit" value="Opslaan" class="btn btn-primary" />
         <a asp-action="Index" class="btn btn-secondary">Annuleren</a>
@@ -68,94 +74,5 @@
 
     @await Html.PartialAsync("_ValidationScriptsPartial")
 
-    <script>
-        $(document).ready(function () {
-            // Voeg de custom validator toe
-            $.validator.addMethod("requiredifnofoto", function (value, element, parameters) {
-                var foto = $(element).data("foto");
-                if (!foto) {
-                    return value && value.length > 0;
-                }
-                return true;
-            });
-
-            $.validator.unobtrusive.adapters.add("requiredifnofoto", [], function (options) {
-                options.rules["requiredifnofoto"] = {};
-                options.messages["requiredifnofoto"] = options.message;
-            });
-
-            var onkostenCounter = @Model.Onkosten?.Count() ?? 0;
-
-            // Voeg nieuwe onkost toe
-            $('#btnAddOnkost').click(function () {
-                var index = onkostenCounter++;
-                var newRow = '<tr>' +
-                    '<td><input class="form-control autocomplete" name="Onkosten[' + index + '].Titel" />' +
-                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Titel" data-valmsg-replace="true"></span></td>' +
-                    '<td><input class="form-control" name="Onkosten[' + index + '].Omschrijving" />' +
-                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Omschrijving" data-valmsg-replace="true"></span></td>' +
-                    '<td><input class="form-control" type="number" step="1" name="Onkosten[' + index + '].Bedrag" />' +
-                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Bedrag" data-valmsg-replace="true"></span></td>' +
-                    '<td><input class="form-control" type="date" name="Onkosten[' + index + '].Datum" />' +
-                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].Datum" data-valmsg-replace="true"></span></td>' +
-                    '<td><input type="file" class="form-control" name="Onkosten[' + index + '].FotoFile" data-val="true" data-val-requiredifnofoto="Het uploaden van een foto is verplicht." data-foto="" />' +
-                    '<span class="text-danger field-validation-valid" data-valmsg-for="Onkosten[' + index + '].FotoFile" data-valmsg-replace="true"></span></td>' +
-                    '<td><button type="button" class="btn btn-danger remove-onkost">Verwijderen</button></td>' +
-                    '<input type="hidden" name="Onkosten[' + index + '].GroepsreisId" value="@Model.Id" />' +
-                    '</tr>';
-                $('#onkostenTable tbody').append(newRow);
-
-                // Re-initialiseer de validatie voor de nieuw toegevoegde elementen
-                $.validator.unobtrusive.parse('#onkostenTable');
-
-                // Initialiseer autocomplete voor de nieuwe titelvelden
-                initializeAutocomplete();
-            });
-
-            // Verwijder onkost
-            $(document).on('click', '.remove-onkost', function () {
-                $(this).closest('tr').remove();
-            });
-
-            // Functie voor autocomplete
-            function initializeAutocomplete() {
-                $('.autocomplete').autocomplete({
-                    source: function (request, response) {
-                        $.ajax({
-                            url: '@Url.Action("GetOnkosten", "Groepsreis")', // De actie in je controller
-                            dataType: "json",
-                            data: {
-                                term: request.term // De zoekterm die je invoert
-                            },
-                            success: function (data) {
-                                response(data); // Geef de zoekresultaten terug
-                            },
-                            error: function () {
-                                response([]); // Lege lijst teruggeven bij fout
-                            }
-                        });
-                    },
-                    minLength: 0, // Start zoekopdracht zonder minimaal aantal tekens
-                    select: function (event, ui) {
-                        $(this).val(ui.item.value); // Vul het tekstveld met de geselecteerde waarde
-                        return false; // Voorkom dat het automatisch invult bij hover
-                    },
-                    open: function () {
-                        // Eventueel kun je hier extra logica toevoegen, bijvoorbeeld styling voor de lijst
-                    }
-                });
-
-                // Trigger autocomplete direct als je op het tekstvak klikt (zonder zoekterm)
-                $(document).on('focus', '.autocomplete', function () {
-                    $(this).autocomplete("search", ""); // Start de zoekfunctie met een lege zoekterm
-                });
-            }
-
-            // Initialiseer autocomplete voor al bestaande velden
-            initializeAutocomplete();
-        });
-
-
-    </script> 
 
 }

@@ -3,7 +3,7 @@
 <!-- Container -->
 <div class="container mt-5">
     <!-- Page Title -->
-    <h1 class="text-center mb-4">Nieuwe Activiteit Toevoegen</h1>
+    <h1 class="text-center mb-4">Nieuwe activiteit toevoegen</h1>
 
     <!-- Form Card -->
     <div class="card shadow-sm" style="border: 1px solid #d4592b;">
@@ -12,7 +12,7 @@
 
                 <!-- Naam Input -->
                 <div class="form-row mb-3">
-                    <label asp-for="Naam" class="form-label font-weight-bold text-secondary">Naam van de Activiteit</label>
+                    <label asp-for="Naam" class="form-label font-weight-bold text-secondary">Naam van de activiteit</label>
                     <input asp-for="Naam" class="form-control" placeholder="Bijv. Yoga Sessies" />
                     <span asp-validation-for="Naam" class="text-danger small"></span>
                 </div>
@@ -26,7 +26,7 @@
 
                 <!-- Groepsreizen Checkbox Group -->
                 <div class="form-row mb-3">
-                    <label class="form-label font-weight-bold text-secondary">Koppel aan Groepsreizen</label>
+                    <label class="form-label font-weight-bold text-secondary">Koppel aan groepsreizen</label>
                     <div class="d-flex flex-wrap p-3 border rounded bg-light">
                         @foreach (var groepsreisOption in Model.GroepsreisOptions)
                         {

@@ -27,7 +27,9 @@ namespace MVC_Project_BSL.Models
 		public ICollection<Programma>? Programmas { get; set; }
 		public List<Onkosten>? Onkosten { get; set; } = new List<Onkosten>();
 		public ICollection<Deelnemer>? Deelnemers { get; set; }
-		[NotMapped]
+        public int MaxAantalDeelnemers { get; set; }
+        public ICollection<Deelnemer> Wachtlijst { get; set; } = new List<Deelnemer>();
+        [NotMapped]
 		public ICollection<Monitor> BeschikbareMonitoren { get; set; } = new List<Monitor>();
 		[NotMapped]
 		public ICollection<GroepsreisMonitor> IngeschrevenMonitoren { get; set; } = new List<GroepsreisMonitor>();

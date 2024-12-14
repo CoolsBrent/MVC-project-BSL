@@ -15,11 +15,16 @@
     </a>
 </p>
 
+<div class="mb-3">
+    <label for="filterBestemming" class="form-label">Filter op bestemming</label>
+    <input type="text" id="filterBestemming" class="form-control autocomplete" placeholder="Typ een bestemmingsnaam...">
+</div>
+
 @if (!Model.ActieveGroepsreizen.Any() && !Model.GearchiveerdeGroepsreizen.Any())
 {
     <div class="alert alert-warning">
         Er zijn momenteel geen groepsreizen beschikbaar. <br />
-        <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe Groepsreis">
+        <a asp-action="Create" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe groepsreis">
             <i class="bi bi-plus-circle h4 text-white"></i>
         </a>
     </div>
@@ -27,7 +32,7 @@
 else
 {
     <!-- Actieve Groepsreizen -->
-    <h2>Actieve Groepsreizen</h2>
+    <h2>Actieve groepsreizen</h2>
     @if (!Model.ActieveGroepsreizen.Any())
     {
         <p>Er zijn geen actieve groepsreizen.</p>
@@ -43,6 +48,7 @@ else
                     <th>Beschrijving</th>
                     <th>Leeftijdscategorie</th>
                     <th>Prijs</th>
+                    <th>Plaatsen</th>
                     <th>Acties</th>
                 </tr>
             </thead>
@@ -53,14 +59,15 @@ else
                         <td>@groepsreis.Begindatum.ToShortDateString()</td>
                         <td>@groepsreis.Einddatum.ToShortDateString()</td>
                         <td>@groepsreis.Bestemming?.BestemmingsNaam</td>
-                        <td style="width: 35%; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal";>
+                        <td style="width: 35%; max-height: 100px; word-wrap: break-word; word-break: break-word; white-space: normal;">
                             <div style="max-height: 100px; overflow-y: auto;">
                                 @groepsreis.Bestemming?.Beschrijving
                             </div>
                         </td>
                         <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
                         <td style="width: 15%">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
-                        <td style="width:25%">
+                        <td>@groepsreis?.Deelnemers?.Count / @groepsreis?.MaxAantalDeelnemers</td>
+                        <td style="width:50%">
                             <!-- Details knop -->
                             <a asp-action="Detail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Details">
                                 <i class="bi bi-eye h5 text-white"></i>
@@ -74,7 +81,7 @@ else
                             <!-- Archiveren knop -->
                             <form asp-action="Archive" asp-route-id="@groepsreis.Id" method="post" style="display:inline;">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-warning me-1" data-bs-toggle="tooltip" title="Archiveren">
+                                <button type="button" style="width: 45.6px; height:39.2px" class="btn btn-warning me-1 archive-button" data-bs-toggle="modal" data-bs-target="#archiveModal" data-id="@groepsreis.Id" data-name="@groepsreis.Bestemming?.BestemmingsNaam">
                                     <i class="bi bi-archive h5"></i>
                                 </button>
                             </form>
@@ -91,7 +98,7 @@ else
     }
 
     <!-- Gearchiveerde Groepsreizen -->
-    <h2>Gearchiveerde Groepsreizen</h2>
+    <h2>Gearchiveerde groepsreizen</h2>
     @if (!Model.GearchiveerdeGroepsreizen.Any())
     {
         <p>Er zijn geen gearchiveerde groepsreizen.</p>
@@ -107,6 +114,7 @@ else
                     <th>Beschrijving</th>
                     <th>Leeftijdscategorie</th>
                     <th>Prijs</th>
+                    <th>Plaatsen</th>
                     <th>Acties</th>
                 </tr>
             </thead>
@@ -124,7 +132,8 @@ else
                         </td>
                         <td>@groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</td>
                         <td style="width: 15%">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</td>
-                        <td>
+                        <td>@groepsreis.Deelnemers?.Count / @groepsreis.MaxAantalDeelnemers</td>
+                        <td width="50%">
                             <!-- Bekijken knop -->
                             <a asp-action="ArchivedDetail" asp-route-id="@groepsreis.Id" class="btn btn-primary me-1" data-bs-toggle="tooltip" title="Bekijken">
                                 <i class="bi bi-eye h5 text-white"></i>
@@ -148,10 +157,36 @@ else
             </tbody>
         </table>
     }
+    <!-- Modal voor bevestiging -->
+    <div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="archiveModalLabel">Groepsreis archiveren</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+                </div>
+                <div class="modal-body">
+                    Ben je zeker dat je de groepsreis met bestemming"<span id="modalGroupName"></span>" wilt archiveren?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+                    <form id="archiveForm" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-warning">Ja, archiveren</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
 
+@section Scripts {
 <!-- Bootstrap 5.3.0 JS (inclusief Popper) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeo0AEKN0dVPr5QK3qtCbhX5cZ1mJJ0k/tVxMn56X50lYqFm" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
 
 <script>
     // Initialiseer tooltips
@@ -161,4 +196,85 @@ else
             new bootstrap.Tooltip(tooltipTriggerEl)
         })
     });
+
+            function initializeAutocomplete() {
+                $('.autocomplete').autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '@Url.Action("GetBestemmingen", "Groepsreis")',
+                            dataType: "json",
+                            data: { term: request.term },
+                            success: function (data) {
+                                console.log("Data ontvangen:", data);
+                                response(data);
+                            },
+                            error: function () {
+                                console.error("Fout in autocomplete AJAX");
+                                response([]);
+                            }
+                        });
+                    },
+                    minLength: 0,
+                    select: function (event, ui) {
+                        console.log("Geselecteerd:", ui.item.value);
+                        $(this).val(ui.item.value);
+                        filterTabel(ui.item.value);
+                        return false;
+                    }
+                });
+
+                // Trigger autocomplete direct bij focus
+                $(document).on('focus', '.autocomplete', function () {
+                    $(this).autocomplete("search", "");
+                });
+            }
+
+            function filterTabel(zoekterm) {
+                if (!zoekterm.trim()) {
+                    console.log("Zoekterm is leeg, toon alle reizen.");
+                    $('table tbody tr').show(); // Toon alle rijen
+                    return;
+                }
+
+                console.log("Filteren op:", zoekterm);
+                $('table tbody tr').each(function () {
+                    var bestemmingsNaam = $(this).find('td:nth-child(3)').text().toLowerCase();
+                    if (bestemmingsNaam.includes(zoekterm.toLowerCase())) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+
+            $(document).ready(function () {
+                initializeAutocomplete();
+
+                // Controleer op het leegmaken van de zoekbalk
+                $('#filterBestemming').on('keyup', function () {
+                    const zoekterm = $(this).val();
+                    filterTabel(zoekterm); // Roep de filterfunctie aan
+                });
+            });
+
+            //Modal archiveren
+        document.addEventListener('DOMContentLoaded', function () {
+            const archiveModal = document.getElementById('archiveModal');
+            const archiveForm = document.getElementById('archiveForm');
+            const modalGroupName = document.getElementById('modalGroupName');
+
+            archiveModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const groupId = button.getAttribute('data-id');
+                const groupName = button.getAttribute('data-name');
+
+                // Update modal content
+                modalGroupName.textContent = groupName || "onbekend";
+
+                // Update form action URL
+                archiveForm.action = `/Groepsreis/Archive/${groupId}`;
+            });
+        });
+
 </script>
+}
