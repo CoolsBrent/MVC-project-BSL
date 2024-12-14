@@ -1,0 +1,60 @@
+﻿@model MVC_Project_BSL.Models.Groepsreis
+
+@{
+    ViewData["Title"] = "Onkosten Overzicht";
+    var groepsreisNaam = ViewBag.GroepsreisNaam ?? "Onbekende Groepsreis";
+}
+
+<h1>Onkosten Overzicht voor: @groepsreisNaam</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Omschrijving</th>
+            <th>Bedrag</th>
+            <th>Datum</th>
+            <th>Foto</th>
+            <th>Acties</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Onkosten.Any())
+        {
+            int index = 1;
+            foreach (var onkost in Model.Onkosten)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>@Html.DisplayFor(modelItem => onkost.Omschrijving)</td>
+                    <td>€ @Html.DisplayFor(modelItem => onkost.Bedrag)</td>
+                    <td>@Html.DisplayFor(modelItem => onkost.Datum)</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(onkost.Foto))
+                        {
+                            <img src="@onkost.Foto" alt="Foto van de onkost" style="max-width: 100px;" />
+                        }
+                        else
+                        {
+                            <span>Geen foto</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@onkost.Id" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="Edit" asp-route-id="@onkost.Id" class="btn btn-warning btn-sm">Bewerken</a>
+                        <a asp-action="Delete" asp-route-id="@onkost.Id" class="btn btn-danger btn-sm">Verwijderen</a>
+                    </td>
+                </tr>
+                index++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" class="text-center">Geen onkosten gevonden.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Nieuwe Onkost Toevoegen</a>

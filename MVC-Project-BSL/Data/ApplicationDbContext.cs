@@ -45,7 +45,7 @@ namespace MVC_Project_BSL.Data
         public DbSet<Groepsreis> Groepsreizen { get; set; }
 
         /// <summary> Monitoren die groepsreizen begeleiden. </summary>
-        public DbSet<Monitor> Monitoren { get; set; }
+        public DbSet<Models.Monitor> Monitoren { get; set; }
 
         /// <summary> Kinderen die deelnemen aan groepsreizen. </summary>
         public DbSet<Kind> Kinderen { get; set; }

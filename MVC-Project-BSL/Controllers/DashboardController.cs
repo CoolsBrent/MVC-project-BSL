@@ -35,8 +35,11 @@ namespace MVC_Project_BSL.Controllers
 		public async Task<IActionResult> Index(string bestemming, string filterType)
 		{
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var user = await _userManager.GetUserAsync(User); // Haal de CustomUser op
+            var userName = user != null ? user.Voornaam + " " + user.Naam : "Onbekende gebruiker"; // Stel een fallback in als er geen gebruiker is
 
-			if (string.IsNullOrEmpty(userId))
+            ViewData["UserName"] = userName; // Zet de naam in ViewData
+            if (string.IsNullOrEmpty(userId))
 			{
 				return Unauthorized(); // Als het gebruikers-ID niet beschikbaar is
 			}
@@ -49,12 +52,13 @@ namespace MVC_Project_BSL.Controllers
 
 			// Controleer of de gebruiker een beheerder is
 			bool isBeheerder = await _userManager.IsInRoleAsync(gebruiker, "Beheerder");
+			bool isVerantwoordelijke = await _userManager.IsInRoleAsync(gebruiker, "Verantwoordelijke");
 			bool isMonitor = await _userManager.IsInRoleAsync(gebruiker, "Monitor");
 			bool isHoofdmonitor = await _userManager.IsInRoleAsync(gebruiker, "Hoofdmonitor");
 
 			GroepsreisViewModel model;
 
-			if (isBeheerder)
+			if (isBeheerder || isVerantwoordelijke)
 			{
 				// Haal alle groepsreizen op voor beheerders, inclusief filters
 				var alleGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
