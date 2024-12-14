@@ -492,39 +492,39 @@ namespace MVC_Project_BSL.Controllers
 				.FirstOrDefaultAsync(g => g.Id == groepsreisId);
 
 			if (groepsreis == null)
-				return NotFound("Groepsreis niet gevonden.");
+				return RedirectToAction("Index", "Groepsreis");
 
 			// Controleer of het kind bestaat en al ingeschreven is
 			var kind = await _unitOfWork.KindRepository.GetQueryable()
 				.FirstOrDefaultAsync(k => k.Id == kindId);
+
 			if (kind == null)
-				return NotFound("Kind niet gevonden.");
+				return RedirectToAction("Detail", new { id = groepsreisId });
+
 			if (groepsreis.Deelnemers.Any(d => d.KindId == kindId) || groepsreis.Wachtlijst.Any(w => w.KindId == kindId))
-				return BadRequest("Kind is al ingeschreven of staat in de wachtlijst.");
+				return RedirectToAction("Detail", new { id = groepsreisId });
 
 			// Controleer of de groepsreis vol is
 			if (groepsreis.Deelnemers.Count >= groepsreis.MaxAantalDeelnemers)
 			{
-				// Voeg toe aan de wachtlijst
 				groepsreis.Wachtlijst.Add(new Deelnemer { KindId = kindId, GroepsreisDetailId = groepsreisId });
 
-				// Controleer of de wachtlijst lang genoeg is voor een nieuwe groepsreis
 				if (groepsreis.Wachtlijst.Count >= groepsreis.MaxAantalDeelnemers / 2)
 				{
-					// Maak een nieuwe groepsreis
 					await MaakNieuweGroepsreisVanWachtlijst(groepsreis);
 				}
 
 				_unitOfWork.SaveChanges();
-				return Ok("De groepsreis is vol. Het kind is toegevoegd aan de wachtlijst.");
+				return RedirectToAction("Detail", new { id = groepsreisId });
 			}
 
 			// Voeg toe aan de deelnemerslijst
 			groepsreis.Deelnemers.Add(new Deelnemer { KindId = kindId, GroepsreisDetailId = groepsreisId });
 			_unitOfWork.SaveChanges();
 
-			return Ok("Het kind is succesvol toegevoegd aan de groepsreis.");
+			return RedirectToAction("Detail", new { id = groepsreisId });
 		}
+
 
 		private async Task MaakNieuweGroepsreisVanWachtlijst(Groepsreis origineleGroepsreis)
 		{
