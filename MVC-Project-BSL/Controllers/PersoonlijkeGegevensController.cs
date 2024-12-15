@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using MVC_Project_BSL.Data.UnitOfWork;
 using MVC_Project_BSL.Models;
 using MVC_Project_BSL.ViewModels;
+using System.Diagnostics;
 
 namespace MVC_Project_BSL.Controllers
 {
@@ -139,49 +140,81 @@ namespace MVC_Project_BSL.Controllers
             TempData["SuccessMessage"] = "Gebruiker gegevens zijn correct opgeslagen!";
             return RedirectToAction(nameof(Index));
         }
-        #endregion
+		#endregion
 
-        #region Add Kind Action
-        // POST: Create actie om een kind toe te voegen
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddKind(KindGegevensViewModel kindModel)
-        {
-            if (!ModelState.IsValid)
-            {
-                TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
-                return RedirectToAction(nameof(Index));
-            }
+		#region Add Kind Action
+		// POST: Create actie om een kind toe te voegen
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> AddKind(KindGegevensViewModel kindModel)
+		{
+			// Debug: Controleer of het ModelState geldig is
+			if (!ModelState.IsValid)
+			{
+				TempData["ErrorMessage"] = "Er is iets mis met de ingevoerde gegevens.";
+				Debug.WriteLine($"[DEBUG] ModelState is not valid: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
+				return RedirectToAction(nameof(Index));
+			}
 
-            var userId = int.Parse(_userManager.GetUserId(User));
-            var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
+			// Debug: Log gebruiker ID ophalen
+			var userId = int.Parse(_userManager.GetUserId(User));
+			Debug.WriteLine($"[DEBUG] Retrieved UserId: {userId}");
 
-            if (user == null)
-            {
-                return NotFound("Gebruiker niet gevonden.");
-            }
+			// Debug: Haal gebruiker op inclusief kinderen
+			var user = await _unitOfWork.CustomUserRepository.GetByIdWithIncludesAsync(userId, u => u.Kinderen);
+			if (user == null)
+			{
+				Debug.WriteLine($"[DEBUG] User with ID {userId} not found.");
+				return NotFound("Gebruiker niet gevonden.");
+			}
 
-            var kind = new Kind
-            {
-                Naam = kindModel.Naam,
-                Voornaam = kindModel.Voornaam,
-                Geboortedatum = kindModel.Geboortedatum,
-                Allergieen = string.IsNullOrWhiteSpace(kindModel.Allergieen) ? "Geen" : kindModel.Allergieen,
-                Medicatie = string.IsNullOrWhiteSpace(kindModel.Medicatie) ? "Geen" : kindModel.Medicatie,
-                PersoonId = userId
-            };
+			Debug.WriteLine($"[DEBUG] User '{user.Naam}' has {user.Kinderen.Count} children before adding a new one.");
 
-            await _unitOfWork.KindRepository.AddAsync(kind);
-            _unitOfWork.SaveChanges();
+			// Maak het nieuwe kind aan
+			var kind = new Kind
+			{
+				Naam = kindModel.Naam,
+				Voornaam = kindModel.Voornaam,
+				Geboortedatum = kindModel.Geboortedatum,
+				Allergieen = string.IsNullOrWhiteSpace(kindModel.Allergieen) ? "Geen" : kindModel.Allergieen,
+				Medicatie = string.IsNullOrWhiteSpace(kindModel.Medicatie) ? "Geen" : kindModel.Medicatie,
+				PersoonId = userId
+			};
 
-            TempData["SuccessMessage"] = $"Kind '{kind.Voornaam} {kind.Naam}' is succesvol toegevoegd!";
-            return RedirectToAction(nameof(Index));
-        }
-        #endregion
+			// Debug: Log details van het nieuwe kind
+			Debug.WriteLine($"[DEBUG] Creating new child: {kind.Voornaam} {kind.Naam}, Geboortedatum: {kind.Geboortedatum}, Allergieën: {kind.Allergieen}, Medicatie: {kind.Medicatie}, PersoonId: {kind.PersoonId}");
 
-        #region Edit Kind Action
-        // POST: Edit Kind actie
-        [HttpPost]
+			// Voeg het nieuwe kind toe
+			try
+			{
+				await _unitOfWork.KindRepository.AddAsync(kind);
+
+				// Debug: Log database wijzigingen
+				Debug.WriteLine("[DEBUG] Attempting to save changes to database.");
+				_unitOfWork.SaveChanges();
+
+				Debug.WriteLine($"[DEBUG] New child '{kind.Voornaam} {kind.Naam}' added successfully.");
+			}
+			catch (Exception ex)
+			{
+				// Debug: Log eventuele fouten bij het opslaan
+				Debug.WriteLine($"[ERROR] Exception while saving new child: {ex.Message}");
+				TempData["ErrorMessage"] = "Er is een fout opgetreden bij het toevoegen van het kind.";
+				return RedirectToAction(nameof(Index));
+			}
+
+			// Debug: Controleer aantal kinderen na toevoeging
+			Debug.WriteLine($"[DEBUG] User '{user.Naam}' now has {user.Kinderen.Count} children after adding a new one.");
+
+			TempData["SuccessMessage"] = $"Kind '{kind.Voornaam} {kind.Naam}' is succesvol toegevoegd!";
+			return RedirectToAction(nameof(Index));
+		}
+
+		#endregion
+
+		#region Edit Kind Action
+		// POST: Edit Kind actie
+		[HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditKind(KindGegevensViewModel kindModel)
         {

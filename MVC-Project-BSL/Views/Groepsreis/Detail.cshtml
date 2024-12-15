@@ -467,10 +467,14 @@
 		</div>
 	</div>
 </div>
+@if (User.Identity.IsAuthenticated)
+{
 	<!-- Knop voor het openen van de modal -->
 	<button type="button" class="btn btn-primary mb-4 w-25" data-bs-toggle="modal" data-bs-target="#beschikbareKinderenModal">
 		Schrijf een kind in
 	</button>
+}
+	
 
 <!-- Modal voor Beschikbare Kinderen -->
 <div class="modal fade" id="beschikbareKinderenModal" tabindex="-1" aria-labelledby="beschikbareKinderenModalLabel" aria-hidden="true">

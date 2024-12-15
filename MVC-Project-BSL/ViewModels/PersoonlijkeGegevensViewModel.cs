@@ -39,10 +39,8 @@ namespace MVC_Project_BSL.ViewModels
 
         [Required(ErrorMessage = "Geboortedatum is verplicht.")]
         public DateTime Geboortedatum { get; set; }
-        [Required(ErrorMessage = "Allergieën verplicht")]
-        public string Allergieen { get; set; } = "Geen";
-        [Required(ErrorMessage = "Medicatie verplicht")]
-        public string Medicatie { get; set; } = "Geen";
+        public string? Allergieen { get; set; } = "Geen";
+        public string? Medicatie { get; set; } = "Geen";
         public int PersoonId { get; set; }
     }
 }

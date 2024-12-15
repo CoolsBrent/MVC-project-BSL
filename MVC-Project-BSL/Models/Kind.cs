@@ -15,10 +15,8 @@ namespace MVC_Project_BSL.Models
 
         [Required(ErrorMessage = "Geboortedatum is verplicht.")]
         public DateTime Geboortedatum { get; set; }
-
-        public string? Allergieen { get; set; }
-
-        public string? Medicatie { get; set; }
+        public string? Allergieen { get; set; } = "Geen";
+        public string? Medicatie { get; set; } = "Geen";
 
         // Navigatie-eigenschappen
         public CustomUser Persoon { get; set; }
