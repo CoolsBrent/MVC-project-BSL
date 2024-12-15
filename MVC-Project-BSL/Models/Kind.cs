@@ -13,10 +13,10 @@ namespace MVC_Project_BSL.Models
 		[Required(ErrorMessage = "Voornaam is verplicht.")]
 		public string Voornaam { get; set; }
 
-		[Required(ErrorMessage = "Geboortedatum is verplicht.")]
-		public DateTime Geboortedatum { get; set; }
-		public string? Allergieen { get; set; } = "Geen";
-		public string? Medicatie { get; set; } = "Geen";
+    [Required(ErrorMessage = "Geboortedatum is verplicht.")]
+    public DateTime Geboortedatum { get; set;
+    public string? Allergieen { get; set; } = "Geen";
+    public string? Medicatie { get; set; } = "Geen";
 
 		// Navigatie-eigenschappen
 		public CustomUser Persoon { get; set; }
