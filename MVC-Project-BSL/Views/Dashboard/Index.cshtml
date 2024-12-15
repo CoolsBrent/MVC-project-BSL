@@ -101,6 +101,9 @@
                                     @{
                                         // Haal de eerste foto op, als deze beschikbaar is
                                         var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                        var ingeschrevenDeelnemers = groepsreis?.Deelnemers
+                                        .Where(d => !groepsreis.Wachtlijst.Any(w => w.KindId == d.KindId))
+                                        .ToList();
                                     }
                                     <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
 													object-position: center;" />
@@ -110,6 +113,7 @@
                                         <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
                                         <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
                                         <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                        <p class="card-text">@ingeschrevenDeelnemers.Count() / @groepsreis.MaxAantalDeelnemers</p>
                                     </div>
                                 </a>
                             </div>
@@ -157,6 +161,9 @@
                                     @{
                                         // Haal de eerste foto op, als deze beschikbaar is
                                         var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                        var ingeschrevenDeelnemers = groepsreis?.Deelnemers
+                                        .Where(d => !groepsreis.Wachtlijst.Any(w => w.KindId == d.KindId))
+                                        .ToList();
                                     }
                                     <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px;object-fit: cover;
 										object-position: center;" />
@@ -166,6 +173,7 @@
                                         <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
                                         <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
                                         <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                        <p class="card-text">@ingeschrevenDeelnemers.Count() / @groepsreis.MaxAantalDeelnemers</p>
                                     </div>
                                 </a>
                             </div>
@@ -273,6 +281,9 @@
                                 <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
                                     @{
                                         var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                        var ingeschrevenDeelnemers = groepsreis?.Deelnemers
+                                        .Where(d => !groepsreis.Wachtlijst.Any(w => w.KindId == d.KindId))
+                                        .ToList();
                                     }
                                     <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px; object-fit: cover; object-position: center;" />
                                     <div class="card-body">
@@ -281,6 +292,7 @@
                                         <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
                                         <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
                                         <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                        <p class="card-text">@ingeschrevenDeelnemers.Count() / @groepsreis.MaxAantalDeelnemers</p>
                                     </div>
                                 </a>
 
@@ -373,6 +385,9 @@
                                 <a asp-controller="Groepsreis" asp-action="Detail" asp-route-id="@groepsreis.Id" class="text-decoration-none text-reset">
                                     @{
                                         var eersteFoto = groepsreis.Bestemming?.Fotos?.FirstOrDefault();
+                                        var ingeschrevenDeelnemers = groepsreis.Deelnemers
+                                        .Where(d => !groepsreis.Wachtlijst.Any(w => w.KindId == d.KindId))
+                                        .ToList();
                                     }
                                     <img src="~/images/@eersteFoto.Naam" class="card-img-top" alt="@groepsreis.Bestemming?.BestemmingsNaam" style="height: 300px; object-fit: cover; object-position: center;" />
                                     <div class="card-body">
@@ -381,6 +396,7 @@
                                         <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
                                         <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
                                         <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                        <p class="card-text">@ingeschrevenDeelnemers.Count() / @groepsreis.MaxAantalDeelnemers</p>
                                     </div>
                                 </a>
                             </div>

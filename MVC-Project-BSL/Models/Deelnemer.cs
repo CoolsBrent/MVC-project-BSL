@@ -18,7 +18,7 @@ namespace MVC_Project_BSL.Models
 		public string? Review { get; set; }
 
 		[MaxLength(255, ErrorMessage = "De voorkeur mag maximaal 255 tekens zijn.")]
-		public string? SlapenBijVoorkeur { get; set; }
+		public string? SlapenBijVoorkeur { get; set; } = "Geen voorkeur opgegeven";
 		public Kind Kind { get; set; }
         public Groepsreis GroepsreisDetail { get; set; }
     }

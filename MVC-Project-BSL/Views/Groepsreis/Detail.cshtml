@@ -653,6 +653,7 @@
                     <tr>
                         <th>Naam</th>
                         <th>Leeftijd</th>
+                        <th>Slaapvoorkeur</th>
                         <th>Acties</th>
                     </tr>
                 </thead>
@@ -666,6 +667,7 @@
                         <tr>
                             <td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
                             <td>@leeftijd jaar</td>
+							<td>@(!string.IsNullOrWhiteSpace(deelnemer.SlapenBijVoorkeur) ? deelnemer.SlapenBijVoorkeur : "Geen voorkeur opgegeven")</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <form asp-action="VerwijderUitWachtlijst" method="post">
