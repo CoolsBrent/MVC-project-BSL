@@ -86,9 +86,9 @@ namespace MVC_Project_BSL.Controllers
 
 			// Haal de ID van de ingelogde gebruiker
 			var userId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
-			
-            if (userId != 0)
-            {
+
+			if (userId != 0)
+			{
 				var user = await _unitOfWork.CustomUserRepository.GetQueryable()
 				.Include(u => u.Kinderen)
 				.FirstOrDefaultAsync(u => u.Id == userId);
@@ -140,13 +140,13 @@ namespace MVC_Project_BSL.Controllers
 					Debug.WriteLine($"Beschikbare kinderen voor gebruiker {userId}: {groepsreis.BeschikbareDeelnemers.Count}");
 				}
 			}
-			
-            else
-            {
+
+			else
+			{
 				// Geen gebruiker ingelogd, logica voor bezoekers
 				Debug.WriteLine("Bezoeker heeft geen kinderen gekoppeld.");
-                // Pas logica aan voor bezoekers hier
-                return View(groepsreis);
+				// Pas logica aan voor bezoekers hier
+				return View(groepsreis);
 			}
 
 
@@ -496,7 +496,7 @@ namespace MVC_Project_BSL.Controllers
 
 
 		[HttpPost]
-		public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId)
+		public async Task<IActionResult> VoegDeelnemerToe(int groepsreisId, int kindId, string voorkeur)
 		{
 			// Haal groepsreis op inclusief deelnemers en wachtlijst
 			var groepsreis = await _unitOfWork.GroepsreisRepository.GetQueryable()
@@ -522,7 +522,12 @@ namespace MVC_Project_BSL.Controllers
 			if (groepsreis.Deelnemers.Count >= groepsreis.MaxAantalDeelnemers)
 			{
 				// Voeg toe aan de wachtlijst
-				groepsreis.Wachtlijst.Add(new Deelnemer { KindId = kindId, GroepsreisDetailId = groepsreisId });
+				groepsreis.Wachtlijst.Add(new Deelnemer
+				{
+					KindId = kindId,
+					GroepsreisDetailId = groepsreisId,
+					SlapenBijVoorkeur = voorkeur
+				});
 
 				// Controleer of wachtlijst groot genoeg is om nieuwe groepsreis te maken
 				if (groepsreis.Wachtlijst.Count >= Math.Floor(groepsreis.MaxAantalDeelnemers * 0.8))
@@ -535,15 +540,11 @@ namespace MVC_Project_BSL.Controllers
 			}
 
 			// Voeg toe aan de deelnemerslijst
-			groepsreis.Deelnemers.Add(new Deelnemer { KindId = kindId, GroepsreisDetailId = groepsreisId });
+			groepsreis.Deelnemers.Add(new Deelnemer { KindId = kindId, GroepsreisDetailId = groepsreisId, SlapenBijVoorkeur = voorkeur });
 
 			_unitOfWork.SaveChanges();
 			return RedirectToAction("Detail", new { id = groepsreisId });
 		}
-
-
-
-
 
 		private async Task MaakNieuweGroepsreisVanWachtlijst(Groepsreis origineleGroepsreis)
 		{
