@@ -247,7 +247,7 @@ namespace MVC_Project_BSL.Controllers
 				var user = await _unitOfWork.CustomUserRepository.GetByIdAsync(model.PersoonId);
 				if (user != null)
 				{
-					var monitor = new Monitor
+					var monitor = new Models.Monitor
 					{
 						PersoonId = model.PersoonId,
 						IsHoofdMonitor = model.IsHoofdMonitor,
