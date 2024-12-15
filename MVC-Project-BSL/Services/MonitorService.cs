@@ -141,7 +141,7 @@ namespace MVC_Project_BSL.Services
 				await _userManager.AddToRoleAsync(gebruiker, "Monitor");
 			}
 
-			var nieuweMonitor = new Monitor
+			var nieuweMonitor = new Models.Monitor
 			{
 				PersoonId = gebruiker.Id,  // Gebruik de gebruikers ID
 				IsHoofdMonitor = false,     // Zet dit naar true als je wilt dat de gebruiker hoofdmonitor is

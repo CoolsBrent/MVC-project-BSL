@@ -84,7 +84,9 @@
 			<dd class="col-sm-8">@Model.Bestemming?.MinLeeftijd - @Model.Bestemming?.MaxLeeftijd</dd>
 
 			<dt class="col-sm-4">Aantal deelnemers</dt>
-			<dd class="col-sm-8">@Model.Deelnemers.Count() / @Model.MaxAantalDeelnemers</dd>
+			<dd class="col-sm-8">
+				@Model.Deelnemers.Where(d => !Model.Wachtlijst.Any(w => w.KindId == d.KindId)).Count() / @Model.MaxAantalDeelnemers
+			</dd>
 		</dl>
 	</div>
 
@@ -144,7 +146,7 @@
 
 @{
 	var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-    var gebruikerId = userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
+	var gebruikerId = userIdClaim != null ? int.Parse(userIdClaim.Value) : 0;
 	var gebruikerIsIngeschreven = Model.Monitoren.Any(d => d.Monitor.PersoonId == gebruikerId);
 }
 <!-- Knoppen om de modals te openen -->
@@ -172,14 +174,14 @@
 	{
 		<div class="col-md-6">
 			<div>
-			<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareMonitorenModal">
-				Bekijk beschikbare monitoren
-			</button>
+				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#beschikbareMonitorenModal">
+					Bekijk beschikbare monitoren
+				</button>
 			</div>
 			<div>
-			<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#beschikbareDeelnemersModal">
-				Bekijk beschikbare deelnemers
-			</button>
+				<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#beschikbareDeelnemersModal">
+					Bekijk beschikbare deelnemers
+				</button>
 			</div>
 		</div>
 	}
@@ -222,12 +224,12 @@
 								<tr class="user-row">
 									<td class="user-fullname">@monitor.Monitor.Persoon?.Voornaam @monitor.Monitor.Persoon?.Naam</td>
 									<td>
-									@{
-										var geboortedatum = monitor.Monitor.Persoon.Geboortedatum;
-										var leeftijd = DateTime.Now.Year - geboortedatum.Year;
-										if (DateTime.Now < geboortedatum.AddYears(leeftijd)) { leeftijd--; }
-										@leeftijd
-									}
+										@{
+											var geboortedatum = monitor.Monitor.Persoon.Geboortedatum;
+											var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+											if (DateTime.Now < geboortedatum.AddYears(leeftijd)) { leeftijd--; }
+											@leeftijd
+										}
 									</td>
 									<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
 									<td>@monitor.Monitor.Persoon.TelefoonNummer</td>
@@ -309,7 +311,7 @@
 						<tbody>
 							@foreach (var monitor in Model.BeschikbareMonitoren)
 							{
-								<tr class= "user-row">
+								<tr class="user-row">
 									<td class="user-fullname">@monitor.Persoon.Voornaam @monitor.Persoon?.Naam</td>
 									<td>@(monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
 									<td>
@@ -323,7 +325,7 @@
 							}
 						</tbody>
 					</table>
-										<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
+					<p id="noUsersMessage" class="text-center text-muted" style="display: none;">Geen deelnemers gevonden voor de geselecteerde filters.</p>
 
 				}
 				else
@@ -362,7 +364,7 @@
 								<th>Leeftijd</th>
 								<th>Telefoonnummer</th>
 								<th>Ouder/Voogd</th>
-								<th>Allergieën</th>
+								<th>Allergie�n</th>
 								<th>Medicatie</th>
 								@if (User.IsInRole("Beheerder"))
 								{
@@ -473,8 +475,8 @@
 					</div>
 				}
 			</div>
-			
-		
+
+
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
 			</div>
@@ -488,7 +490,6 @@
 		Schrijf een kind in
 	</button>
 }
-	
 
 <!-- Modal voor Beschikbare Kinderen -->
 <div class="modal fade" id="beschikbareKinderenModal" tabindex="-1" aria-labelledby="beschikbareKinderenModalLabel" aria-hidden="true">
@@ -588,3 +589,78 @@
 	</script>
 }
 
+
+<!-- Wachtlijst -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <h4>Wachtlijst</h4>
+        @if (Model.Wachtlijst != null && Model.Wachtlijst.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Naam</th>
+                        <th>Leeftijd</th>
+                        <th>Acties</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var deelnemer in Model.Wachtlijst)
+                    {
+                        var geboortedatum = deelnemer.Kind.Geboortedatum;
+                        var leeftijd = DateTime.Now.Year - geboortedatum.Year;
+                        if (DateTime.Now < geboortedatum.AddYears(leeftijd)) leeftijd--;
+
+                        <tr>
+                            <td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
+                            <td>@leeftijd jaar</td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    <form asp-action="VerwijderUitWachtlijst" method="post">
+                                        <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                                        <input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Verwijder</button>
+                                    </form>
+                                    <button hidden class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#verplaatsModal-@deelnemer.Kind.Id">Verplaats</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Er staan momenteel geen deelnemers op de wachtlijst.</p>
+        }
+    </div>
+</div>
+
+<!-- Modal voor verplaatsing in de wachtlijst -->
+@* TODO Werkt nog niet naar behoren
+ *@@foreach (var deelnemer in Model.Wachtlijst)
+{
+    <div class="modal fade" id="verplaatsModal-@deelnemer.Kind.Id" tabindex="-1" aria-labelledby="verplaatsModalLabel-@deelnemer.Kind.Id" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="verplaatsModalLabel-@deelnemer.Kind.Id">Verplaats @deelnemer.Kind.Voornaam</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-action="VerplaatsInWachtlijst" method="post">
+                        <input type="hidden" name="groepsreisId" value="@Model.Id" />
+                        <input type="hidden" name="kindId" value="@deelnemer.Kind.Id" />
+                        <div class="mb-3">
+                            <label for="nieuweIndex" class="form-label">Nieuwe positie</label>
+                            <input type="number" class="form-control" id="nieuweIndex" name="nieuweIndex"
+                                   min="0" max="@Model.Wachtlijst.Count - 1"
+                                   value="@Model.Wachtlijst.ToList().IndexOf(deelnemer)" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verplaats</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}

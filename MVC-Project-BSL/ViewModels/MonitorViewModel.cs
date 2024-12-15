@@ -11,8 +11,8 @@ namespace MVC_Project_BSL.ViewModels
 		public bool IsHoofdMonitor { get; set; } // Is het een hoofdmonitor?
 		public DateTime Geboortedatum { get; set; }
 		public bool IsActief { get; set; }
-		public Monitor Monitor { get; set; }
-		public List<Monitor> Monitoren { get; set; } // Lijst van monitoren
+		public Models.Monitor Monitor { get; set; }
+		public List<Models.Monitor> Monitoren { get; set; } // Lijst van monitoren
 		public CustomUser Persoon { get; set; } // Navigatie-eigenschap naar de gebruiker
 		public List<GroepsreisOverzichtViewModel> Groepsreizen { get; set; } = new List<GroepsreisOverzichtViewModel>();
 
