@@ -1,0 +1,45 @@
+﻿@model MVC_Project_BSL.Models.Onkosten
+
+@{
+    ViewData["Title"] = "Onkost details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-bordered">
+            <tr>
+                <th>Titel</th>
+                <td>@Model.Titel</td>
+            </tr>
+            <tr>
+                <th>Omschrijving</th>
+                <td>@Model.Omschrijving</td>
+            </tr>
+            <tr>
+                <th>Bedrag</th>
+                <td>€ @Model.Bedrag.ToString("F2")</td>
+            </tr>
+            <tr>
+                <th>Datum</th>
+                <td>@Model.Datum.ToString("dd-MM-yyyy")</td>
+            </tr>
+            <tr>
+                <th>Foto</th>
+                <td>
+                    @if (!string.IsNullOrEmpty(Model.Foto))
+                    {
+                        <img src="@Model.Foto" alt="Foto van de onkost" style="max-width: 200px;" />
+                    }
+                    else
+                    {
+                        <span>Geen foto beschikbaar</span>
+                    }
+                </td>
+            </tr>
+        </table>
+    </div> 
+</div>
+<a href="@Url.Action("Index", "Onkosten", new { groepsreisId = @Model.GroepsreisId })" class="btn btn-secondary">Terug naar overzicht</a>
+

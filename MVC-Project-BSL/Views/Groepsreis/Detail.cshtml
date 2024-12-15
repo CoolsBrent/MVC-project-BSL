@@ -1,4 +1,4 @@
-﻿@using System.Globalization
+@using System.Globalization
 @model MVC_Project_BSL.Models.Groepsreis
 
 <h1>De reis naar @Model.Bestemming?.BestemmingsNaam</h1>
@@ -46,6 +46,18 @@
 		else
 		{
 			<p>Nog geen activiteiten beschikbaar voor deze reis.</p>
+		}
+		@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
+		{
+			<a asp-controller="Onkosten" asp-action="Index" asp-route-groepsreisId="@Model.Id" class="btn btn-secondary mt-4">
+				Onkosten Beheren
+			</a>
+		}
+		@if (User.IsInRole("Hoofdmonitor"))
+		{
+			<a asp-controller="Onkosten" asp-action="Create" asp-route-groepsreisId="@Model.Id" class="btn btn-secondary mt-4">
+				Onkost ingeven
+			</a>
 		}
 	</div>
 
@@ -461,6 +473,8 @@
 					</div>
 				}
 			</div>
+			
+		
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
 			</div>

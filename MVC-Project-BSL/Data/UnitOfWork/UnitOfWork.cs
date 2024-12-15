@@ -27,7 +27,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
             GroepsreisRepository = new GenericRepository<Groepsreis>(_context);
             BestemmingRepository = new GenericRepository<Bestemming>(_context);
             ActiviteitRepository = new GenericRepository<Activiteit>(_context);
-            MonitorRepository = new GenericRepository<Monitor>(_context);
+            MonitorRepository = new GenericRepository<Models.Monitor>(_context);
             KindRepository = new GenericRepository<Kind>(_context);
             ProgrammaRepository = new GenericRepository<Programma>(_context);
             FotoRepository = new GenericRepository<Foto>(_context);
@@ -68,7 +68,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
         /// <summary>
         /// Repository voor het beheren van monitoren.
         /// </summary>
-        public IGenericRepository<Monitor> MonitorRepository { get; private set; }
+        public IGenericRepository<Models.Monitor> MonitorRepository { get; private set; }
 
         /// <summary>
         /// Repository voor het beheren van kinderen.
@@ -92,7 +92,7 @@ namespace MVC_Project_BSL.Data.UnitOfWork
 		/// <summary>
 		/// Repository voor het beheren van onkosten.
 		/// </summary>
-		public IGenericRepository<Onkosten> OnkostenRepository { get; }
+		public IGenericRepository<Onkosten> OnkostenRepository { get; private set; }
 
 		#endregion
 

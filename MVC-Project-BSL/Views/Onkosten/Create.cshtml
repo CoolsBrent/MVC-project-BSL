@@ -1,0 +1,139 @@
+﻿@model MVC_Project_BSL.Models.Onkosten
+
+@{
+    var userType = User.IsInRole("Hoofdmonitor") ? "Hoofdmonitor" : "Verantwoordelijke"; // Dynamisch de gebruiker bepalen
+    var resterendBudget = ViewBag.ResterendBudget ?? 0;  // Haal het resterende budget op uit de ViewBag
+    var groepsreisNaam = ViewBag.GroepsreisNaam ?? "Onbekende Groepsreis";
+}
+
+<h1>Onkosten voor @groepsreisNaam</h1>
+
+@if (userType == "Hoofdmonitor")
+{
+    <h5>Resterend Budget: @string.Format("{0:F2}", resterendBudget)€</h5>
+    @if (resterendBudget <= 0)
+    {
+        <p class="text-danger">Het budget is bereikt. Geen onkosten kunnen meer worden toegevoegd.</p>
+    }
+}
+
+<form asp-action="Create" method="post" enctype="multipart/form-data" id="onkostenForm">
+    <div class="form-group">
+        <label asp-for="Titel" class="control-label"></label>
+        <input asp-for="Titel" class="form-control autocomplete" />
+        <span asp-validation-for="Titel" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Omschrijving" class="control-label"></label>
+        <textarea asp-for="Omschrijving" class="form-control"></textarea>
+        <span asp-validation-for="Omschrijving" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Bedrag" class="control-label"></label>
+        <input asp-for="Bedrag" class="form-control" id="Bedrag" />
+        <span asp-validation-for="Bedrag" class="text-danger"></span>
+    </div>
+    <!-- Waarschuwing voor het bedragveld (alleen voor hoofdmonitoren) -->
+    @if (userType == "Hoofdmonitor")
+    {
+        <div class="form-group" id="budgetWarning" style="display: none;">
+            <div class="text-danger">
+                Het ingevoerde bedrag is groter dan het resterende budget. Pas het bedrag aan.
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label asp-for="Datum" class="control-label"></label>
+        <input asp-for="Datum" class="form-control" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+        <span asp-validation-for="Datum" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Foto" class="control-label"></label>
+        <input asp-for="FotoFile" type="file" class="form-control" />
+        <span asp-validation-for="FotoFile" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="GroepsreisId" />
+    <input type="hidden" asp-for="TypeOnkost" value="@userType" />
+
+    <button type="submit" class="btn btn-primary mt-4">Opslaan</button>
+</form>
+@if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+{
+    <a asp-controller="Onkosten" asp-action="Index" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-secondary mt-2">Annuleren</a>
+
+}
+else
+{
+    <a asp-controller="Groepsreis" asp-action="Detail" asp-route-Id="@Model.GroepsreisId" class="btn btn-secondary mt-2">Annuleren</a>
+}
+
+@section Scripts {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        $(document).ready(function () {
+
+            // Functie voor autocomplete
+            function initializeAutocomplete() {
+                $('.autocomplete').autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '@Url.Action("GetOnkosten", "Onkosten")', // De actie in je controller
+                            dataType: "json",
+                            data: {
+                                term: request.term // De zoekterm die je invoert
+                            },
+                            success: function (data) {
+                                response(data); // Geef de zoekresultaten terug
+                            },
+                            error: function () {
+                                response([]); // Lege lijst teruggeven bij fout
+                            }
+                        });
+                    },
+                    minLength: 0, // Start zoekopdracht zonder minimaal aantal tekens
+                    select: function (event, ui) {
+                        $(this).val(ui.item.value); // Vul het tekstveld met de geselecteerde waarde
+                        return false; // Voorkom dat het automatisch invult bij hover
+                    }
+                });
+                // Trigger autocomplete direct als je op het tekstvak klikt (zonder zoekterm)
+                $(document).on('focus', '.autocomplete', function () {
+                    $(this).autocomplete("search", ""); // Start de zoekfunctie met een lege zoekterm
+                });
+            }
+            // Initialiseer autocomplete voor alle velden
+            initializeAutocomplete();
+        });
+    </script>
+    <script>
+        document.getElementById("onkostenForm").addEventListener("submit", function (event) {
+            var isHoofdmonitor = @User.IsInRole("Hoofdmonitor").ToString().ToLower() === "true";
+            if (isHoofdmonitor) {
+                var resterendBudget = @resterendBudget;
+                var bedragInput = document.getElementById("Bedrag");
+                var bedrag = parseFloat(bedragInput.value);
+
+                if (bedrag > resterendBudget) {
+                    event.preventDefault(); // Voorkom formulier verzenden
+                    document.getElementById("budgetWarning").style.display = "block";
+                } else {
+                    document.getElementById("budgetWarning").style.display = "none";
+                }
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var isHoofdmonitor = @User.IsInRole("Hoofdmonitor").ToString().ToLower() === "true";
+            var fotoInput = document.querySelector("input[name='FotoFile']");
+
+            if (fotoInput && !isHoofdmonitor) {
+                fotoInput.removeAttribute("required");
+            }
+        });
+    </script>
+}

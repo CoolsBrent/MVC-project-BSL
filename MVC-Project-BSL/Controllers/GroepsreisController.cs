@@ -839,6 +839,21 @@ namespace MVC_Project_BSL.Controllers
             // Retourneer de resultaten als JSON
             return Json(onkostenTitels);
         }
+		public IActionResult Onkosten(int id)
+		{
+            // Haal de onkosten op voor de groepsreis met het opgegeven id
+            var groepsreizen = _unitOfWork.GroepsreisRepository.GetAllAsync();
+	        var groepsreis = groepsreizen.Result.FirstOrDefault(r => r.Id == id);
+
+
+			if (groepsreis == null)
+			{
+				return NotFound();
+			}
+			return View(groepsreis); // Stuur het volledige groepsreis object naar de view
+
+		}
+
 
         [HttpGet]
         public async Task<JsonResult> GetBestemmingen(string term)

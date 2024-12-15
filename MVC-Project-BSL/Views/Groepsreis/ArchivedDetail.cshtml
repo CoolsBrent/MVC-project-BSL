@@ -47,6 +47,12 @@
 		{
 			<p>Nog geen activiteiten beschikbaar voor deze reis.</p>
 		}
+		@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke") || User.IsInRole("Hoofdmonitor"))
+		{
+			<a asp-controller="Onkosten" asp-action="Index" asp-route-groepsreisId="@Model.Id" class="btn btn-secondary mt-4">
+				Onkosten Beheren
+			</a>
+		}
 	</div>
 
 </div>

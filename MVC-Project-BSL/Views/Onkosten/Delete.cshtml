@@ -1,0 +1,18 @@
+﻿@model MVC_Project_BSL.Models.Onkosten
+
+
+<h3>Weet je zeker dat je de onkosten voor de groepsreis wilt verwijderen?</h3>
+
+<div class="mt-5">
+    <h4>@Model.Titel</h4>
+    <p><strong>Omschrijving:</strong> @Model.Omschrijving</p>
+    <p><strong>Bedrag:</strong> @Model.Bedrag</p>
+    <p><strong>Datum:</strong> @Model.Datum.ToString("dd-MM-yyyy")</p>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="GroepsreisId" />
+    <button type="submit" class="btn btn-danger">Verwijder</button>
+    <a asp-controller="Onkosten" asp-action="Index" asp-route-groepsreisId="@Model.GroepsreisId" class="btn btn-secondary">Annuleren</a>
+</form>

@@ -1,54 +1,52 @@
-﻿@{
+@{
     ViewData["Title"] = "Dashboard";
 }
-﻿@using System.Globalization
+@using System.Globalization
 @using MVC_Project_BSL.ViewModels
 @model GroepsreisViewModel
 
 <div class="hero-section-dashboard bg-navbar text-black text-center py-5 rounded-3 mb-3 position-relative">
-    <div class="container">
-        <h2 class="display-4">Welkom op je dashboard, @User.Identity.Name!</h2>
+	<div class="container">
+		<h2 class="display-4">Welkom op je dashboard, @ViewData["UserName"]!</h2>
 
-        <!-- Knop wordt absoluut gepositioneerd -->
-        <a href="@Url.Action("Index", "PersoonlijkeGegevens")" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px;">
-            <i class="bi bi-person-lines-fill"></i> Beheer
-        </a>
-    </div>
+		<!-- Knop wordt absoluut gepositioneerd -->
+		<a href="@Url.Action("Index", "PersoonlijkeGegevens")" class="btn btn-primary position-absolute" style="bottom: 10px; right: 10px;">
+			<i class="bi bi-person-lines-fill"></i> Beheer
+		</a>
+	</div>
+
 </div>
 
 
 <!-- Knoppen voor beheer -->
-@if (User.IsInRole("Beheerder"))
+@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 {
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers beheren</a>
-        </div>
-        <div class="col-md-3">
-            <a href="@Url.Action("Index", "Groepsreis")" class="btn btn-success btn-block">Groepsreizen beheren</a>
-        </div>
-        <div class="col-md-3">
-            <a href="@Url.Action("Index", "Activiteit")" class="btn btn-info btn-block">Activiteiten beheren</a>
-        </div>
-        <div class="col-md-3">
-            <a href="@Url.Action("Index", "Opleiding")" class="btn btn-warning btn-block">Opleidingen beheren</a>
-        </div>
-    </div>
-}
-@if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
-{
+
 	<div class="row mb-4">
+		@if (User.IsInRole("Beheerder"))
+		{
+			<div class="col-md-3">
+				<a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
+			</div>
+		}
+		
 		<div class="col-md-3">
-			<a href="@Url.Action("Index", "Monitor")" class="btn btn-primary btn-block">Monitoren Beheren</a>
+			<a href="@Url.Action("Index", "Groepsreis")" class="btn btn-success btn-block">Groepsreizen Beheren</a>
+		</div>
+		<div class="col-md-3">
+			<a href="@Url.Action("Index", "Activiteit")" class="btn btn-info btn-block">Activiteiten Beheren</a>
+		</div>
+		<div class="col-md-3">
+			<a href="@Url.Action("Index", "Opleiding")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
+
 		</div>
 	
 	</div>
+
 }
 
+@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 
-
-
-@if (User.IsInRole("Beheerder"))
 {
     <ul class="nav nav-tabs" id="myTab">
         <li class="nav-item">

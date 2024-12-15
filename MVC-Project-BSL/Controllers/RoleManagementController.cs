@@ -178,7 +178,7 @@ namespace MVC_Project_BSL.Controllers
 
             if (monitor == null)
             {
-                monitor = new Monitor
+                monitor = new Models.Monitor
                 {
                     PersoonId = userId,
                     Persoon = user,

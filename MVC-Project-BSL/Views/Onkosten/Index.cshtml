@@ -1,0 +1,133 @@
+﻿@model MVC_Project_BSL.Models.Onkosten
+
+@{
+    ViewData["Title"] = "Onkosten Overzicht";
+    var groepsreisNaam = ViewBag.GroepsreisNaam ?? "Onbekende Groepsreis";
+    var totaalPrijs = Model.Groepsreis?.Deelnemers?.Count() * (Model.Groepsreis?.Prijs);
+    var budget = Model.Groepsreis?.Deelnemers?.Count() * (Model.Groepsreis?.Prijs * 0.3); // 30% van totaalprijs voor budget hoofdmonitor
+
+    // Bereken de totale onkosten van de hoofdmonitor en verantwoordelijke
+    var totaleOnkosten = Model.HoofdmonitorOnkosten.Sum(o => o.Bedrag) + Model.VerantwoordelijkeOnkosten.Sum(o => o.Bedrag);
+    var resterendBudget = ViewBag.ResterendBudget ?? 0;
+}
+
+<h1>Onkosten overzicht voor @groepsreisNaam</h1>
+
+<div class="row">
+    <!-- Laat de knop "Nieuwe Onkost Toevoegen" alleen zien als er resterend budget is -->
+    @if (resterendBudget > 0)
+    {
+        <p>
+            <a asp-action="Create" asp-route-groepsreisId="@ViewBag.GroepsreisId" class="btn btn-primary" data-bs-toggle="tooltip" title="Nieuwe Onkost Toevoegen">
+                <i class="bi bi-plus-circle h4 text-white"></i>
+            </a>
+        </p>
+    }
+    else
+    {
+        <p class="text-danger">Het budget is bereikt. Geen onkosten kunnen meer worden toegevoegd.</p>
+    }
+
+    <!-- Linkerkant: Onkosten tabel -->
+    <div class="col-md-8">
+        <h3>Onkosten van hoofdmonitor</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Omschrijving</th>
+                    <th>Bedrag</th>
+                    @if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+                    {
+                        <th>Acties</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var onkosten in Model.HoofdmonitorOnkosten)
+                {
+                    <tr>
+                        <td>@onkosten.Titel</td>
+                        <td>@onkosten.Omschrijving</td>
+                        <td>@onkosten.Bedrag €</td>
+                        @if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+                        {
+                            <td>
+                                <a href="@Url.Action("Detail", "Onkosten", new { id = onkosten.Id })" class="btn btn-primary" data-bs-toggle="tooltip" title="Detail"><i class="bi bi-eye h5 text-white"></i></a>
+                                <a href="@Url.Action("Edit", "Onkosten", new { id = onkosten.Id })" class="btn btn-secondary" data-bs-toggle="tooltip" title="Bewerken"><i class="bi bi-pencil-square h5"></i></a>
+                                <a href="@Url.Action("Delete", "Onkosten", new { id = onkosten.Id })" class="btn btn-danger" data-bs-toggle="tooltip" title="Verwijderen"><i class="bi bi-trash h5"></i></a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Onkosten van de reis</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Titel</th>
+                    <th>Omschrijving</th>
+                    <th>Bedrag</th>
+                    @if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+                    {
+                        <th>Acties</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var onkosten in Model.VerantwoordelijkeOnkosten)
+                {
+                    <tr>
+                        <td>@onkosten.Titel</td>
+                        <td>@onkosten.Omschrijving</td>
+                        <td>@onkosten.Bedrag €</td>
+                        @if (User.IsInRole("Verantwoordelijke") || User.IsInRole("Beheerder"))
+                        {
+                            <td>
+                                <a href="@Url.Action("Detail", "Onkosten", new { id = onkosten.Id })" class="btn btn-primary" data-bs-toggle="tooltip" title="Detail"><i class="bi bi-eye h5 text-white"></i></a>
+                                <a href="@Url.Action("Edit", "Onkosten", new { id = onkosten.Id })" class="btn btn-secondary" data-bs-toggle="tooltip" title="Bewerken"><i class="bi bi-pencil-square h5"></i></a>
+                                <a href="@Url.Action("Delete", "Onkosten", new { id = onkosten.Id })" class="btn btn-danger" data-bs-toggle="tooltip" title="Verwijderen"><i class="bi bi-trash h5"></i></a>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Rechterkant: Financiële tabel -->
+    <div class="col-md-4">
+        <h3>Financieel overzicht</h3>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Beschrijving</th>
+                    <th>Bedrag</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Totale opbrengst</strong></td>
+                    <td>@string.Format("{0:F2}", totaalPrijs - totaleOnkosten)€</td>
+                </tr>
+                <tr>
+                    <td><strong>Totaal onkosten</strong></td>
+                    <td>@string.Format("{0:F2}", totaleOnkosten)€</td>
+                </tr>
+                <tr>
+                    <td><strong>Budget voor de hoofdmonitor</strong></td>
+                    <td>@string.Format("{0:F2}", budget)€</td>
+                </tr>
+                <tr>
+                    <td><strong>Resterend budget</strong></td>
+                    <td>@string.Format("{0:F2}", resterendBudget)€</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Terugknop -->
+<a href="@Url.Action("Index", "Groepsreis")" class="btn btn-secondary">Terug naar overzicht</a>

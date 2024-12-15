@@ -8,7 +8,7 @@ namespace MVC_Project_BSL.Attributes
     {
         protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
         {
-            var onkost = (Onkosten)validationContext.ObjectInstance;
+            var onkost = (Models.Onkosten)validationContext.ObjectInstance;
 
             // Controleer of er een bestaande foto is
             if (string.IsNullOrEmpty(onkost.Foto))
