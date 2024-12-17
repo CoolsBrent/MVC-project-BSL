@@ -106,7 +106,7 @@ namespace MVC_Project_BSL.Controllers
 					AlleOpleidingen = alleOpleidingen.ToList()
 				};
 			}
-			else if (isMonitor || isHoofdmonitor)
+			else if (isMonitor || isHoofdmonitor || isVerantwoordelijke)
 			{
 				// Haal alle ingeschreven groepsreizen op waarvoor de gebruiker als monitor is aangesteld
 				var geboekteGroepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(query =>
