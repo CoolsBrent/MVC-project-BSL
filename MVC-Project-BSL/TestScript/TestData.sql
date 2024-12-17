@@ -2,10 +2,10 @@
 DELETE FROM Kinderen WHERE PersoonId IN (1, 2, 3, 4);
 SET IDENTITY_INSERT Kinderen ON;
 INSERT INTO Kinderen (Id, PersoonId, Voornaam, Naam, Geboortedatum, Allergieen, Medicatie) VALUES
-(11, 1011, 'Emma', 'Doe', '2010-06-01', 'Noten', 'Epipen'),
-(12, 1011, 'Tom', 'Doe', '2012-12-15', 'Geen', 'Geen'),
-(13, 1011, 'Lisa', 'Smith', '2013-03-21', 'Pollen', 'Antihistamine'),
-(14, 1011, 'Ben', 'Johnson', '2014-08-09', 'Geen', 'Geen');
+(1, 1, 'Emma', 'Doe', '2010-06-01', 'Noten', 'Epipen'),
+(2, 1, 'Tom', 'Doe', '2012-12-15', 'Geen', 'Geen'),
+(3, 2, 'Lisa', 'Smith', '2013-03-21', 'Pollen', 'Antihistamine'),
+(4, 3, 'Ben', 'Johnson', '2014-08-09', 'Geen', 'Geen');
 SET IDENTITY_INSERT Kinderen OFF;
 
 -- Bestemmingen
@@ -21,15 +21,15 @@ SET IDENTITY_INSERT Bestemmingen OFF;
 -- Groepsreizen toevoegen
 DELETE FROM Groepsreizen WHERE Id IN (1, 2, 3, 4, 5, 6, 7, 8);
 SET IDENTITY_INSERT Groepsreizen ON;
-INSERT INTO Groepsreizen (Id, BestemmingId, BeginDatum, EindDatum, Prijs, IsArchived) VALUES
-(1, 1, '2024-05-01', '2024-05-07', 500.00, 1),
-(2, 2, '2024-06-10', '2024-06-15', 600.00, 0),
-(3, 3, '2024-07-01', '2024-07-08', 700.00, 0),
-(4, 4, '2024-08-15', '2024-08-22', 650.00, 0),
-(5, 1, '2025-05-01', '2025-05-07', 520.00, 0), -- Toekomstige reis Parijs
-(6, 2, '2025-06-15', '2025-06-20', 630.00, 0), -- Toekomstige reis Londen
-(7, 3, '2025-07-10', '2025-07-17', 720.00, 0), -- Toekomstige reis Rome
-(8, 4, '2025-08-20', '2025-08-27', 670.00, 0); -- Toekomstige reis Barcelona
+INSERT INTO Groepsreizen (Id, BestemmingId, BeginDatum, EindDatum, Prijs, IsArchived, MaxAantalDeelnemers) VALUES
+(1, 1, '2024-05-01', '2024-05-07', 500.00, 1, 10),
+(2, 2, '2024-06-10', '2024-06-15', 600.00, 0, 20),
+(3, 3, '2024-07-01', '2024-07-08', 700.00, 0, 15),
+(4, 4, '2024-08-15', '2024-08-22', 650.00, 0, 10),
+(5, 1, '2025-05-01', '2025-05-07', 520.00, 0, 20), -- Toekomstige reis Parijs
+(6, 2, '2025-06-15', '2025-06-20', 630.00, 0, 15), -- Toekomstige reis Londen
+(7, 3, '2025-07-10', '2025-07-17', 720.00, 0, 18), -- Toekomstige reis Rome
+(8, 4, '2025-08-20', '2025-08-27', 670.00, 0, 10); -- Toekomstige reis Barcelona
 SET IDENTITY_INSERT Groepsreizen OFF;
 
 -- Activiteiten toevoegen
@@ -75,8 +75,8 @@ SET IDENTITY_INSERT Onkosten OFF;
 -- Monitoren toevoegen
 SET IDENTITY_INSERT Monitoren ON;
 INSERT INTO Monitoren (Id, PersoonId, IsHoofdMonitor) VALUES
-(11, 1012, 0), -- Monitor
-(12, 1013, 1); -- Hoofdmonitor
+(1, 2, 0), -- Monitor
+(2, 3, 1); -- Hoofdmonitor
 SET IDENTITY_INSERT Monitoren OFF;
 
 -- Monitoren koppelen aan groepsreizen
@@ -113,10 +113,10 @@ SET IDENTITY_INSERT Opleidingen OFF;
 DELETE FROM OpleidingPersonen WHERE Id IN (1, 2, 3);
 SET IDENTITY_INSERT OpleidingPersonen ON;
 INSERT INTO OpleidingPersonen (Id, OpleidingId, PersoonId) VALUES
-(1, 1, 1012), -- Monitor volgt EHBO
-(2, 2, 1013), -- Hoofdmonitor volgt Reisleiding
-(4, 4, 1012), -- Monitor volgt Advanced EHBOdate
-(5, 5, 1013) -- Hoofdmonitor volgt Culturele gids
+(1, 1, 2), -- Monitor volgt EHBO
+(2, 2, 3), -- Hoofdmonitor volgt Reisleiding
+(4, 4, 2), -- Monitor volgt Advanced EHBOdate
+(5, 5, 3) -- Hoofdmonitor volgt Culturele gids
 SET IDENTITY_INSERT OpleidingPersonen OFF;
 
 -- Foto's toevoegen
