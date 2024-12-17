@@ -15,8 +15,8 @@
 		<p class="card-text">@Model.Beschrijving</p>
 
 		<h5 class="card-title">Datums</h5>
-		<p class="card-text">Begindatum: @Model.Begindatum.ToShortDateString()</p>
-		<p class="card-text">Einddatum: @Model.Einddatum.ToShortDateString()</p>
+		<p class="card-text">Begindatum: @Model.Begindatum.ToString("dd/MM/yyyy")</p>
+		<p class="card-text">Einddatum: @Model.Einddatum.ToString("dd/MM/yyyy")</p>
 
 		<h5 class="card-title">Aantal plaatsen</h5>
 		<p class="card-text">@Model.IngeschrevenPersonen / @Model.AantalPlaatsen</p>
