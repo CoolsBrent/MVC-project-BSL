@@ -29,10 +29,14 @@ namespace MVC_Project_BSL.Controllers
         // GET: Home/Index met filters voor leeftijdscategorie, begindatum, en prijsbereik
         public async Task<IActionResult> Index(string leeftijdscategorie, DateTime? begindatum, decimal? minPrijs, decimal? maxPrijs)
         {
+            
             // Haal alle groepsreizen op inclusief bestemmingen en foto's
             var groepsreizen = await _unitOfWork.GroepsreisRepository.GetAllAsync(
-                query => query.Include(g => g.Bestemming)
-                              .ThenInclude(b => b.Fotos)
+                query => query.Include(g => g.Deelnemers!)
+                            .ThenInclude(d => d.Kind)
+                            .Include(g => g.Monitoren)
+                            .Include(g => g.Bestemming)
+                            .ThenInclude(b => b!.Fotos)
                               .Where(g => !g.IsArchived && g.Einddatum > DateTime.Now)); // Filter de niet-gearchiveerde reizen
 
             // Haal unieke leeftijdscategorieën op uit de database
@@ -81,6 +85,8 @@ namespace MVC_Project_BSL.Controllers
                 MinLeeftijd = g.Bestemming.MinLeeftijd,
                 MaxLeeftijd = g.Bestemming.MaxLeeftijd,
                 FotoUrls = g.Bestemming.Fotos.Select(f => f.Naam).ToList(),
+                MaxAantalDeelnemers = g.MaxAantalDeelnemers,
+                Deelnemers = g.Deelnemers,
                 Prijs = (decimal)g.Prijs,
             }).ToList();
 

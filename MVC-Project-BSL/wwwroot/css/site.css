@@ -214,3 +214,6 @@ footer {
     transform: none; /* Verhindert de vergroting van de knop */
     box-shadow: none; /* Verhindert eventuele schaduwen bij hover */
 }
+.modal-dialog {
+    max-width: 65%;
+}

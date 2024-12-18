@@ -25,7 +25,7 @@
 	<div class="row mb-4">
 		@if (User.IsInRole("Beheerder"))
 		{
-			<div class="col-md-3">
+			<div class="col-md-3 mb-4">
 				<a href="@Url.Action("Index", "RoleManagement")" class="btn btn-primary btn-block">Gebruikers Beheren</a>
 			</div>
 		}
@@ -40,6 +40,9 @@
 			<a href="@Url.Action("Index", "Opleiding")" class="btn btn-warning btn-block">Opleidingen Beheren</a>
 
 		</div>
+        <div class="col-md-3">
+            <a href="@Url.Action("Index", "Monitor")" class="btn btn-primary btn-block">Monitoren Beheren</a>
+        </div>
 	
 	</div>
 
@@ -110,6 +113,8 @@
                                         <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToShortDateString() - @groepsreis.Einddatum.ToShortDateString()</p>
                                         <p class="card-text"><i class="bi bi-cake"></i> @groepsreis.Bestemming?.MinLeeftijd - @groepsreis.Bestemming?.MaxLeeftijd</p>
                                         <p class="card-text">@groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                        <p class="card-text"><i class="bi bi-people"></i> @groepsreis.Deelnemers.Count/@groepsreis.MaxAantalDeelnemers</p>
+
                                     </div>
                                 </a>
                             </div>
@@ -210,24 +215,24 @@
 
 }
 
-@if (User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor") || User.IsInRole("Verantwoordelijke"))
+@if (User.IsInRole("Deelnemer") || User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
 {
     <ul class="nav nav-tabs" id="userTab">
 
         <li class="nav-item">
-            <a class="nav-link active" data-bs-toggle="tab" href="#groepsReizen">Mijn Groepsreizen</a>
+            <a class="nav-link active" data-bs-toggle="tab" href="#groepsReizen">Mijn groepsreizen</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-bs-toggle="tab" href="#toekomstigeGroepsReizen">Te Ontdekken Groepsreizen</a>
+            <a class="nav-link" data-bs-toggle="tab" href="#toekomstigeGroepsReizen">Te ontdekken groepsreizen</a>
         </li>
         @if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
         {
 
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#ingeschrevenOpleidingen">Ingeschreven Opleidingen</a>
+                <a class="nav-link" data-bs-toggle="tab" href="#ingeschrevenOpleidingen">Ingeschreven opleidingen</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="tab" href="#toekomstigeOpleidingen">Toekomstige Opleidingen</a>
+                <a class="nav-link" data-bs-toggle="tab" href="#toekomstigeOpleidingen">Aankomende opleidingen</a>
             </li>
         }
 
@@ -389,7 +394,7 @@
                 }
             </div>
         </div>
-        @if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor"))
+        @if (User.IsInRole("Monitor") || User.IsInRole("Hoofdmonitor") || User.IsInRole("Verantwoordelijke"))
         {
             <!-- Tab 1: Ingeschreven Opleidingen -->
             <div id="ingeschrevenOpleidingen" class="tab-pane fade">

@@ -98,6 +98,8 @@
                                 <p class="card-text"><i class="bi bi-calendar-event"></i> @groepsreis.Begindatum.ToString("dd/MM/yyyy") - @groepsreis.Einddatum.ToString("dd/MM/yyyy")</p>
                                 <p class="card-text"><i class="bi bi-cake"></i> Leeftijd: @groepsreis.MinLeeftijd - @groepsreis.MaxLeeftijd</p>
                                 <p class="card-text">Prijs: @groepsreis.Prijs.ToString("C", new CultureInfo("nl-BE"))</p>
+                                <p class="card-text"><i class="bi bi-people"></i> @groepsreis.Deelnemers.Count/@groepsreis.MaxAantalDeelnemers</p>
+
                             </div>
                         </div>
                     </a>
