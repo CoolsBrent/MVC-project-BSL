@@ -1,4 +1,5 @@
 ﻿
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MVC_Project_BSL.Models
@@ -16,7 +17,9 @@ namespace MVC_Project_BSL.Models
 		[Column(TypeName = "nvarchar(max)")]
 		public string? Review { get; set; }
 
-        public Kind Kind { get; set; }
+		[MaxLength(255, ErrorMessage = "De voorkeur mag maximaal 255 tekens zijn.")]
+		public string? SlapenBijVoorkeur { get; set; } = "Geen voorkeur opgegeven";
+		public Kind Kind { get; set; }
         public Groepsreis GroepsreisDetail { get; set; }
     }
 }

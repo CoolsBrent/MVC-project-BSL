@@ -527,8 +527,14 @@
 										<form asp-action="VoegDeelnemerToe" method="post">
 											<input type="hidden" name="groepsreisId" value="@Model.Id" />
 											<input type="hidden" name="kindId" value="@kind.Id" />
-											<button type="submit" class="btn btn-primary btn-sm">Schrijf In</button>
 										</form>
+										<button class="btn btn-primary btn-sm"
+												data-bs-toggle="modal"
+												data-bs-target="#voorkeurModal"
+												data-groepsreis-id="@Model.Id"
+												data-kind-id="@kind.Id">
+											Schrijf In
+										</button>
 									</td>
 								</tr>
 							}
@@ -545,6 +551,37 @@
 		</div>
 	</div>
 </div>
+
+<!-- Modal voor Slaapvoorkeur -->
+<div class="modal fade" id="voorkeurModal" tabindex="-1" aria-labelledby="voorkeurModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="voorkeurModalLabel">Bij wie wil het kind slapen?</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form id="voorkeurForm" method="post" asp-action="VoegDeelnemerToe">
+				<div class="modal-body">
+					<input type="hidden" name="groepsreisId" id="groepsreisIdInput" />
+					<input type="hidden" name="kindId" id="kindIdInput" />
+					<div class="mb-3">
+						<label for="voorkeurInput" class="form-label">Voorkeur</label>
+						<input type="text"
+							   class="form-control"
+							   id="voorkeurInput"
+							   name="voorkeur"
+							   placeholder="Naam of namen" />
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuleren</button>
+					<button type="submit" class="btn btn-primary">Inschrijven</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
 <p>
 	<a href="javascript:history.back()" class="btn btn-primary">Terug</a>
 </p>
@@ -590,6 +627,21 @@
 			// Voeg vergelijkbare logica toe voor de andere modals indien nodig
 		});
 
+				document.addEventListener('DOMContentLoaded', function () {
+			const voorkeurModal = document.getElementById('voorkeurModal');
+			voorkeurModal.addEventListener('show.bs.modal', function (event) {
+				const button = event.relatedTarget; // Knop die de modal heeft geopend
+				const groepsreisId = button.getAttribute('data-groepsreis-id');
+				const kindId = button.getAttribute('data-kind-id');
+
+				// Vul de hidden inputs in de modal met de juiste waarden
+				document.getElementById('groepsreisIdInput').value = groepsreisId;
+				document.getElementById('kindIdInput').value = kindId;
+
+				// Reset de voorkeur-input
+				document.getElementById('voorkeurInput').value = '';
+			});
+		});
 	</script>
 }
 
@@ -605,6 +657,7 @@
                     <tr>
                         <th>Naam</th>
                         <th>Leeftijd</th>
+                        <th>Slaapvoorkeur</th>
                         <th>Acties</th>
                     </tr>
                 </thead>
@@ -618,6 +671,7 @@
                         <tr>
                             <td>@deelnemer.Kind.Voornaam @deelnemer.Kind.Naam</td>
                             <td>@leeftijd jaar</td>
+							<td>@(!string.IsNullOrWhiteSpace(deelnemer.SlapenBijVoorkeur) ? deelnemer.SlapenBijVoorkeur : "Geen voorkeur opgegeven")</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <form asp-action="VerwijderUitWachtlijst" method="post">
