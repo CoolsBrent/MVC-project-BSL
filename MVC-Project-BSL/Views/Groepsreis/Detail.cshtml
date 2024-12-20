@@ -72,10 +72,10 @@
 		<h4>Details</h4>
 		<dl class="row">
 			<dt class="col-sm-4">Begindatum</dt>
-			<dd class="col-sm-8">@Model.Begindatum.ToString("dd-MM-yyyy")</dd>
+			<dd class="col-sm-8">@Model.Begindatum.ToString("dd/MM/yyyy")</dd>
 
 			<dt class="col-sm-4">Einddatum</dt>
-			<dd class="col-sm-8">@Model.Einddatum.ToString("dd-MM-yyyy")</dd>
+			<dd class="col-sm-8">@Model.Einddatum.ToString("dd/MM/yyyy")</dd>
 
 			<dt class="col-sm-4">Prijs</dt>
 			<dd class="col-sm-8">@Model.Prijs.ToString("C", new CultureInfo("nl-BE"))</dd>
@@ -118,18 +118,22 @@
 								}
 							</p>
 							<p><strong>Opmerking:</strong> @review.Review</p>
-
-							<!-- Verwijder Review-knop -->
-							@if (review.ReviewScore.HasValue)
+							@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 							{
-								<form method="post" asp-controller="Dashboard" asp-action="VerwijderReview" class="d-inline">
-									<input type="hidden" name="deelnemerId" value="@review.Id" />
-									<button type="submit" class="btn btn-danger btn-sm mt-2">
-										<i class="bi bi-trash"></i> <!-- Bootstrap Trash Icon -->
-										<span class="visually-hidden">Review verwijderen</span>
-									</button>
-								</form>
+								<!-- Verwijder Review-knop -->
+								@if (review.ReviewScore.HasValue)
+								{
+									<form method="post" asp-controller="Dashboard" asp-action="VerwijderReview" class="d-inline">
+										<input type="hidden" name="deelnemerId" value="@review.Id" />
+										<button type="submit" class="btn btn-danger btn-sm mt-2">
+											<i class="bi bi-trash"></i> <!-- Bootstrap Trash Icon -->
+											<span class="visually-hidden">Review verwijderen</span>
+										</button>
+									</form>
+								}
 							}
+							
+							
 						</div>
 					}
 				</div>
@@ -151,26 +155,26 @@
 }
 <!-- Knoppen om de modals te openen -->
 <div class="row mb-4">
-	@if (User.IsInRole("Beheerder") || (User.IsInRole("Monitor") && gebruikerIsIngeschreven) || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven))
+	@if (User.IsInRole("Beheerder") || (User.IsInRole("Monitor") && gebruikerIsIngeschreven) || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven) || (User.IsInRole("Verantwoordelijke")))
 	{
 		<div class="col-md-6">
 			<div>
 				<button type="button" class="btn btn-primary mb-4 w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenMonitorenModal">
-					Bekijk Ingeschreven monitoren
+					Bekijk ingeschreven monitoren
 				</button>
 			</div>
-			@if (User.IsInRole("Beheerder") || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven))
+			@if (User.IsInRole("Beheerder") || (User.IsInRole("Hoofdmonitor") && gebruikerIsIngeschreven) || User.IsInRole("Verantwoordelijke"))
 			{
 				<div>
 					<button type="button" class="btn btn-primary w-50" data-bs-toggle="modal" data-bs-target="#ingeschrevenDeelnemersModal">
-						Bekijk Ingeschreven deelnemers
+						Bekijk ingeschreven deelnemers
 					</button>
 				</div>
 			}
 		</div>
 	}
 
-	@if (User.IsInRole("Beheerder"))
+	@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 	{
 		<div class="col-md-6">
 			<div>
@@ -212,7 +216,7 @@
 								<th>Hoofdmonitor</th>
 								<th>Telefoonnummer</th>
 								<th>Emailadres</th>
-								@if (User.IsInRole("Beheerder"))
+								@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 								{
 									<th class="text-center">Acties</th>
 								}
@@ -234,7 +238,7 @@
 									<td>@(monitor.Monitor.IsHoofdMonitor ? "Ja" : "Nee")</td>
 									<td>@monitor.Monitor.Persoon.TelefoonNummer</td>
 									<td>@monitor.Monitor.Persoon.Email</td>
-									@if (User.IsInRole("Beheerder"))
+									@if (User.IsInRole("Beheerder") || User.IsInRole("Verantwoordelijke"))
 									{
 										<td class="text-center align-middle">
 											<div class="d-flex justify-content-center gap-2">
@@ -483,7 +487,7 @@
 		</div>
 	</div>
 </div>
-@if (User.Identity.IsAuthenticated)
+@if (User.IsInRole("Deelnemer"))
 {
 	<!-- Knop voor het openen van de modal -->
 	<button type="button" class="btn btn-primary mb-4 w-25" data-bs-toggle="modal" data-bs-target="#beschikbareKinderenModal">

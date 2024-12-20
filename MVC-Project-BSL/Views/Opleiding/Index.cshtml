@@ -52,8 +52,8 @@ else
                             @opleiding.Beschrijving
                         </div>
                     </td>
-                    <td>@opleiding.Begindatum.ToShortDateString()</td>
-                    <td>@opleiding.Einddatum.ToShortDateString()</td>
+                    <td>@opleiding.Begindatum.ToString("dd/MM/yyyy")</td>
+                    <td>@opleiding.Einddatum.ToString("dd/MM/yyyy")</td>
                     <td>@opleiding.AantalPlaatsen</td>
                     <td>@opleiding.AantalBeschikbarePlaatsen</td>
                     <td>@opleiding.OpleidingVereist?.Naam</td>
